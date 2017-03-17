@@ -159,7 +159,6 @@
 #define PORT_ACT_MENU_ABORT               0x207
 
 
-
 #define LOOK_MODE_MOUSE    0
 #define LOOK_MODE_ABSOLUTE 1
 #define LOOK_MODE_JOYSTICK 2
