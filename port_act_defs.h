@@ -25,6 +25,8 @@
 #define PORT_ACT_INVNEXT   22
 #define PORT_ACT_HELPCOMP  23 //also RTCW, also Strife
 
+#define PORT_ACT_CONSOLE   25
+
 //Doom
 #define PORT_ACT_MAP         30
 #define PORT_ACT_MAP_UP      31
