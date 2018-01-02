@@ -26,6 +26,7 @@
 #define PORT_ACT_HELPCOMP  23 //also RTCW, also Strife
 
 #define PORT_ACT_CONSOLE   25
+#define PORT_ACT_SHOW_KBRD   26
 
 //Doom
 #define PORT_ACT_MAP         30
