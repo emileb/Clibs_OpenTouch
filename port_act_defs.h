@@ -160,7 +160,7 @@
 #define PORT_ACT_MENU_BACK                0x205
 #define PORT_ACT_MENU_CONFIRM             0x206
 #define PORT_ACT_MENU_ABORT               0x207
-
+#define PORT_ACT_MENU_SHOW                0x208 //(back button)
 
 #define LOOK_MODE_MOUSE    0
 #define LOOK_MODE_ABSOLUTE 1
