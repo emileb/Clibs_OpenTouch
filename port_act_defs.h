@@ -26,7 +26,8 @@
 #define PORT_ACT_HELPCOMP  23 //also RTCW, also Strife
 
 #define PORT_ACT_CONSOLE   25
-#define PORT_ACT_SHOW_KBRD   26
+#define PORT_ACT_SHOW_KBRD 26
+#define PORT_ACT_SHOW_INV  27
 
 //Doom
 #define PORT_ACT_MAP         30
@@ -151,16 +152,26 @@
 #define PORT_ACT_INVSLOT5         175
 
 
+// Demo playback
+#define PORT_ACT_DEMO_SPD_UP      180
+#define PORT_ACT_DEMO_SPD_DWN     181
+#define PORT_ACT_DEMO_SPD_DEF     182
+#define PORT_ACT_DEMO_JOIN        183
+#define PORT_ACT_DEMO_CAMERA      184
 
-#define PORT_ACT_MENU_UP                  0x200
-#define PORT_ACT_MENU_DOWN                0x201
-#define PORT_ACT_MENU_LEFT                0x202
-#define PORT_ACT_MENU_RIGHT               0x203
-#define PORT_ACT_MENU_SELECT              0x204
-#define PORT_ACT_MENU_BACK                0x205
-#define PORT_ACT_MENU_CONFIRM             0x206
-#define PORT_ACT_MENU_ABORT               0x207
-#define PORT_ACT_MENU_SHOW                0x208 //(back button)
+
+
+
+
+#define PORT_ACT_MENU_UP                  0x200 //512
+#define PORT_ACT_MENU_DOWN                0x201 //513
+#define PORT_ACT_MENU_LEFT                0x202 //514
+#define PORT_ACT_MENU_RIGHT               0x203 //515
+#define PORT_ACT_MENU_SELECT              0x204 //516
+#define PORT_ACT_MENU_BACK                0x205 //517
+#define PORT_ACT_MENU_CONFIRM             0x206 //518
+#define PORT_ACT_MENU_ABORT               0x207 //519
+#define PORT_ACT_MENU_SHOW                0x208 //520 (back button)
 
 #define LOOK_MODE_MOUSE    0
 #define LOOK_MODE_ABSOLUTE 1
