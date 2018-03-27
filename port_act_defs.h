@@ -28,6 +28,7 @@
 #define PORT_ACT_CONSOLE   25
 #define PORT_ACT_SHOW_KBRD 26
 #define PORT_ACT_SHOW_INV  27
+#define PORT_ACT_SHOW_GP_UTILS  28
 
 //Doom
 #define PORT_ACT_MAP         30
@@ -142,6 +143,15 @@
 #define PORT_ACT_CUSTOM_6          156
 #define PORT_ACT_CUSTOM_7          157
 
+
+#define PORT_ACT_CUSTOM_8          158
+#define PORT_ACT_CUSTOM_9          159
+#define PORT_ACT_CUSTOM_10         160
+#define PORT_ACT_CUSTOM_11         161
+#define PORT_ACT_CUSTOM_12         162
+#define PORT_ACT_CUSTOM_13         163
+#define PORT_ACT_CUSTOM_14         164
+#define PORT_ACT_CUSTOM_15         165
 
 //strife VE
 #define PORT_ACT_INVSLOT0         170
