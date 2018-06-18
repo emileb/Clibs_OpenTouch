@@ -29,6 +29,7 @@
 #define PORT_ACT_SHOW_KBRD 26
 #define PORT_ACT_SHOW_INV  27
 #define PORT_ACT_SHOW_GP_UTILS  28
+#define PORT_ACT_SHOW_DPAD_INV  29
 
 //Doom
 #define PORT_ACT_MAP         30
