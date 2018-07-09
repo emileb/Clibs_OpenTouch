@@ -95,7 +95,7 @@ static float look_pitch_mouse = 0;
 static float look_pitch_joy = 0;
 
 //left right
-static int look_yaw_mode;
+static int look_yaw_mode = LOOK_MODE_MOUSE;
 static float look_yaw_mouse = 0;
 static float look_yaw_joy = 0;
 
@@ -441,26 +441,35 @@ void Mobile_IN_Move(ticcmd_t* cmd )
 	cmd->ucmd.sidemove  += sidemove_android   * sidemove[1];
 
 	//LOGI("Side: %d   %d",(int)(sidemove_android  * sidemove[1]),(int)(-look_yaw_joy * 100000));
+//LOGI("LOGX %f  %f  %f  %f  %f  %f",forwardmove_android,sidemove_android,look_pitch_mouse,look_pitch_joy,look_yaw_mouse,look_yaw_joy);
 
 	switch(look_pitch_mode)
 	{
 	case LOOK_MODE_MOUSE:
-		G_AddViewPitch(look_pitch_mouse * 30000);
-		look_pitch_mouse = 0;
+	    if( look_pitch_mouse )
+	    {
+		    G_AddViewPitch(look_pitch_mouse * 30000);
+		    look_pitch_mouse = 0;
+        }
 		break;
 	case LOOK_MODE_JOYSTICK:
-		G_AddViewPitch(-look_pitch_joy * 800);
+	    if( look_pitch_joy )
+		    G_AddViewPitch(-look_pitch_joy * 800);
 		break;
 	}
 
 	switch(look_yaw_mode)
 	{
 	case LOOK_MODE_MOUSE:
-		G_AddViewAngle(-look_yaw_mouse * 100000);
-		look_yaw_mouse = 0;
+	    if( look_yaw_mouse )
+	    {
+		    G_AddViewAngle(-look_yaw_mouse * 100000);
+		    look_yaw_mouse = 0;
+		}
 		break;
 	case LOOK_MODE_JOYSTICK:
-		G_AddViewAngle(-look_yaw_joy * 1000);
+	    if( look_yaw_joy )
+		    G_AddViewAngle(-look_yaw_joy * 1000);
 		break;
 	}
 

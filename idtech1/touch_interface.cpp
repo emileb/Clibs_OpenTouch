@@ -43,7 +43,8 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 #define KEY_F10  0x100A
 #define KEY_BACK_BUTTON  0x100B
 
-#define GAME_OPTION_HIDE_TOUCH 0x1
+#define GAME_OPTION_AUTO_HIDE_GAMEPAD 0x1
+#define GAME_OPTION_HIDE_MENU_AND_GAME 0x2
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
 #define GAME_TYPE_HEXEN    2
@@ -61,6 +62,7 @@ static bool gamepadHideTouch = false;
 static bool autoHideInventory = true;
 static bool autoHideNumbers = true;
 static bool weaponWheelEnabled = true;
+static bool hideGameAndMenu = false;
 static int left_double_action;
 static int right_double_action;
 
@@ -692,24 +694,30 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                 tcBlank->setEnabled(true);
                 break;
             case TS_MENU:
-                tcMenuMain->setEnabled(true);
-                tcMenuMain->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
+                if( !hideGameAndMenu )
+                {
+                    tcMenuMain->setEnabled(true);
+                    tcMenuMain->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
+                }
                 break;
             case TS_Y_N:
                 tcYesNo->setEnabled(true);
                 tcYesNo->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
                 break;
             case TS_GAME:
-                tcGameMain->setEnabled(true);
-                tcGameMain->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
-
-                if( weaponWheelEnabled )
-                	tcWeaponWheel->setEnabled(true);
-
-                if( showCustomOn ) // Also remember if custom buttons were shown
+                if( !hideGameAndMenu )
                 {
-                    tcCutomButtons->setEnabled(true);
-                    tcCutomButtons->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
+                    tcGameMain->setEnabled(true);
+                    tcGameMain->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
+
+                    if( weaponWheelEnabled )
+                        tcWeaponWheel->setEnabled(true);
+
+                    if( showCustomOn ) // Also remember if custom buttons were shown
+                    {
+                        tcCutomButtons->setEnabled(true);
+                        tcCutomButtons->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
+                    }
                 }
                 break;
             case TS_MAP:
@@ -1134,8 +1142,11 @@ const char * getGamePath()
 
 void mobile_init(int width, int height, const char *pngPath,int options, int game)
 {
-    if( options & GAME_OPTION_HIDE_TOUCH )
+    if( options & GAME_OPTION_AUTO_HIDE_GAMEPAD )
         gamepadHideTouch = true;
+
+    if( options & GAME_OPTION_HIDE_MENU_AND_GAME )
+        hideGameAndMenu = true;
 
     gameType = game;
 
