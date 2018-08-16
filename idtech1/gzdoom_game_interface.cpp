@@ -90,12 +90,10 @@ static float forwardmove_android = 0;
 static float sidemove_android = 0;
 
 //Look up and down
-static int look_pitch_mode = LOOK_MODE_MOUSE;
 static float look_pitch_mouse = 0;
 static float look_pitch_joy = 0;
 
 //left right
-static int look_yaw_mode = LOOK_MODE_MOUSE;
 static float look_yaw_mouse = 0;
 static float look_yaw_joy = 0;
 
@@ -328,7 +326,6 @@ void PortableMove(float fwd, float strafe)
 
 void PortableLookPitch(int mode, float pitch)
 {
-	look_pitch_mode = mode;
 	switch(mode)
 	{
 	case LOOK_MODE_MOUSE:
@@ -343,7 +340,6 @@ void PortableLookPitch(int mode, float pitch)
 
 void PortableLookYaw(int mode, float yaw)
 {
-	look_yaw_mode = mode;
 	switch(mode)
 	{
 	case LOOK_MODE_MOUSE:
@@ -443,35 +439,19 @@ void Mobile_IN_Move(ticcmd_t* cmd )
 	//LOGI("Side: %d   %d",(int)(sidemove_android  * sidemove[1]),(int)(-look_yaw_joy * 100000));
 //LOGI("LOGX %f  %f  %f  %f  %f  %f",forwardmove_android,sidemove_android,look_pitch_mouse,look_pitch_joy,look_yaw_mouse,look_yaw_joy);
 
-	switch(look_pitch_mode)
-	{
-	case LOOK_MODE_MOUSE:
-	    if( look_pitch_mouse )
-	    {
-		    G_AddViewPitch(look_pitch_mouse * 30000);
-		    look_pitch_mouse = 0;
-        }
-		break;
-	case LOOK_MODE_JOYSTICK:
-	    if( look_pitch_joy )
-		    G_AddViewPitch(-look_pitch_joy * 800);
-		break;
-	}
 
-	switch(look_yaw_mode)
-	{
-	case LOOK_MODE_MOUSE:
-	    if( look_yaw_mouse )
-	    {
-		    G_AddViewAngle(-look_yaw_mouse * 100000);
-		    look_yaw_mouse = 0;
-		}
-		break;
-	case LOOK_MODE_JOYSTICK:
-	    if( look_yaw_joy )
-		    G_AddViewAngle(-look_yaw_joy * 1000);
-		break;
-	}
+// Add pitch
+    G_AddViewPitch(look_pitch_mouse * 30000);
+    look_pitch_mouse = 0;
+
+    G_AddViewPitch(-look_pitch_joy * 800);
+
+// Add yaw
+    G_AddViewAngle(-look_yaw_mouse * 100000);
+    look_yaw_mouse = 0;
+
+    G_AddViewAngle(-look_yaw_joy * 1000);
+
 
 	if (cmd_to_run)
 	{

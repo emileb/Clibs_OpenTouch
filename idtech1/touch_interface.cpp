@@ -42,9 +42,11 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 
 #define KEY_F10  0x100A
 #define KEY_BACK_BUTTON  0x100B
+#define KEY_SHOW_GYRO    0x100C
 
-#define GAME_OPTION_AUTO_HIDE_GAMEPAD 0x1
-#define GAME_OPTION_HIDE_MENU_AND_GAME 0x2
+#define GAME_OPTION_AUTO_HIDE_GAMEPAD   0x1
+#define GAME_OPTION_HIDE_MENU_AND_GAME  0x2
+#define GAME_OPTION_USE_SYSTEM_KEYBOARD 0x4
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
 #define GAME_TYPE_HEXEN    2
@@ -80,6 +82,8 @@ static bool showCustomOn = false;
 
 // Show custom buttons in the menu
 static bool showCustomMenu = false;
+
+static bool useSystemKeyboard = false;
 
 static int controlsCreated = 0;
 static touchcontrols::TouchControlsContainer controlsContainer;
@@ -441,6 +445,12 @@ static void menuButton(int state,int code)
     {
         PortableKeyEvent(state, code, 0);
     }
+    else  if(code == KEY_SHOW_GYRO)
+    {
+        // Show gyro options
+        if (state)
+            Android_JNI_SendMessage( 0x8002, 0 );
+    }
     else
     {
         PortableAction(state, code);
@@ -542,12 +552,21 @@ static void automap_multitouch_mouse_move(int action,float x, float y,float dx, 
 static void showHideKeyboard( int show )
 {
     LOGI( "showHideKeyboard %d", show );
-    tcKeyboard->setEnabled( show );
+
+    if( useSystemKeyboard )
+    {
+        if( show )
+            Android_JNI_SendMessage( 0x8003, 0 );
+    }
+    else
+    {
+        tcKeyboard->setEnabled( show );
+    }
 }
 
 static void brightnessSlideMouse( int action, float x, float y, float dx, float dy )
 {
-    y = 1- y;
+    y = 1 - y;
     Android_JNI_SendMessage( 0x8001, y * 255 );
 }
 
@@ -557,11 +576,10 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
 
     invertLook = settings.invertLook;
 
-    //To be set by android
     strafe_sens = settings.moveSensitivity;
     forward_sens = settings.moveSensitivity;
     pitch_sens = settings.lookSensitivity;
-    yaw_sens = settings.lookSensitivity;
+    yaw_sens = settings.turnSensitivity;
 
     showSticks = settings.showJoysticks;
 
@@ -587,6 +605,7 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
     }
 
     tcGameMain->setAlpha(gameControlsAlpha);
+    touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
 }
 
 extern SDL_Scancode SDLCALL SDL_GetScancodeFromKey(SDL_Keycode key);
@@ -756,8 +775,8 @@ void frameControls()
     {
         touchcontrols::clearGlTexCache();
         controlsContainer.initGL();
-        //inited = true;
     }
+
     touchscreemode_t screenMode = PortableGetScreenMode();
 
     if( (screenMode == TS_MAP) && (mapState == 1) )
@@ -828,6 +847,8 @@ void initControls(int width, int height,const char * graphics_path)
         tcMenuMain->addControl(new touchcontrols::Button("right_arrow",touchcontrols::RectF(23,13,26,16),"arrow_right",PORT_ACT_MENU_RIGHT));
         tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,10,6,16),"enter",PORT_ACT_MENU_SELECT));
         tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
+        tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
+
         //tcMenuMain->addControl(new touchcontrols::Button("brightness",touchcontrols::RectF(21,0,23,2),"brightness",KEY_BRIGHTNESS));
 #ifdef CHOC_SETUP
         tcMenuMain->addControl(new touchcontrols::Button("f10",touchcontrols::RectF(24,0,26,2),"key_f10",SDL_SCANCODE_F10));
@@ -840,7 +861,8 @@ void initControls(int width, int height,const char * graphics_path)
 #endif
 
 #ifdef GZDOOM
-        tcMenuMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(24,0,26,2),"custom_show",KEY_SHOW_CUSTOM,false,false));
+        // Actually this isn't needed now
+        //tcMenuMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(24,0,26,2),"custom_show",KEY_SHOW_CUSTOM,false,false));
 #endif
         tcMenuMain->signal_button.connect(  sigc::ptr_fun(&menuButton) );
         tcMenuMain->setAlpha(0.8);
@@ -849,10 +871,10 @@ void initControls(int width, int height,const char * graphics_path)
         //Game -------------------------------------------
         //------------------------------------------------------
         tcGameMain->setAlpha(gameControlsAlpha);
-        tcGameMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON));
-        tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(20,7,23,10),"shoot",KEY_SHOOT));
+        tcGameMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON,false,false,"Show menu"));
+        tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(20,7,23,10),"shoot",KEY_SHOOT,false,false,"Attack!"));
 
-        tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE));
+        tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE,false,false,"Use/Open"));
         tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE,false,false,"Quick save"));
         tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD,false,false,"Quick load"));
         tcGameMain->addControl(new touchcontrols::Button("map",touchcontrols::RectF(2,0,4,2),"map",PORT_ACT_MAP,false,false,"Show map"));
@@ -1147,6 +1169,9 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
 
     if( options & GAME_OPTION_HIDE_MENU_AND_GAME )
         hideGameAndMenu = true;
+
+    if( options & GAME_OPTION_USE_SYSTEM_KEYBOARD )
+        useSystemKeyboard = true;
 
     gameType = game;
 
