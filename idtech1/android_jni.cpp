@@ -12,7 +12,9 @@
 
 #include <unistd.h>
 
+#ifndef NO_SEC
 #include "./secure/license/license.h"
+#endif
 
 extern "C"
 {
@@ -109,6 +111,7 @@ static int check = -1;
 void EXPORT_ME
 JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x, jfloat y)
 {
+#ifndef NO_SEC
 	//LOGI("TOUCHED");
 	if (apkRandomDelay == -1)
     {
@@ -129,7 +132,7 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
         if( check != 1)
             return;
     }
-
+#endif
 	mobileGetTouchInterface()->processPointer(action,pid,x,y);
 }
 
