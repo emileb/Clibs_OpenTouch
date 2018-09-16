@@ -9,7 +9,7 @@ LOCAL_CFLAGS :=   -O2
 
 LOCAL_C_INCLUDES := .
 
-LOCAL_SRC_FILES =  LogWritter.c
+LOCAL_SRC_FILES =  LogWritter.c fts.c
 
 LOCAL_LDLIBS :=  -ldl -llog
 

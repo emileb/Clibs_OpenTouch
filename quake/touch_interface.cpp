@@ -17,11 +17,7 @@
 extern "C"
 {
 
-#ifdef CHOC_SETUP
-    #define DEFAULT_FADE_FRAMES 0
-#else
-    #define DEFAULT_FADE_FRAMES 10
-#endif
+#define DEFAULT_FADE_FRAMES 10
 
 #include "game_interface.h"
 #include "SDL_keycode.h"
@@ -40,18 +36,12 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 #define KEY_SHOW_KBRD    0x1008
 #define KEY_SHOW_CUSTOM  0x1009
 
-#define KEY_F10  0x100A
 #define KEY_BACK_BUTTON  0x100B
 #define KEY_SHOW_GYRO    0x100C
 
 #define GAME_OPTION_AUTO_HIDE_GAMEPAD   0x1
 #define GAME_OPTION_HIDE_MENU_AND_GAME  0x2
 #define GAME_OPTION_USE_SYSTEM_KEYBOARD 0x4
-
-#define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
-#define GAME_TYPE_HEXEN    2
-#define GAME_TYPE_HERETIC  3
-#define GAME_TYPE_STRIFE   4
 
 static int gameType;
 
@@ -122,55 +112,46 @@ touchcontrols::ButtonGrid *uiInventoryButtonGrid;
 // Send message to JAVA SDL activity
 int Android_JNI_SendMessage(int command, int param);
 
-#if defined(PRBOOM_DOOM)
-typedef enum {
-  VID_MODE8,
-  VID_MODE15,
-  VID_MODE16,
-  VID_MODE32,
-  VID_MODEGL,
-  VID_MODEMAX
-} video_mode_t;
-video_mode_t V_GetMode(void);
-#endif
-
-#if defined(GZDOOM)
-
-#ifdef  GZDOOM_DEV // For the dev versions it is always OpenGL, even software mode uses ogl
-static int currentrenderer = 1;
-#else
-extern int currentrenderer;
+#ifdef DARKPLACES
+//These are in gl_backend
+extern int android_reset_vertex;
+extern int android_reset_color;
+extern int android_reset_tex;
 #endif
 
 static GLint     matrixMode;
 static GLfloat   projection[16];
 static GLfloat   model[16];
-#endif
 
 
 static void openGLStart()
 {
-#if 1
 
-#if defined(GZDOOM)
-    if(currentrenderer == 1)
-    {
-        glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
-        glGetFloatv(GL_PROJECTION_MATRIX, projection);
-        glGetFloatv(GL_MODELVIEW_MATRIX, model);
-    }
+#ifdef YQUAKE2
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport(0, 0, mobile_screen_width, mobile_screen_height);
+    glOrthof(0.0f, mobile_screen_width, mobile_screen_height, 0.0f, -1.0f, 1.0f);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    //-----------------
+
+    glDisableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY );
+
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glEnable (GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_ALPHA_TEST);
 #endif
 
-
-#if defined(PRBOOM_DOOM)
-    if(V_GetMode() == VID_MODEGL)
-    {
-         glMatrixMode(GL_PROJECTION);
-         glPushMatrix();
-         glMatrixMode(GL_MODELVIEW);
-         glPushMatrix();
-    }
-#endif
+#if defined(FTEQW) || defined(QUAKE3) || defined(QUAKESDL)
+	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
+	glGetFloatv(GL_PROJECTION_MATRIX, projection);
+	glGetFloatv(GL_MODELVIEW_MATRIX, model);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -184,78 +165,83 @@ static void openGLStart()
     glDisableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY );
-    
+
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable (GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_TEXTURE_2D);
-
-//    glDisable(GL_CULL_FACE);
     glDisable(GL_ALPHA_TEST);
-//    glDisable(GL_DEPTH_TEST);
-
-
-#ifdef GZDOOM
-    glBindBuffer(GL_ARRAY_BUFFER, 0); //GZDoom binds a buffer, this unbinds it
 #endif
+
+#ifdef QUAKE2
+	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
+	glGetFloatv(GL_PROJECTION_MATRIX, projection);
+	glGetFloatv(GL_MODELVIEW_MATRIX, model);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glViewport(0, 0, mobile_screen_width, mobile_screen_height);
+    glOrthof(0.0f, mobile_screen_width, mobile_screen_height, 0.0f, -1.0f, 1.0f);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    //-----------------
+
+    glDisableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY );
+
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glEnable (GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_ALPHA_TEST);
+
+
+	void nanoPushState();
+	nanoPushState();
 
 #endif
 }
 
 static void openGLEnd()
 {
-#if 1
+#ifdef FTEQW
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(model);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(projection);
+	glMatrixMode(matrixMode);
 
-#if defined(GZDOOM)
-    if(currentrenderer == 1) //GL mode
-    {
-        glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf(model);
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf(projection);
-        glMatrixMode(matrixMode);
-
-        void jwzgles_restore (void);
-        jwzgles_restore();
-    }
-    else
-    {
-        glDisable (GL_BLEND);
-        glColor4f(1,1,1,1);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-        glLoadIdentity();
-    }
-
-    //nanoPopState();
+	glColor4f(1,1,1,1);
+	void BE_FixPointers();
+	BE_FixPointers();
 #endif
 
-#if defined(CHOCOLATE) || defined(RETRO_DOOM)// || defined(GZDOOM)
-    glDisable (GL_BLEND);
-    glColor4f(1,1,1,1);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glLoadIdentity();
+#ifdef DARKPLACES
+    android_reset_vertex = 1;
+    android_reset_color = 1;
+    android_reset_tex = 1;
 #endif
 
-
-#if defined(PRBOOM_DOOM)
-    if(V_GetMode() == VID_MODEGL)
-    {
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-
-        void jwzgles_restore (void);
-        jwzgles_restore();
-    }
-    else
-    {
-        glDisable (GL_BLEND);
-        glColor4f(1,1,1,1);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-        glLoadIdentity();
-    }
+#ifdef QUAKE3
+	void GL_FixState();
+	GL_FixState();
 #endif
+
+#ifdef QUAKE2
+	void nanoPopState();
+	nanoPopState();
+	glEnable(GL_ALPHA_TEST);
+	glDisable (GL_BLEND);
+	glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(model);
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(projection);
+    glMatrixMode(matrixMode);
+#endif
+
+#ifdef QUAKESLD
 
 #endif
 }
@@ -359,10 +345,6 @@ static void automapButton(int state,int code)
 {
     if( state && code == PORT_ACT_MAP && mapState == 0 )
     {
-#ifdef RETRO_DOOM // Turn on follow mode to allow movment in map mode
-        void AM_toggleFollowMode(void);
-        AM_toggleFollowMode();
-#endif
         mapState = 1;
     }
 }
@@ -388,13 +370,8 @@ static void gameUtilitiesOutside( bool fromGamepad )
 
 static void blankButton(int state,int code)
 {
-#if (PRBOOM_DOOM)
-    if( state )
-        PortableBackButton();
-#else
     PortableAction(state, PORT_ACT_USE);
     PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
-#endif
 }
 
 static void customButton(int state,int code)
@@ -449,10 +426,6 @@ static void menuButton(int state,int code)
         // Show gyro options
         if (state)
             Android_JNI_SendMessage( 0x8002, 0 );
-    }
-    else if(code == PORT_ACT_CONSOLE)
-    {
-         PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
     }
     else
     {
@@ -648,12 +621,8 @@ static void keyboardKeyPressed( uint32_t key )
     if( sc != SDL_SCANCODE_UNKNOWN )
     {
         LOGI( "scan code: %d",sc );
-//SDL_SendKeyboardKey( SDL_PRESSED, SDL_SCANCODE_LSHIFT );
-//SDL_SetModState( KMOD_LSHIFT );
         SDL_SendKeyboardKey( SDL_PRESSED, sc );
         SDL_SendKeyboardKey( SDL_RELEASED, sc );
-//SDL_SetModState( KMOD_NONE );
-// SDL_SendKeyboardKey( SDL_RELEASED, SDL_SCANCODE_LSHIFT );
     }
 }
 
@@ -773,6 +742,7 @@ static void updateTouchScreenMode(touchscreemode_t mode)
 
 void frameControls()
 {
+    //LOGI("frameControls");
     //static bool inited = false;
     if( SDL_NewEGLCreated() )
     {
@@ -805,7 +775,9 @@ void frameControls()
     
     setHideSticks(!showSticks);
 
-    controlsContainer.draw();
+//openGLStart();
+//openGLEnd();
+    //controlsContainer.draw();
 }
 
 void initControls(int width, int height,const char * graphics_path)
@@ -827,13 +799,13 @@ void initControls(int width, int height,const char * graphics_path)
 
         touchcontrols::getSettingsSignal()->connect( sigc::ptr_fun(&touchSettings) );
         
-        tcMenuMain = new touchcontrols::TouchControls("menu",false,true,10,false);
+        tcMenuMain = new touchcontrols::TouchControls("menu",false,false);
         tcYesNo = new touchcontrols::TouchControls("yes_no",false,false);
         tcGameMain = new touchcontrols::TouchControls("game",false,true,1,true);
         tcGameWeapons = new touchcontrols::TouchControls("weapons",false,true,1,false);
         tcInventory  = new touchcontrols::TouchControls("inventory",false,true,2,false); //Different edit group
         tcWeaponWheel = new touchcontrols::TouchControls("weapon_wheel",false,true,1,false);
-        tcAutomap = new touchcontrols::TouchControls("automap",false,false);
+        //tcAutomap = new touchcontrols::TouchControls("automap",false,false);
         tcBlank = new touchcontrols::TouchControls("blank",true,false);
         tcCutomButtons = new touchcontrols::TouchControls("custom_buttons",false,true,1,true);
         tcKeyboard = new touchcontrols::TouchControls("keyboard",false,false);
@@ -850,17 +822,8 @@ void initControls(int width, int height,const char * graphics_path)
         tcMenuMain->addControl(new touchcontrols::Button("right_arrow",touchcontrols::RectF(23,13,26,16),"arrow_right",PORT_ACT_MENU_RIGHT));
         tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,10,6,16),"enter",PORT_ACT_MENU_SELECT));
         tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
-#if defined(GZDOOM) || defined(RETRO_DOOM)
-		// Consoel does not work properly in menu
-        //tcMenuMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE));
-#endif
-#ifndef CHOC_SETUP
         tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
-#endif
-        //tcMenuMain->addControl(new touchcontrols::Button("brightness",touchcontrols::RectF(21,0,23,2),"brightness",KEY_BRIGHTNESS));
-#ifdef CHOC_SETUP
-        tcMenuMain->addControl(new touchcontrols::Button("f10",touchcontrols::RectF(24,0,26,2),"key_f10",SDL_SCANCODE_F10));
-#endif
+
 
 #ifndef CHOC_SETUP
         touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24,3,26,11), "brightness_slider" );
@@ -868,10 +831,6 @@ void initControls(int width, int height,const char * graphics_path)
         tcMenuMain->addControl( brightnessSlide );
 #endif
 
-#ifdef GZDOOM
-        // Actually this isn't needed now
-        //tcMenuMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(24,0,26,2),"custom_show",KEY_SHOW_CUSTOM,false,false));
-#endif
         tcMenuMain->signal_button.connect(  sigc::ptr_fun(&menuButton) );
         tcMenuMain->setAlpha(0.8);
         
@@ -885,33 +844,19 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE,false,false,"Use/Open"));
         tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE,false,false,"Quick save"));
         tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD,false,false,"Quick load"));
-        tcGameMain->addControl(new touchcontrols::Button("map",touchcontrols::RectF(2,0,4,2),"map",PORT_ACT_MAP,false,false,"Show map"));
+        //tcGameMain->addControl(new touchcontrols::Button("map",touchcontrols::RectF(2,0,4,2),"map",PORT_ACT_MAP,false,false,"Show map"));
         tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,true,"Show Keyboard"));
 
-#if defined(RETRO_DOOM) || defined(CHOCOLATE) || defined (PRBOOM_DOOM)
-        tcGameMain->addControl(new touchcontrols::Button("gamma",touchcontrols::RectF(17,0,19,2),"gamma",PORT_ACT_GAMMA,false,false,"Gamma"));
-#endif
-
         bool hideJump = true;
-        if(( gameType == GAME_TYPE_STRIFE ) || (gameType == GAME_TYPE_HEXEN ) || (gameType == GAME_TYPE_HERETIC))
-            hideJump = false;
+        hideJump = false;
 
         tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,hideJump,"Jump"));
 
         bool hideInventory = true;
-        if(( gameType == GAME_TYPE_STRIFE ) || (gameType == GAME_TYPE_HEXEN ) || (gameType == GAME_TYPE_HERETIC))
-            hideInventory = false;
+        hideInventory = false;
 
         tcGameMain->addControl(new touchcontrols::Button("use_inventory",touchcontrols::RectF(0,9,2,11),"inventory",KEY_SHOW_INV,false,hideInventory,"Show Inventory"));
 
-#ifndef CHOCOLATE
-        tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,true,"Crouch"));
-        tcGameMain->addControl(new touchcontrols::Button("attack_alt",touchcontrols::RectF(21,5,23,7),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt fire"));
-#endif
-
-#ifdef GZDOOM
-        tcGameMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(0,7,2,9),"custom_show",KEY_SHOW_CUSTOM,false,true,"Show custom"));
-#endif
         
         tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(12,14,14,16),"show_weapons",KEY_SHOW_WEAPONS,false,false,"Show numbers"));
         tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
@@ -964,15 +909,7 @@ void initControls(int width, int height,const char * graphics_path)
         //------------------------------------------------------
         const char * weapon_wheel_gfx = "weapon_wheel";
         int weaponWheelNbr = 8;
-        if( gameType == GAME_TYPE_HERETIC )
-        {
-            weapon_wheel_gfx = "weapon_wheel_heretic";
-        }
-        else if( gameType == GAME_TYPE_HEXEN )
-        {
-            weapon_wheel_gfx = "weapon_wheel_hexen";
-            weaponWheelNbr = 4;
-        }
+
 
         touchcontrols::WheelSelect *wheel = new touchcontrols::WheelSelect("weapon_wheel",touchcontrols::RectF(7,2,19,14),weapon_wheel_gfx,weaponWheelNbr);
         wheel->signal_selected.connect(sigc::ptr_fun(&weaponWheel) );
@@ -982,28 +919,14 @@ void initControls(int width, int height,const char * graphics_path)
 
         // Inventory -------------------------------------------
         //------------------------------------------------------
-        if( gameType == GAME_TYPE_STRIFE )
-        {
-            uiInventoryButtonGrid = new touchcontrols::ButtonGrid("inventory_grid", touchcontrols::RectF(3,7,11,11),"inventory_bg", 4, 2 );
 
-            uiInventoryButtonGrid->addCell(0,0,"ammo",PORT_ACT_SHOW_WEAPONS);
-            uiInventoryButtonGrid->addCell(1,0,"key",PORT_ACT_SHOW_KEYS);
-            uiInventoryButtonGrid->addCell(2,0,"notebook",PORT_ACT_HELPCOMP);
+        uiInventoryButtonGrid = new touchcontrols::ButtonGrid("inventory_grid", touchcontrols::RectF(3,9,11,11),"inventory_bg", 4, 1 );
 
-            uiInventoryButtonGrid->addCell(0,1,"inventory_left",PORT_ACT_INVPREV);
-            uiInventoryButtonGrid->addCell(1,1,"inventory_right",PORT_ACT_INVNEXT);
-            uiInventoryButtonGrid->addCell(2,1,"inventory_use",PORT_ACT_INVUSE);
-            uiInventoryButtonGrid->addCell(3,1,"inventory_drop",PORT_ACT_INVDROP);
-        }
-        else
-        {
-            uiInventoryButtonGrid = new touchcontrols::ButtonGrid("inventory_grid", touchcontrols::RectF(3,9,11,11),"inventory_bg", 4, 1 );
+        uiInventoryButtonGrid->addCell(0,0,"inventory_left",PORT_ACT_INVPREV);
+        uiInventoryButtonGrid->addCell(1,0,"inventory_right",PORT_ACT_INVNEXT);
+        uiInventoryButtonGrid->addCell(2,0,"inventory_use",PORT_ACT_INVUSE);
+        uiInventoryButtonGrid->addCell(3,0,"inventory_drop",PORT_ACT_INVDROP);
 
-            uiInventoryButtonGrid->addCell(0,0,"inventory_left",PORT_ACT_INVPREV);
-            uiInventoryButtonGrid->addCell(1,0,"inventory_right",PORT_ACT_INVNEXT);
-            uiInventoryButtonGrid->addCell(2,0,"inventory_use",PORT_ACT_INVUSE);
-            uiInventoryButtonGrid->addCell(3,0,"inventory_drop",PORT_ACT_INVDROP);
-        }
 
         uiInventoryButtonGrid->signal_outside.connect( sigc::ptr_fun(&inventoryOutside) );
 
@@ -1015,13 +938,14 @@ void initControls(int width, int height,const char * graphics_path)
         
         //Auto Map -------------------------------------------
         //------------------------------------------------------
+        /*
         touchcontrols::MultitouchMouse *multimouse = new touchcontrols::MultitouchMouse("gamemouse",touchcontrols::RectF(0,0,26,16),"");
         multimouse->setHideGraphics(true);
         tcAutomap->addControl(multimouse);
         multimouse->signal_action.connect(sigc::ptr_fun(&automap_multitouch_mouse_move) );
         tcAutomap->addControl(new touchcontrols::Button("map",touchcontrols::RectF(2,0,4,2),"map",PORT_ACT_MAP));
         tcAutomap->signal_button.connect(  sigc::ptr_fun(&automapButton) );
-        
+        */
         
         //Blank -------------------------------------------
         //------------------------------------------------------
@@ -1126,21 +1050,11 @@ void initControls(int width, int height,const char * graphics_path)
 
         controlsContainer.addControlGroup(tcMenuMain);
         controlsContainer.addControlGroup(tcWeaponWheel);
-        controlsContainer.addControlGroup(tcAutomap);
+        //controlsContainer.addControlGroup(tcAutomap);
         controlsContainer.addControlGroup(tcBlank);
         controlsContainer.addControlGroup(tcDemo);
 
         controlsCreated = 1;
-
-        // Doom type stays the same so existing user keep original config
-        if( gameType == GAME_TYPE_HEXEN )
-            touchcontrols::setGlobalXmlAppend(".hexen");
-        else if( gameType == GAME_TYPE_HERETIC )
-            touchcontrols::setGlobalXmlAppend(".heretic");
-        else if( gameType == GAME_TYPE_STRIFE )
-            touchcontrols::setGlobalXmlAppend(".strife");
-
-		tcMenuMain->setXMLFile((std::string)graphics_path +  "/menu.xml");
 
         tcGameMain->setXMLFile((std::string)graphics_path +  "/game_" ENGINE_NAME ".xml");
         tcInventory->setXMLFile((std::string)graphics_path +  "/inventory_" ENGINE_NAME ".xml");
