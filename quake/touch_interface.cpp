@@ -11,6 +11,8 @@
 
 #include "touch_interface.h"
 
+#include "quake_game_dll.h"
+
 #include <jni.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"touch_interface", __VA_ARGS__))
 
@@ -96,7 +98,7 @@ touchcontrols::TouchControls *tcAutomap=0;
 touchcontrols::TouchControls *tcBlank=0;
 touchcontrols::TouchControls *tcKeyboard=0;
 touchcontrols::TouchControls *tcCutomButtons=0;
-touchcontrols::TouchControls *tcDemo=0;
+//touchcontrols::TouchControls *tcDemo=0;
 touchcontrols::TouchControls *tcGamepadUtility=0;
 touchcontrols::TouchControls *tcDPadInventory=0;
 
@@ -112,6 +114,11 @@ touchcontrols::ButtonGrid *uiInventoryButtonGrid;
 // Send message to JAVA SDL activity
 int Android_JNI_SendMessage(int command, int param);
 
+int getGameType()
+{
+    return gameType;
+}
+
 #ifdef DARKPLACES
 //These are in gl_backend
 extern int android_reset_vertex;
@@ -123,32 +130,43 @@ static GLint     matrixMode;
 static GLfloat   projection[16];
 static GLfloat   model[16];
 
+void jwzgles_restore (void);
+
+#ifdef YQUAKE2
+extern int yquake2Renderer;
+#endif
 
 static void openGLStart()
 {
-
 #ifdef YQUAKE2
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport(0, 0, mobile_screen_width, mobile_screen_height);
-    glOrthof(0.0f, mobile_screen_width, mobile_screen_height, 0.0f, -1.0f, 1.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    if( yquake2Renderer != 3 )
+    {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glViewport(0, 0, mobile_screen_width, mobile_screen_height);
+        glOrthof(0.0f, mobile_screen_width, mobile_screen_height, 0.0f, -1.0f, 1.0f);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
 
-    //-----------------
+        //-----------------
 
-    glDisableClientState(GL_COLOR_ARRAY);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY );
+        glDisableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY );
 
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glEnable (GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_TEXTURE_2D);
-    glDisable(GL_ALPHA_TEST);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glEnable (GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_TEXTURE_2D);
+        glDisable(GL_ALPHA_TEST);
+    }
+    else
+    {
+        // GLES 3
+    }
 #endif
 
-#if defined(FTEQW) || defined(QUAKE3) || defined(QUAKESDL)
+#if defined(FTEQW) || defined(QUAKE3) || defined(QUAKESPASM)
 	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
 	glGetFloatv(GL_PROJECTION_MATRIX, projection);
 	glGetFloatv(GL_MODELVIEW_MATRIX, model);
@@ -197,15 +215,23 @@ static void openGLStart()
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_ALPHA_TEST);
 
-
 	void nanoPushState();
 	nanoPushState();
-
 #endif
 }
 
 static void openGLEnd()
 {
+#ifdef YQUAKE2
+    if( yquake2Renderer != 3 )
+    {
+        glDisable (GL_BLEND);
+        glColor4f(1,1,1,1);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+        glLoadIdentity();
+    }
+#endif
+
 #ifdef FTEQW
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(model);
@@ -241,8 +267,14 @@ static void openGLEnd()
     glMatrixMode(matrixMode);
 #endif
 
-#ifdef QUAKESLD
+#ifdef QUAKESPASM
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(model);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(projection);
+	glMatrixMode(matrixMode);
 
+	jwzgles_restore();
 #endif
 }
 
@@ -340,14 +372,6 @@ static void gameButton(int state,int code)
     }
 }
 
-
-static void automapButton(int state,int code)
-{
-    if( state && code == PORT_ACT_MAP && mapState == 0 )
-    {
-        mapState = 1;
-    }
-}
 
 static void gameUtilitiesButton(int state,int code)
 {
@@ -513,17 +537,6 @@ static void selectWeaponButton(int state, int code)
         tcGameWeapons->animateOut(5);
 }
 
-static void automap_multitouch_mouse_move(int action,float x, float y,float dx, float dy)
-{
-    if (action == MULTITOUCHMOUSE_MOVE)
-    {
-        PortableAutomapControl( 0, dx, dy );
-    }
-    else if (action == MULTITOUCHMOUSE_ZOOM)
-    {
-        PortableAutomapControl( x, 0, 0 );
-    }
-}
 
 static void showHideKeyboard( int show )
 {
@@ -545,6 +558,24 @@ static void brightnessSlideMouse( int action, float x, float y, float dx, float 
     y = 1 - y;
     Android_JNI_SendMessage( 0x8001, y * 255 );
 }
+
+#ifdef QUAKE3
+static void mouse_move(int action,float x, float y,float mouse_x, float mouse_y)
+{
+
+    if( action == TOUCHMOUSE_MOVE )
+	{
+	    PortableMouse(mouse_x,mouse_y);
+	}
+	/* // Dont do this because pressing the other buttons will cause a tap
+	else if( action == TOUCHMOUSE_TAP )
+	{
+	    PortableAction(1, PORT_ACT_MENU_SELECT);
+	    PortableAction(0, PORT_ACT_MENU_SELECT);
+	}
+	*/
+}
+#endif
 
 static void touchSettings( touchcontrols::tTouchSettings settings )
 {
@@ -663,19 +694,13 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                 tcInventory->resetOutput();
                 tcInventory->setEnabled(false);
                 break;
-            case TS_MAP:
-                tcAutomap->resetOutput();
-                tcAutomap->fade(touchcontrols::FADE_OUT,DEFAULT_FADE_FRAMES);
-                break;
             case TS_CUSTOM:
                 tcCutomButtons->resetOutput();
                 tcCutomButtons->fade(touchcontrols::FADE_OUT,DEFAULT_FADE_FRAMES);
                 break;
-            case TS_DEMO:
-                tcDemo->resetOutput();
-                tcDemo->fade(touchcontrols::FADE_OUT,DEFAULT_FADE_FRAMES);
-                break;
             case TS_CONSOLE:
+            case TS_MAP:
+            case TS_DEMO:
                 break;
         }
         
@@ -711,27 +736,14 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                     }
                 }
                 break;
-            case TS_MAP:
-                { // This is a bit of hack. We want the map button to be in the same place as the game map button
-                  // So move it
-                    touchcontrols::Button* mapGame = (touchcontrols::Button*)tcGameMain->getControl("map");
-                    touchcontrols::Button* map = (touchcontrols::Button*)tcAutomap->getControl("map");
-                    map->controlPos = mapGame->controlPos;
-                    map->updateSize();
-                }
-                tcAutomap->setEnabled(true);
-                tcAutomap->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
-                break;
             case TS_CUSTOM:
                 tcCutomButtons->setEnabled(true);
                 tcCutomButtons->setAlpha(1.0);
                 tcCutomButtons->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
                 break;
-           case TS_DEMO:
-                tcDemo->setEnabled(true);
-                tcDemo->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
-                break;
             case TS_CONSOLE:
+            case TS_MAP:
+            case TS_DEMO:
                 break;
         }
         
@@ -762,22 +774,13 @@ void frameControls()
         screenMode = TS_CUSTOM;
     }
 
-    if( screenMode == TS_DEMO ) // Fade out demo buttons if not touched for a while
-    {
-        if(demoControlsAlpha > 0 )
-        {
-            demoControlsAlpha -= DEMO_ALPFA_DEC;
-        }
-        tcDemo->setAlpha(demoControlsAlpha);
-    }
-
     updateTouchScreenMode(screenMode);
     
     setHideSticks(!showSticks);
 
 //openGLStart();
 //openGLEnd();
-    //controlsContainer.draw();
+   controlsContainer.draw();
 }
 
 void initControls(int width, int height,const char * graphics_path)
@@ -799,7 +802,7 @@ void initControls(int width, int height,const char * graphics_path)
 
         touchcontrols::getSettingsSignal()->connect( sigc::ptr_fun(&touchSettings) );
         
-        tcMenuMain = new touchcontrols::TouchControls("menu",false,false);
+        tcMenuMain = new touchcontrols::TouchControls("menu",false,true,10,false);
         tcYesNo = new touchcontrols::TouchControls("yes_no",false,false);
         tcGameMain = new touchcontrols::TouchControls("game",false,true,1,true);
         tcGameWeapons = new touchcontrols::TouchControls("weapons",false,true,1,false);
@@ -809,26 +812,38 @@ void initControls(int width, int height,const char * graphics_path)
         tcBlank = new touchcontrols::TouchControls("blank",true,false);
         tcCutomButtons = new touchcontrols::TouchControls("custom_buttons",false,true,1,true);
         tcKeyboard = new touchcontrols::TouchControls("keyboard",false,false);
-        tcDemo = new touchcontrols::TouchControls("demo_playback",false,false);
+        //tcDemo = new touchcontrols::TouchControls("demo_playback",false,false);
         tcGamepadUtility = new touchcontrols::TouchControls("gamepad_utility",false,false);
         tcDPadInventory = new touchcontrols::TouchControls("dpad_inventory",false,false);
 
         //Menu -------------------------------------------
         //------------------------------------------------------
         tcMenuMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON));
+#ifndef QUAKE3
         tcMenuMain->addControl(new touchcontrols::Button("down_arrow",touchcontrols::RectF(20,13,23,16),"arrow_down",PORT_ACT_MENU_DOWN));
         tcMenuMain->addControl(new touchcontrols::Button("up_arrow",touchcontrols::RectF(20,10,23,13),"arrow_up",PORT_ACT_MENU_UP));
         tcMenuMain->addControl(new touchcontrols::Button("left_arrow",touchcontrols::RectF(17,13,20,16),"arrow_left",PORT_ACT_MENU_LEFT));
         tcMenuMain->addControl(new touchcontrols::Button("right_arrow",touchcontrols::RectF(23,13,26,16),"arrow_right",PORT_ACT_MENU_RIGHT));
-        tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,10,6,16),"enter",PORT_ACT_MENU_SELECT));
+
         tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
         tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
-
-
-#ifndef CHOC_SETUP
+        tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,10,6,16),"enter",PORT_ACT_MENU_SELECT));
         touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24,3,26,11), "brightness_slider" );
         brightnessSlide->signal_action.connect(  sigc::ptr_fun(& brightnessSlideMouse ) );
         tcMenuMain->addControl( brightnessSlide );
+#else // QUAKE 3 menu is different
+        tcMenuMain->addControl(new touchcontrols::Button("up_arrow",touchcontrols::RectF(3,12,5,14),"arrow_up",PORT_ACT_MENU_UP));
+        tcMenuMain->addControl(new touchcontrols::Button("down_arrow",touchcontrols::RectF(3,14,5,16),"arrow_down",PORT_ACT_MENU_DOWN));
+        tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,12,3,16),"enter",PORT_ACT_MENU_SELECT));
+
+        tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
+        tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
+
+	    touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse",touchcontrols::RectF(0,0,26,16),"");
+		mouse->setHideGraphics(true);
+		mouse->setEditable(false);
+		tcMenuMain->addControl(mouse);
+		mouse->signal_action.connect(sigc::ptr_fun(&mouse_move) );
 #endif
 
         tcMenuMain->signal_button.connect(  sigc::ptr_fun(&menuButton) );
@@ -839,32 +854,36 @@ void initControls(int width, int height,const char * graphics_path)
         //------------------------------------------------------
         tcGameMain->setAlpha(gameControlsAlpha);
         tcGameMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON,false,false,"Show menu"));
-        tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(20,7,23,10),"shoot",KEY_SHOOT,false,false,"Attack!"));
+        tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(23,6,26,9),"shoot",KEY_SHOOT,false,false,"Attack!"));
 
-        tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE,false,false,"Use/Open"));
+        //tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE,false,false,"Use/Open"));
         tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE,false,false,"Quick save"));
         tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD,false,false,"Quick load"));
-        //tcGameMain->addControl(new touchcontrols::Button("map",touchcontrols::RectF(2,0,4,2),"map",PORT_ACT_MAP,false,false,"Show map"));
         tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,true,"Show Keyboard"));
+        tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,false,"Jump"));
+        tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,false,"Crouch"));
 
-        bool hideJump = true;
-        hideJump = false;
-
-        tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,hideJump,"Jump"));
-
-        bool hideInventory = true;
-        hideInventory = false;
-
-        tcGameMain->addControl(new touchcontrols::Button("use_inventory",touchcontrols::RectF(0,9,2,11),"inventory",KEY_SHOW_INV,false,hideInventory,"Show Inventory"));
-
-        
-        tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(12,14,14,16),"show_weapons",KEY_SHOW_WEAPONS,false,false,"Show numbers"));
-        tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
-        tcGameMain->addControl(new touchcontrols::Button("prev_weapon",touchcontrols::RectF(0,5,3,7),"prev_weap",PORT_ACT_PREV_WEP,false,false,"Prev weapon"));
-
-#if defined(GZDOOM) || defined(RETRO_DOOM)
-        tcGameMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE,false,true,"Console"));
+#if defined(QUAKE2) || defined(YQUAKE2)
+        tcGameMain->addControl(new touchcontrols::Button("use_inventory",touchcontrols::RectF(0,9,2,11),"inventory",KEY_SHOW_INV,false,false,"Show Inventory"));
+		tcGameMain->addControl(new touchcontrols::Button("help_comp",touchcontrols::RectF(2,0,4,2),"gamma",PORT_ACT_HELPCOMP));
 #endif
+
+
+        tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(12,14,14,16),"show_weapons",KEY_SHOW_WEAPONS,false,false,"Show numbers"));
+        tcGameMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE,false,true,"Console"));
+
+        if (gameType != Q1MALICE )
+        {
+            tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
+            tcGameMain->addControl(new touchcontrols::Button("prev_weapon",touchcontrols::RectF(0,5,3,7),"prev_weap",PORT_ACT_PREV_WEP,false,false,"Prev weapon"));
+        }
+        else // MALICE
+        {
+            tcGameMain->addControl( new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,4,3,6),"next_weap",PORT_ACT_NEXT_WEP));
+			tcGameMain->addControl(new touchcontrols::Button("malice_reload",touchcontrols::RectF(0,6,3,9),"reload",PORT_MALICE_RELOAD));
+			tcGameMain->addControl(new touchcontrols::Button("malice_use",touchcontrols::RectF(22,3,24,5),"use",PORT_MALICE_USE));
+			tcGameMain->addControl(new touchcontrols::Button("malice_cycle",touchcontrols::RectF(15,0,17,2),"cycle",PORT_MALICE_CYCLE));
+        }
 
 
         touchJoyRight = new touchcontrols::TouchJoy("touch",touchcontrols::RectF(17,4,26,16),"look_arrow");
@@ -921,7 +940,6 @@ void initControls(int width, int height,const char * graphics_path)
         //------------------------------------------------------
 
         uiInventoryButtonGrid = new touchcontrols::ButtonGrid("inventory_grid", touchcontrols::RectF(3,9,11,11),"inventory_bg", 4, 1 );
-
         uiInventoryButtonGrid->addCell(0,0,"inventory_left",PORT_ACT_INVPREV);
         uiInventoryButtonGrid->addCell(1,0,"inventory_right",PORT_ACT_INVNEXT);
         uiInventoryButtonGrid->addCell(2,0,"inventory_use",PORT_ACT_INVUSE);
@@ -934,34 +952,11 @@ void initControls(int width, int height,const char * graphics_path)
         tcInventory->setPassThroughTouch( touchcontrols::TouchControls::PassThrough::NO_CONTROL );
         tcInventory->signal_button.connect( sigc::ptr_fun(&inventoryButton) );
         tcInventory->setAlpha(0.9);
-        
-        
-        //Auto Map -------------------------------------------
-        //------------------------------------------------------
-        /*
-        touchcontrols::MultitouchMouse *multimouse = new touchcontrols::MultitouchMouse("gamemouse",touchcontrols::RectF(0,0,26,16),"");
-        multimouse->setHideGraphics(true);
-        tcAutomap->addControl(multimouse);
-        multimouse->signal_action.connect(sigc::ptr_fun(&automap_multitouch_mouse_move) );
-        tcAutomap->addControl(new touchcontrols::Button("map",touchcontrols::RectF(2,0,4,2),"map",PORT_ACT_MAP));
-        tcAutomap->signal_button.connect(  sigc::ptr_fun(&automapButton) );
-        */
-        
+
         //Blank -------------------------------------------
         //------------------------------------------------------
         tcBlank->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,0,26,16),"",0x123));
         tcBlank->signal_button.connect(  sigc::ptr_fun(&blankButton) );
-
-        //Demo -------------------------------------------
-        //------------------------------------------------------
-        tcDemo->addControl(new touchcontrols::Button("pressed",touchcontrols::RectF(0,2,26,16),"",0));
-        tcDemo->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
-        tcDemo->addControl(new touchcontrols::Button("speed_down",touchcontrols::RectF(20,14,22,16),"key_-",PORT_ACT_DEMO_SPD_DWN));
-        tcDemo->addControl(new touchcontrols::Button("speed_default",touchcontrols::RectF(22,14,24,16),"key_0",PORT_ACT_DEMO_SPD_DEF));
-        tcDemo->addControl(new touchcontrols::Button("speed_up",touchcontrols::RectF(24,14,26,16),"key_+",PORT_ACT_DEMO_SPD_UP));
-        tcDemo->addControl(new touchcontrols::Button("camera",touchcontrols::RectF(0,14,2,16),"camera",PORT_ACT_DEMO_CAMERA));
-        tcDemo->signal_button.connect(  sigc::ptr_fun(&menuButton) );
-        tcDemo->setAlpha(1);
 
         //Keyboard -------------------------------------------
         //------------------------------------------------------
@@ -1052,10 +1047,18 @@ void initControls(int width, int height,const char * graphics_path)
         controlsContainer.addControlGroup(tcWeaponWheel);
         //controlsContainer.addControlGroup(tcAutomap);
         controlsContainer.addControlGroup(tcBlank);
-        controlsContainer.addControlGroup(tcDemo);
+        //controlsContainer.addControlGroup(tcDemo);
 
         controlsCreated = 1;
 
+        if( gameType == Q1MALICE )
+            touchcontrols::setGlobalXmlAppend(".malice");
+
+#ifdef QUAKE3
+        tcMenuMain->setXMLFile((std::string)graphics_path +  "/quake3_menu.xml");
+#else
+		tcMenuMain->setXMLFile((std::string)graphics_path +  "/menu.xml");
+#endif
         tcGameMain->setXMLFile((std::string)graphics_path +  "/game_" ENGINE_NAME ".xml");
         tcInventory->setXMLFile((std::string)graphics_path +  "/inventory_" ENGINE_NAME ".xml");
         tcWeaponWheel->setXMLFile((std::string)graphics_path +  "/weaponwheel_" ENGINE_NAME ".xml");
@@ -1100,6 +1103,11 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
     gameType = game;
 
     LOGI("Game type = %d", gameType );
+
+// Quake 2 does not use glGenTextures
+#if defined(QUAKE2) || defined(YQUAKE2)
+	touchcontrols::setTextureNumberStart( 5000 );
+#endif
 
 #ifdef __ANDROID__
     mobile_screen_width = width;

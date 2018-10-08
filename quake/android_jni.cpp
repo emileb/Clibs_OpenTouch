@@ -30,16 +30,6 @@ JNIEnv* env_;
 
 #define EXPORT_ME __attribute__ ((visibility("default")))
 
-//Bit strange! This is called by the setup program to launch the game..
-void launchChocGame()
-{
-	jclass helloWorldClass;
-	jmethodID mainMethod;
-	helloWorldClass = env_->FindClass("org/libsdl/app/SDLActivity");
-	mainMethod = env_->GetStaticMethodID(helloWorldClass, "reLaunch", "()V");
-	env_->CallStaticVoidMethod(helloWorldClass, mainMethod);
-}
-
 __attribute__((visibility("default"))) jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	LOGI("JNI_OnLoad");
@@ -113,7 +103,7 @@ static int check = -1;
 void EXPORT_ME
 JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x, jfloat y)
 {
-/*
+
 	//LOGI("TOUCHED");
 	if (apkRandomDelay == -1)
     {
@@ -128,13 +118,14 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
     {
         if( check == -1 )
         {
-            check =  checkLicense( env );
+            check =  checkLicense( env, "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArVTuCs3MUfRpivh5ETTzfgq+pdSHPfvWKKOsqLdyugv37TPWGfjHADzI+Ryst8qdObT9qEfKQXbd5PLC6+Lspl3/N8L+FXJO5tNSzcxDNr/gCXgR/vs+YiRpyuCJMNcuwPHfDIKdBmPaFxQAxSggdzoWfEmTXyaA1S8PZprT1GcOIB1scLUWpXPjzZeOTXwEzD20HWKeR+oG7PzFBAF85clKu5Y2bypoBcmnlpBl3nK2TdNJdESitxjS5CssRp5zBxYQ6BnMfDI1W8n2QCatFb+lAHcnhye/FB8/nA476b2WOw3VBkk5CspXhDNRom6dCMfP1HTxHrH6Q0LFh81SxQIDAQAB",
+             "com.opentouchgaming.quadtouch");
         }
 
         if( check != 1)
             return;
     }
-*/
+
 	mobileGetTouchInterface()->processPointer(action,pid,x,y);
 }
 

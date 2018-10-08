@@ -45,6 +45,8 @@ void PortableMoveSide(float strafe);
 void PortableLookPitch(int mode, float pitch);
 void PortableLookYaw(int mode, float pitch);
 
+void PortableMouse(float dx,float dy);
+
 void PortableCommand(const char * cmd);
 void PortableAutomapControl(float zoom, float x, float y);
 int PortableShowKeyboard(void);

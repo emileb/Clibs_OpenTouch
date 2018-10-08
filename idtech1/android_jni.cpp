@@ -126,7 +126,8 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
     {
         if( check == -1 )
         {
-            check =  checkLicense( env );
+            check =  checkLicense( env,"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Ty9fat4Mag+a/UAncpVM8lNDrAQxk754HupOlYbJt3ALv6Fqagjj2vzPK8570aALqw2XEk5JxPAazdTQJ+W5aEVM8N2Ij1SbqN/yF+HfqDG+hHfszddwAZzKzWUlAkkeqW6qiIEy4L/TTOgj2vQv24ix4YcpO3eea2Ltz2UDyq+o0+K1cOCMqtuGL/GQbFS92zp3dnH9CpgtWFsbvVarjntJWiI6RrZpqpTTsuZWckK1ztMBjzNNnD1w6QbgTRqoGU7xmsHImWjk5MtwxiDqKL1EFOBvQDqOXxVc/jmT8StqAjk1ItCWStvJLZTzejNoGdTisxBQT/P3Xyppo8/MwIDAQAB",
+             "com.opentouchgaming.deltatouch");
         }
 
         if( check != 1)
