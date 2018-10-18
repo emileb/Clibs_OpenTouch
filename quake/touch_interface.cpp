@@ -189,6 +189,7 @@ static void openGLStart()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_ALPHA_TEST);
+    glDisable(GL_DEPTH_TEST);
 #endif
 
 #ifdef QUAKE2
@@ -253,6 +254,7 @@ static void openGLEnd()
 #ifdef QUAKE3
 	void GL_FixState();
 	GL_FixState();
+    glEnable(GL_DEPTH_TEST);
 #endif
 
 #ifdef QUAKE2
@@ -395,7 +397,11 @@ static void gameUtilitiesOutside( bool fromGamepad )
 static void blankButton(int state,int code)
 {
     PortableAction(state, PORT_ACT_USE);
+#if DARKPLACES // Needed because demos need esc
+    PortableKeyEvent(state, SDL_SCANCODE_ESCAPE, 0);
+#else
     PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
+#endif
 }
 
 static void customButton(int state,int code)
@@ -818,6 +824,7 @@ void initControls(int width, int height,const char * graphics_path)
 
         //Menu -------------------------------------------
         //------------------------------------------------------
+        tcMenuMain->setFixAspect( false ); // Dont want menu to fix the aspect
         tcMenuMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON));
 #ifndef QUAKE3
         tcMenuMain->addControl(new touchcontrols::Button("down_arrow",touchcontrols::RectF(20,13,23,16),"arrow_down",PORT_ACT_MENU_DOWN));
@@ -826,24 +833,49 @@ void initControls(int width, int height,const char * graphics_path)
         tcMenuMain->addControl(new touchcontrols::Button("right_arrow",touchcontrols::RectF(23,13,26,16),"arrow_right",PORT_ACT_MENU_RIGHT));
 
         tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
+        tcMenuMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE));
+
         tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
         tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,10,6,16),"enter",PORT_ACT_MENU_SELECT));
         touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24,3,26,11), "brightness_slider" );
         brightnessSlide->signal_action.connect(  sigc::ptr_fun(& brightnessSlideMouse ) );
         tcMenuMain->addControl( brightnessSlide );
 #else // QUAKE 3 menu is different
-        tcMenuMain->addControl(new touchcontrols::Button("up_arrow",touchcontrols::RectF(3,12,5,14),"arrow_up",PORT_ACT_MENU_UP));
-        tcMenuMain->addControl(new touchcontrols::Button("down_arrow",touchcontrols::RectF(3,14,5,16),"arrow_down",PORT_ACT_MENU_DOWN));
-        tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,12,3,16),"enter",PORT_ACT_MENU_SELECT));
 
         tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
+        tcMenuMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE));
+
         tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
 
-	    touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse",touchcontrols::RectF(0,0,26,16),"");
-		mouse->setHideGraphics(true);
-		mouse->setEditable(false);
-		tcMenuMain->addControl(mouse);
-		mouse->signal_action.connect(sigc::ptr_fun(&mouse_move) );
+		// Stop buttons passing though control, otherwise goes wierd with mouse
+        touchcontrols::Button *b;
+
+        b = new touchcontrols::Button("left_arrow",touchcontrols::RectF(1,10,3,12),"arrow_left",PORT_ACT_MENU_LEFT);
+        b->setAllowPassThrough(false);
+        tcMenuMain->addControl( b );
+
+        b = new touchcontrols::Button("right_arrow",touchcontrols::RectF(3,10,5,12),"arrow_right",PORT_ACT_MENU_RIGHT);
+        b->setAllowPassThrough(false);
+        tcMenuMain->addControl( b );
+
+        b = new touchcontrols::Button("up_arrow",touchcontrols::RectF(3,12,5,14),"arrow_up",PORT_ACT_MENU_UP);
+        b->setAllowPassThrough(false);
+        tcMenuMain->addControl( b );
+
+        b = new touchcontrols::Button("down_arrow",touchcontrols::RectF(3,14,5,16),"arrow_down",PORT_ACT_MENU_DOWN);
+        b->setAllowPassThrough(false);
+        tcMenuMain->addControl( b );
+
+        b = new touchcontrols::Button("enter",touchcontrols::RectF(0,12,3,16),"enter",PORT_ACT_MENU_SELECT);
+        b->setAllowPassThrough(false);
+        tcMenuMain->addControl( b );
+
+        // Mouse at end
+        touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse",touchcontrols::RectF(0,0,26,16),"");
+        mouse->setHideGraphics(true);
+        mouse->setEditable(false);
+        tcMenuMain->addControl(mouse);
+        mouse->signal_action.connect(sigc::ptr_fun(&mouse_move) );
 #endif
 
         tcMenuMain->signal_button.connect(  sigc::ptr_fun(&menuButton) );
@@ -857,11 +889,17 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(23,6,26,9),"shoot",KEY_SHOOT,false,false,"Attack!"));
 
         //tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE,false,false,"Use/Open"));
+#ifdef QUAKE3
+        tcGameMain->addControl(new touchcontrols::Button("use_inventory",touchcontrols::RectF(0,9,2,11),"inventory",PORT_ACT_USE,false,false,"Use item"));
+        tcGameMain->addControl(new touchcontrols::Button("zoom",touchcontrols::RectF(24,0,26,2),"binocular",PORT_ACT_ZOOM_IN,false,false,"Weapon zoom"));
+#else
         tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE,false,false,"Quick save"));
         tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD,false,false,"Quick load"));
+#endif
         tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,true,"Show Keyboard"));
-        tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,false,"Jump"));
-        tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,false,"Crouch"));
+        tcGameMain->addControl(new touchcontrols::Button("showscores",touchcontrols::RectF(17,0,19,2),"scores",PORT_ACT_MP_SCORES,false,true,"Show Scores"));
+        tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,false,"Jump/Swim up"));
+        tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,false,"Crouch/Swim down"));
 
 #if defined(QUAKE2) || defined(YQUAKE2)
         tcGameMain->addControl(new touchcontrols::Button("use_inventory",touchcontrols::RectF(0,9,2,11),"inventory",KEY_SHOW_INV,false,false,"Show Inventory"));
@@ -879,7 +917,7 @@ void initControls(int width, int height,const char * graphics_path)
         }
         else // MALICE
         {
-            tcGameMain->addControl( new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,4,3,6),"next_weap",PORT_ACT_NEXT_WEP));
+            tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,4,3,6),"next_weap",PORT_ACT_NEXT_WEP));
 			tcGameMain->addControl(new touchcontrols::Button("malice_reload",touchcontrols::RectF(0,6,3,9),"reload",PORT_MALICE_RELOAD));
 			tcGameMain->addControl(new touchcontrols::Button("malice_use",touchcontrols::RectF(22,3,24,5),"use",PORT_MALICE_USE));
 			tcGameMain->addControl(new touchcontrols::Button("malice_cycle",touchcontrols::RectF(15,0,17,2),"cycle",PORT_MALICE_CYCLE));
@@ -1002,7 +1040,7 @@ void initControls(int width, int height,const char * graphics_path)
         touchcontrols::ButtonGrid *gamepadUtils = new touchcontrols::ButtonGrid("gamepad_grid", touchcontrols::RectF(8,5,18,11),"gamepad_utils_bg", 3, 2 );
 
         gamepadUtils->addCell(0,0,"ui_back_arrow",KEY_BACK_BUTTON);
-        gamepadUtils->addCell(0,1,"map",PORT_ACT_MAP);
+        gamepadUtils->addCell(0,1,"scores",PORT_ACT_MP_SCORES);
         gamepadUtils->addCell(1,0,"keyboard",KEY_SHOW_KBRD);
         gamepadUtils->addCell(1,1,"tild",PORT_ACT_CONSOLE);
         gamepadUtils->addCell(2,0,"save",PORT_ACT_QUICKSAVE);
