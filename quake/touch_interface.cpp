@@ -397,7 +397,7 @@ static void gameUtilitiesOutside( bool fromGamepad )
 static void blankButton(int state,int code)
 {
     PortableAction(state, PORT_ACT_USE);
-#if DARKPLACES // Needed because demos need esc
+#if DARKPLACES_NONO // Needed because demos need esc
     PortableKeyEvent(state, SDL_SCANCODE_ESCAPE, 0);
 #else
     PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
@@ -906,6 +906,7 @@ void initControls(int width, int height,const char * graphics_path)
 		tcGameMain->addControl(new touchcontrols::Button("help_comp",touchcontrols::RectF(2,0,4,2),"gamma",PORT_ACT_HELPCOMP));
 #endif
 
+        tcGameMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(0,2,2,4),"custom_show",KEY_SHOW_CUSTOM,false,true,"Show custom"));
 
         tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(12,14,14,16),"show_weapons",KEY_SHOW_WEAPONS,false,false,"Show numbers"));
         tcGameMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE,false,true,"Console"));
@@ -1013,24 +1014,25 @@ void initControls(int width, int height,const char * graphics_path)
 
         //Custom Controls -------------------------------------------
         //------------------------------------------------------
-        tcCutomButtons->addControl(new touchcontrols::Button("A",touchcontrols::RectF(5,5,7,7),"Custom_1",PORT_ACT_CUSTOM_0,false,false,"Custom 1"));
-        tcCutomButtons->addControl(new touchcontrols::Button("B",touchcontrols::RectF(7,5,9,7),"Custom_2",PORT_ACT_CUSTOM_1,false,false,"Custom 2"));
-        tcCutomButtons->addControl(new touchcontrols::Button("C",touchcontrols::RectF(5,7,7,9),"Custom_3",PORT_ACT_CUSTOM_2,false,false,"Custom 3"));
+        tcCutomButtons->addControl(new touchcontrols::Button("A",touchcontrols::RectF(5,5,7,7),"Custom_1",PORT_ACT_CUSTOM_0,false,false,"Custom 1 (H)"));
+        tcCutomButtons->addControl(new touchcontrols::Button("B",touchcontrols::RectF(7,5,9,7),"Custom_2",PORT_ACT_CUSTOM_1,false,false,"Custom 2 (I)"));
+        tcCutomButtons->addControl(new touchcontrols::Button("C",touchcontrols::RectF(5,7,7,9),"Custom_3",PORT_ACT_CUSTOM_2,false,false,"Custom 3 (J)"));
         
-        tcCutomButtons->addControl(new touchcontrols::Button("D",touchcontrols::RectF(7,7,9,9),"Custom_4",PORT_ACT_CUSTOM_3,false,false,"Custom 4"));
-        tcCutomButtons->addControl(new touchcontrols::Button("E",touchcontrols::RectF(5,9,7,11),"Custom_5",PORT_ACT_CUSTOM_4,false,false,"Custom 5"));
-        tcCutomButtons->addControl(new touchcontrols::Button("F",touchcontrols::RectF(7,9,9,11),"Custom_6",PORT_ACT_CUSTOM_5,false,false,"Custom 6"));
+        tcCutomButtons->addControl(new touchcontrols::Button("D",touchcontrols::RectF(7,7,9,9),"Custom_4",PORT_ACT_CUSTOM_3,false,false,"Custom 4 (K)"));
+        tcCutomButtons->addControl(new touchcontrols::Button("E",touchcontrols::RectF(5,9,7,11),"Custom_5",PORT_ACT_CUSTOM_4,false,false,"Custom 5 (L)"));
+        tcCutomButtons->addControl(new touchcontrols::Button("F",touchcontrols::RectF(7,9,9,11),"Custom_6",PORT_ACT_CUSTOM_5,false,false,"Custom 6 (M)"));
 
-        touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_8,PORT_ACT_CUSTOM_9,PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,false,"Quad Slide 1");
-        tcCutomButtons->addControl(qs1);
+        //touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_8,PORT_ACT_CUSTOM_9,PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,false,"Quad Slide 1");
+        //tcCutomButtons->addControl(qs1);
 
-        touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,false,"Quad Slide 2");
-        tcCutomButtons->addControl(qs2);
+        //touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,false,"Quad Slide 2");
+        //tcCutomButtons->addControl(qs2);
 
         //tcCutomButtons->setColor(0.7,0.7,1.f);
 
-        qs1->signal.connect(sigc::ptr_fun(&customButton));
-        qs2->signal.connect(sigc::ptr_fun(&customButton));
+        //qs1->signal.connect(sigc::ptr_fun(&customButton));
+        //qs2->signal.connect(sigc::ptr_fun(&customButton));
+
         tcCutomButtons->signal_button.connect(sigc::ptr_fun(&customButton));
         tcCutomButtons->signal_settingsButton.connect(  sigc::ptr_fun(&customSettingsButton) );
         tcCutomButtons->setAlpha(0.8);
@@ -1074,9 +1076,7 @@ void initControls(int width, int height,const char * graphics_path)
         controlsContainer.addControlGroup(tcInventory); // before gamemain so touches don't go through
         controlsContainer.addControlGroup(tcGamepadUtility); // before gamemain so touches don't go through
         controlsContainer.addControlGroup(tcDPadInventory);
-#ifdef GZDOOM
         controlsContainer.addControlGroup(tcCutomButtons);
-#endif
         controlsContainer.addControlGroup(tcGameMain);
         controlsContainer.addControlGroup(tcYesNo);
         controlsContainer.addControlGroup(tcGameWeapons);
