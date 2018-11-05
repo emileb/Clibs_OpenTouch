@@ -43,6 +43,7 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 #define KEY_F10  0x100A
 #define KEY_BACK_BUTTON  0x100B
 #define KEY_SHOW_GYRO    0x100C
+#define KEY_SHOW_GAMEPAD 0x100D
 
 #define GAME_OPTION_AUTO_HIDE_GAMEPAD   0x1
 #define GAME_OPTION_HIDE_MENU_AND_GAME  0x2
@@ -152,7 +153,7 @@ static void openGLStart()
 {
 #if 1
 
-#if defined(GZDOOM)
+#if defined(GZDOOM) && !defined(GZDOOM_GL3)
     if(currentrenderer == 1)
     {
         glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
@@ -171,6 +172,8 @@ static void openGLStart()
          glPushMatrix();
     }
 #endif
+
+#if !defined(GZDOOM_GL3)
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -193,9 +196,9 @@ static void openGLStart()
 //    glDisable(GL_CULL_FACE);
     glDisable(GL_ALPHA_TEST);
 //    glDisable(GL_DEPTH_TEST);
+#endif
 
-
-#ifdef GZDOOM
+#if defined(GZDOOM)  && !defined(GZDOOM_GL3)
     glBindBuffer(GL_ARRAY_BUFFER, 0); //GZDoom binds a buffer, this unbinds it
 #endif
 
@@ -206,7 +209,7 @@ static void openGLEnd()
 {
 #if 1
 
-#if defined(GZDOOM)
+#if defined(GZDOOM) && !defined(GZDOOM_GL3)
     if(currentrenderer == 1) //GL mode
     {
         glMatrixMode(GL_MODELVIEW);
@@ -449,6 +452,12 @@ static void menuButton(int state,int code)
         // Show gyro options
         if (state)
             Android_JNI_SendMessage( 0x8002, 0 );
+    }
+    else  if(code == KEY_SHOW_GAMEPAD)
+    {
+        // Show gamepad options
+        if (state)
+            Android_JNI_SendMessage( 0x8004, 0 );
     }
     else if(code == PORT_ACT_CONSOLE)
     {
@@ -805,7 +814,7 @@ void frameControls()
     
     setHideSticks(!showSticks);
 
-    controlsContainer.draw();
+    //controlsContainer.draw();
 }
 
 void initControls(int width, int height,const char * graphics_path)
@@ -855,6 +864,7 @@ void initControls(int width, int height,const char * graphics_path)
         //tcMenuMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE));
 #endif
 #ifndef CHOC_SETUP
+        tcMenuMain->addControl(new touchcontrols::Button("gamepad",touchcontrols::RectF(22,0,24,2),"gamepad",KEY_SHOW_GAMEPAD));
         tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
 #endif
         //tcMenuMain->addControl(new touchcontrols::Button("brightness",touchcontrols::RectF(21,0,23,2),"brightness",KEY_BRIGHTNESS));

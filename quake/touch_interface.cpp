@@ -40,6 +40,7 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 
 #define KEY_BACK_BUTTON  0x100B
 #define KEY_SHOW_GYRO    0x100C
+#define KEY_SHOW_GAMEPAD 0x100D
 
 #define GAME_OPTION_AUTO_HIDE_GAMEPAD   0x1
 #define GAME_OPTION_HIDE_MENU_AND_GAME  0x2
@@ -457,6 +458,12 @@ static void menuButton(int state,int code)
         if (state)
             Android_JNI_SendMessage( 0x8002, 0 );
     }
+    else  if(code == KEY_SHOW_GAMEPAD)
+    {
+        // Show gamepad options
+        if (state)
+            Android_JNI_SendMessage( 0x8004, 0 );
+    }
     else
     {
         PortableAction(state, code);
@@ -835,6 +842,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
         tcMenuMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE));
 
+        tcMenuMain->addControl(new touchcontrols::Button("gamepad",touchcontrols::RectF(22,0,24,2),"gamepad",KEY_SHOW_GAMEPAD));
         tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
         tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,10,6,16),"enter",PORT_ACT_MENU_SELECT));
         touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24,3,26,11), "brightness_slider" );
@@ -845,6 +853,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
         tcMenuMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE));
 
+        tcMenuMain->addControl(new touchcontrols::Button("gamepad",touchcontrols::RectF(22,0,24,2),"gamepad",KEY_SHOW_GAMEPAD));
         tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
 
 		// Stop buttons passing though control, otherwise goes wierd with mouse
@@ -887,6 +896,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->setAlpha(gameControlsAlpha);
         tcGameMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON,false,false,"Show menu"));
         tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(23,6,26,9),"shoot",KEY_SHOOT,false,false,"Attack!"));
+        tcGameMain->addControl(new touchcontrols::Button("attack2",touchcontrols::RectF(3,5,6,8),"shoot",KEY_SHOOT,false,true,"Attack! (duplicate)"));
 
         //tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE,false,false,"Use/Open"));
 #ifdef QUAKE3
