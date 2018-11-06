@@ -41,6 +41,10 @@
 #define PORT_ACT_MAP_ZOOM_OUT 36
 #define PORT_ACT_ALWAYS_RUN  37
 
+// Hexen 2
+#define PORT_ACT_CROUCH    40
+
+
 //RTCW
 #define PORT_ACT_ZOOM_IN    50 //Also used for Quake 3 zoom
 #define PORT_ACT_ALT_FIRE   51

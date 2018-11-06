@@ -909,12 +909,21 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,true,"Show Keyboard"));
         tcGameMain->addControl(new touchcontrols::Button("showscores",touchcontrols::RectF(17,0,19,2),"scores",PORT_ACT_MP_SCORES,false,true,"Show Scores"));
         tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,false,"Jump/Swim up"));
-        tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,false,"Crouch/Swim down"));
+
+        if (gameType == Q1HEXEN2)
+            tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_CROUCH,false,false,"Crouch/Swim down"));
+        else
+            tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,false,"Crouch/Swim down"));
 
 #if defined(QUAKE2) || defined(YQUAKE2)
         tcGameMain->addControl(new touchcontrols::Button("use_inventory",touchcontrols::RectF(0,9,2,11),"inventory",KEY_SHOW_INV,false,false,"Show Inventory"));
 		tcGameMain->addControl(new touchcontrols::Button("help_comp",touchcontrols::RectF(2,0,4,2),"gamma",PORT_ACT_HELPCOMP));
 #endif
+        if (gameType == Q1HEXEN2 )
+        {
+           tcGameMain->addControl(new touchcontrols::Button("use_inventory",touchcontrols::RectF(0,9,2,11),"inventory",KEY_SHOW_INV,false,false,"Show Inventory"));
+           tcGameMain->addControl(new touchcontrols::Button("help_comp",touchcontrols::RectF(2,0,4,2),"gamma",PORT_ACT_HELPCOMP));
+        }
 
         tcGameMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(0,2,2,4),"custom_show",KEY_SHOW_CUSTOM,false,true,"Show custom"));
 
@@ -1101,6 +1110,8 @@ void initControls(int width, int height,const char * graphics_path)
 
         if( gameType == Q1MALICE )
             touchcontrols::setGlobalXmlAppend(".malice");
+        else if( gameType == Q1HEXEN2 )
+            touchcontrols::setGlobalXmlAppend(".hexen2");
 
 #ifdef QUAKE3
         tcMenuMain->setXMLFile((std::string)graphics_path +  "/quake3_menu.xml");

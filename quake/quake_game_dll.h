@@ -7,3 +7,5 @@
 
 
 #define Q1MALICE      10
+
+#define Q1HEXEN2      20
