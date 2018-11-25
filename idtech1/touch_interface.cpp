@@ -814,7 +814,7 @@ void frameControls()
     
     setHideSticks(!showSticks);
 
-    //controlsContainer.draw();
+    controlsContainer.draw();
 }
 
 void initControls(int width, int height,const char * graphics_path)
@@ -891,6 +891,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->setAlpha(gameControlsAlpha);
         tcGameMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON,false,false,"Show menu"));
         tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(20,7,23,10),"shoot",KEY_SHOOT,false,false,"Attack!"));
+        tcGameMain->addControl(new touchcontrols::Button("attack2",touchcontrols::RectF(3,5,6,8),"shoot",KEY_SHOOT,false,true,"Attack! (duplicate)"));
 
         tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE,false,false,"Use/Open"));
         tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE,false,false,"Quick save"));
