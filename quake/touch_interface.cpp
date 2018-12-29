@@ -13,6 +13,8 @@
 
 #include "quake_game_dll.h"
 
+#include <GLES/gl.h> // This is OK because YQ2 GLES3 does not call any gl functions yet..
+
 #include <jni.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"touch_interface", __VA_ARGS__))
 
@@ -45,6 +47,7 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 #define GAME_OPTION_AUTO_HIDE_GAMEPAD   0x1
 #define GAME_OPTION_HIDE_MENU_AND_GAME  0x2
 #define GAME_OPTION_USE_SYSTEM_KEYBOARD 0x4
+#define GAME_OPTION_GLES2               0x8
 
 static int gameType;
 
@@ -806,8 +809,9 @@ void initControls(int width, int height,const char * graphics_path)
     if (!controlsCreated)
     {
         LOGI("creating controls");
-        
-        touchcontrols::setGraphicsBasePath(graphics_path);
+
+
+        touchcontrols::gl_setGraphicsBasePath(graphics_path);
         //setControlsContainer(&controlsContainer);
         
         controlsContainer.openGL_start.connect( sigc::ptr_fun(&openGLStart));
@@ -1164,8 +1168,23 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
     LOGI("Game type = %d", gameType );
 
 // Quake 2 does not use glGenTextures
-#if defined(QUAKE2) || defined(YQUAKE2)
+#if defined(QUAKE2)
 	touchcontrols::setTextureNumberStart( 5000 );
+#endif
+
+    if( options & GAME_OPTION_GLES2 )
+    {
+        touchcontrols::gl_setGLESVersion( 2 );
+    }
+    else
+    {
+#if defined(YQUAKE2) // When using GLES1 on YQ2, does not use glGenTextures
+ 	    touchcontrols::setTextureNumberStart( 5000 );
+#endif
+    }
+
+#ifdef DARKPLACES
+    touchcontrols::gl_setGLESVersion( 2 );
 #endif
 
 #ifdef __ANDROID__

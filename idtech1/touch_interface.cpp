@@ -5,6 +5,7 @@
 #include "SDL.h"
 //#include "ios_interface.h"
 
+#include <GLES/gl.h>
 
 #include "UI_TouchDefaultSettings.h"
 #include "UI_ButtonListWindow.h"
@@ -48,6 +49,7 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 #define GAME_OPTION_AUTO_HIDE_GAMEPAD   0x1
 #define GAME_OPTION_HIDE_MENU_AND_GAME  0x2
 #define GAME_OPTION_USE_SYSTEM_KEYBOARD 0x4
+#define GAME_OPTION_GLES2               0x8
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
 #define GAME_TYPE_HEXEN    2
@@ -828,7 +830,7 @@ void initControls(int width, int height,const char * graphics_path)
     {
         LOGI("creating controls");
         
-        touchcontrols::setGraphicsBasePath(graphics_path);
+        touchcontrols::gl_setGraphicsBasePath(graphics_path);
         //setControlsContainer(&controlsContainer);
         
         controlsContainer.openGL_start.connect( sigc::ptr_fun(&openGLStart));
