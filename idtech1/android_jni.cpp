@@ -81,6 +81,10 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jo
 
 	setenv("HOME", game_path.c_str(),1);
 
+	setenv("LIBGL_ES","2",1);
+	setenv("LIBGL_GL","20",1);
+	setenv("LIBGL_DEFAULTWRAP","0",1);
+
 	chdir( game_path.c_str() );
 
     //checkLicense( env_ );

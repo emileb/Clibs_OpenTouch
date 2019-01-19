@@ -5,7 +5,11 @@
 #include "SDL.h"
 //#include "ios_interface.h"
 
-#include <GLES/gl.h>
+#if defined(GZDOOM_GL3)
+   #include <GLES3/gl3.h>
+#else
+    #include <GLES/gl.h>
+#endif
 
 #include "UI_TouchDefaultSettings.h"
 #include "UI_ButtonListWindow.h"
@@ -137,6 +141,13 @@ typedef enum {
 video_mode_t V_GetMode(void);
 #endif
 
+
+#if defined(CHOCOLATE) || defined(RETRO_DOOM)
+    #define SW_SDL_RENDER 1
+#else
+    #define SW_SDL_RENDER 0
+#endif
+
 #if defined(GZDOOM)
 
 #ifdef  GZDOOM_DEV // For the dev versions it is always OpenGL, even software mode uses ogl
@@ -155,12 +166,16 @@ static void openGLStart()
 {
 #if 1
 
+touchcontrols::gl_startRender();
+
 #if defined(GZDOOM) && !defined(GZDOOM_GL3)
     if(currentrenderer == 1)
     {
+    /*
         glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
         glGetFloatv(GL_PROJECTION_MATRIX, projection);
         glGetFloatv(GL_MODELVIEW_MATRIX, model);
+        */
     }
 #endif
 
@@ -168,40 +183,60 @@ static void openGLStart()
 #if defined(PRBOOM_DOOM)
     if(V_GetMode() == VID_MODEGL)
     {
+/*
          glMatrixMode(GL_PROJECTION);
          glPushMatrix();
          glMatrixMode(GL_MODELVIEW);
          glPushMatrix();
+*/
     }
 #endif
 
 #if !defined(GZDOOM_GL3)
+    if( touchcontrols::gl_getGLESVersion() == 1 )
+    {
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glViewport(0, 0, mobile_screen_width, mobile_screen_height);
+        glOrthof(0.0f, mobile_screen_width, mobile_screen_height, 0.0f, -1.0f, 1.0f);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport(0, 0, mobile_screen_width, mobile_screen_height);
-    glOrthof(0.0f, mobile_screen_width, mobile_screen_height, 0.0f, -1.0f, 1.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+        //-----------------
 
-    //-----------------
+        glDisableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY );
 
-    glDisableClientState(GL_COLOR_ARRAY);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY );
-    
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glEnable (GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_TEXTURE_2D);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glEnable (GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_TEXTURE_2D);
 
-//    glDisable(GL_CULL_FACE);
-    glDisable(GL_ALPHA_TEST);
-//    glDisable(GL_DEPTH_TEST);
+    //    glDisable(GL_CULL_FACE);
+        glDisable(GL_ALPHA_TEST);
+    //    glDisable(GL_DEPTH_TEST);
+    }
+    else
+    {
+
+    }
 #endif
 
 #if defined(GZDOOM)  && !defined(GZDOOM_GL3)
     glBindBuffer(GL_ARRAY_BUFFER, 0); //GZDoom binds a buffer, this unbinds it
+#endif
+
+
+#if defined(GZDOOM_GL3)
+touchcontrols::gl_startGLES3();
+     //glBindBuffer(GL_ARRAY_BUFFER, 0);
+     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+     //        glEnable (GL_BLEND);
+     //        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      //       glEnable(GL_TEXTURE_2D);
 #endif
 
 #endif
@@ -211,58 +246,68 @@ static void openGLEnd()
 {
 #if 1
 
-#if defined(GZDOOM) && !defined(GZDOOM_GL3)
-    if(currentrenderer == 1) //GL mode
-    {
-        glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf(model);
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf(projection);
-        glMatrixMode(matrixMode);
+touchcontrols::gl_endRender();
 
-        void jwzgles_restore (void);
-        jwzgles_restore();
+#if defined(PRBOOM_DOOM)
+bool sdlSWMode = (V_GetMode() != VID_MODEGL);
+#else
+bool sdlSWMode = false;
+#endif
+
+#if defined(GZDOOM) && !defined(GZDOOM_GL3)
+    if( touchcontrols::gl_getGLESVersion() == 1 )
+    {
+        if(currentrenderer == 1) //GL mode
+        {
+        /*
+            glMatrixMode(GL_MODELVIEW);
+            glLoadMatrixf(model);
+            glMatrixMode(GL_PROJECTION);
+            glLoadMatrixf(projection);
+            glMatrixMode(matrixMode);
+        */
+            void jwzgles_restore (void);
+            jwzgles_restore();
+        }
+        else
+        {
+            sdlSWMode = true;
+            /*
+            glDisable (GL_BLEND);
+            glColor4f(1,1,1,1);
+            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+            glLoadIdentity();
+            */
+        }
     }
     else
     {
-        glDisable (GL_BLEND);
-        glColor4f(1,1,1,1);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-        glLoadIdentity();
+        touchcontrols::gl_resetGL4ES();
     }
-
-    //nanoPopState();
 #endif
 
-#if defined(CHOCOLATE) || defined(RETRO_DOOM)// || defined(GZDOOM)
-    glDisable (GL_BLEND);
-    glColor4f(1,1,1,1);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glLoadIdentity();
-#endif
+
+// Setup for SDL Software rendering again
+if( SW_SDL_RENDER || sdlSWMode )
+{
+     glDisable (GL_BLEND);
+     glColor4f(1,1,1,1);
+     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+     glMatrixMode(GL_MODELVIEW);
+     glLoadIdentity();
+}
 
 
 #if defined(PRBOOM_DOOM)
     if(V_GetMode() == VID_MODEGL)
     {
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-
         void jwzgles_restore (void);
         jwzgles_restore();
     }
-    else
-    {
-        glDisable (GL_BLEND);
-        glColor4f(1,1,1,1);
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-        glLoadIdentity();
-    }
 #endif
 
 #endif
+
 }
 
 static void gameSettingsButton(int state)
@@ -886,7 +931,7 @@ void initControls(int width, int height,const char * graphics_path)
 #endif
         tcMenuMain->signal_button.connect(  sigc::ptr_fun(&menuButton) );
         tcMenuMain->setAlpha(0.8);
-        
+        tcMenuMain->setFixAspect(false);
         
         //Game -------------------------------------------
         //------------------------------------------------------
@@ -1195,6 +1240,13 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
 
     if( options & GAME_OPTION_USE_SYSTEM_KEYBOARD )
         useSystemKeyboard = true;
+
+    if( options & GAME_OPTION_GLES2 )
+    {
+        touchcontrols::gl_setGLESVersion( 2 );
+        touchcontrols::gl_useGL4ES(); // GLES2 always uses GL4ES library
+    }
+
 
     gameType = game;
 
