@@ -142,6 +142,9 @@ extern int yquake2Renderer;
 
 static void openGLStart()
 {
+
+    touchcontrols::gl_startRender();
+
 #ifdef YQUAKE2
     if( yquake2Renderer != 3 )
     {
