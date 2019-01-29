@@ -142,7 +142,6 @@ extern int yquake2Renderer;
 
 static void openGLStart()
 {
-
     touchcontrols::gl_startRender();
 
 #ifdef YQUAKE2
@@ -431,8 +430,14 @@ static void weaponWheelSelected(int enabled)
 static void weaponWheel(int segment)
 {
     LOGI("weaponWheel %d",segment);
-    PortableAction(1,PORT_ACT_WEAP1 + segment);
-    PortableAction(0,PORT_ACT_WEAP1 + segment);
+    int number = 0;
+    if( segment == 9 ) // Press '0'
+        number = 0;
+    else
+        number = 1 + segment;
+
+    PortableAction(1,PORT_ACT_WEAP0 + number);
+    PortableAction(0,PORT_ACT_WEAP0 + number);
 }
 
 static void menuButton(int state,int code)
@@ -992,8 +997,7 @@ void initControls(int width, int height,const char * graphics_path)
         //Weapon wheel -------------------------------------------
         //------------------------------------------------------
         const char * weapon_wheel_gfx = "weapon_wheel";
-        int weaponWheelNbr = 8;
-
+        int weaponWheelNbr = 10;
 
         touchcontrols::WheelSelect *wheel = new touchcontrols::WheelSelect("weapon_wheel",touchcontrols::RectF(7,2,19,14),weapon_wheel_gfx,weaponWheelNbr);
         wheel->signal_selected.connect(sigc::ptr_fun(&weaponWheel) );

@@ -12,9 +12,13 @@
 
 #include <unistd.h>
 
+
 #ifndef NO_SEC
 #include "./secure/license/license.h"
 #endif
+
+#include <time.h>
+
 
 extern "C"
 {
@@ -136,6 +140,17 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
 
         if( check != 1)
             return;
+    }
+#else
+    // Beta test time
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    int yr =  tm.tm_year + 1900;
+    int mo = tm.tm_mon + 1;
+    //LOGI("%d   %d",yr,mo);
+    if(yr > 2019 || mo > 6)
+    {
+        return;
     }
 #endif
 	mobileGetTouchInterface()->processPointer(action,pid,x,y);
