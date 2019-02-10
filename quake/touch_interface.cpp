@@ -782,6 +782,13 @@ void frameControls()
     //static bool inited = false;
     if( SDL_NewEGLCreated() )
     {
+#if defined(YQUAKE2) // When using GLES1 on YQ2, does not use glGenTextures
+        if( yquake2Renderer ==1 )
+        {
+            touchcontrols::setTextureNumberStart( 10000 );
+        }
+#endif
+
         touchcontrols::clearGlTexCache();
         controlsContainer.initGL();
     }
@@ -1183,12 +1190,7 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
     {
         touchcontrols::gl_setGLESVersion( 2 );
     }
-    else
-    {
-#if defined(YQUAKE2) // When using GLES1 on YQ2, does not use glGenTextures
- 	    touchcontrols::setTextureNumberStart( 5000 );
-#endif
-    }
+
 
 #ifdef DARKPLACES
     touchcontrols::gl_setGLESVersion( 2 );
