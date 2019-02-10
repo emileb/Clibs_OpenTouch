@@ -898,6 +898,11 @@ void initControls(int width, int height,const char * graphics_path)
         b->setAllowPassThrough(false);
         tcMenuMain->addControl( b );
 
+        b = new touchcontrols::Button("left_mouse",touchcontrols::RectF(0,6,2,9),"left_mouse",PORT_ACT_MOUSE_LEFT);
+        b->setAllowPassThrough(false);
+        tcMenuMain->addControl( b );
+
+
         // Mouse at end
         touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse",touchcontrols::RectF(0,0,26,16),"");
         mouse->setHideGraphics(true);

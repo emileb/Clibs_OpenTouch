@@ -188,6 +188,10 @@
 #define PORT_ACT_MENU_ABORT               0x207 //519
 #define PORT_ACT_MENU_SHOW                0x208 //520 (back button)
 
+#define PORT_ACT_MOUSE_LEFT               0x240 // Left mouse button
+#define PORT_ACT_MOUSE_RIGHT              0x241 // Right mouse button
+
+
 #define LOOK_MODE_MOUSE    0
 #define LOOK_MODE_ABSOLUTE 1
 #define LOOK_MODE_JOYSTICK 2
