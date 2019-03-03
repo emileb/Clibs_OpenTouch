@@ -60,7 +60,8 @@
 #define PORT_MALICE_RELOAD  60
 #define PORT_MALICE_CYCLE   61
 
-
+//SMD for Q2
+#define PORT_SMD_USE        62
 
 //JK2
 //#define PORT_ACT_FORCE_LIGHTNING 60

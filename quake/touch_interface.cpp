@@ -32,8 +32,9 @@ int mobile_screen_height;
 
 touchscreemode_t currentScreenMode = TS_BLANK;
 
-#define KEY_SHOW_WEAPONS 0x1000
-#define KEY_SHOOT        0x1001
+#define KEY_SHOW_WEAPONS     0x1000
+#define KEY_SHOOT            0x1001
+#define KEY_PRECISION_SHOOT  0x1002
 
 #define KEY_SHOW_INV     0x1006
 #define KEY_QUICK_CMD    0x1007
@@ -71,7 +72,7 @@ static float forward_sens = 1;
 static float pitch_sens = 1;
 static float yaw_sens = 1;
     
-static bool m_shooting = false;
+static bool shooting = false;
 
 // Show buttons in game
 static bool showCustomOn = false;
@@ -263,6 +264,7 @@ static void openGLEnd()
     glEnable(GL_DEPTH_TEST);
 #endif
 
+
 #ifdef QUAKE2
 	void nanoPopState();
 	nanoPopState();
@@ -308,8 +310,12 @@ static void gameButton(int state,int code)
 {
     if (code == KEY_SHOOT)
     {
-        m_shooting = state;
+        shooting = state;
         PortableAction(state,PORT_ACT_ATTACK);
+    }
+    else if( code == KEY_PRECISION_SHOOT )
+    {
+        precisionShoot = state;
     }
     else if (code == KEY_SHOW_WEAPONS)
     {
@@ -534,7 +540,8 @@ static void right_stick(float joy_x, float joy_y,float mouse_x, float mouse_y)
 {
     //LOGI(" mouse x = %f",mouse_x);
     int invert        = invertLook ? -1 : 1;
-    float scale       = (m_shooting && precisionShoot) ? 0.3 : 1;
+    //float scale       = (shooting && precisionShoot) ? 0.3 : 1;
+    float scale       = (precisionShoot) ? 0.3 : 1; // Actually always do this when pressed, not just when shooting
     float pitchMouse       = mouse_y * pitch_sens * invert * scale;
     float pitchJoystick    = joy_y * pitch_sens * invert * scale * -2;
 
@@ -811,7 +818,7 @@ void frameControls()
 
 //openGLStart();
 //openGLEnd();
-   controlsContainer.draw();
+  controlsContainer.draw();
 }
 
 void initControls(int width, int height,const char * graphics_path)
@@ -958,6 +965,7 @@ void initControls(int width, int height,const char * graphics_path)
         {
             tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
             tcGameMain->addControl(new touchcontrols::Button("prev_weapon",touchcontrols::RectF(0,5,3,7),"prev_weap",PORT_ACT_PREV_WEP,false,false,"Prev weapon"));
+            tcGameMain->addControl(new touchcontrols::Button("precision_shoot",touchcontrols::RectF(0,7,2,9),"precision_shoot",KEY_PRECISION_SHOOT,false,true,"Precision aim"));
         }
         else // MALICE
         {
@@ -967,6 +975,11 @@ void initControls(int width, int height,const char * graphics_path)
 			tcGameMain->addControl(new touchcontrols::Button("malice_cycle",touchcontrols::RectF(15,0,17,2),"cycle",PORT_MALICE_CYCLE));
         }
 
+        // Slight mechanical destruction for YQ2
+        if(gameType == Q2DLL_SMD)
+        {
+        	tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(22,3,24,5),"use",PORT_SMD_USE,false,false,"Use"));
+        }
 
         touchJoyRight = new touchcontrols::TouchJoy("touch",touchcontrols::RectF(17,4,26,16),"look_arrow");
         tcGameMain->addControl(touchJoyRight);
@@ -1135,6 +1148,8 @@ void initControls(int width, int height,const char * graphics_path)
             touchcontrols::setGlobalXmlAppend(".malice");
         else if( gameType == Q1HEXEN2 )
             touchcontrols::setGlobalXmlAppend(".hexen2");
+        else if(gameType == Q2DLL_SMD)
+            touchcontrols::setGlobalXmlAppend(".smd");
 
 #ifdef QUAKE3
         tcMenuMain->setXMLFile((std::string)graphics_path +  "/quake3_menu.xml");
