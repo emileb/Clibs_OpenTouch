@@ -990,9 +990,11 @@ void initControls(int width, int height,const char * graphics_path)
         touchJoyLeft->signal_move.connect(sigc::ptr_fun(&left_stick) );
         touchJoyLeft->signal_double_tap.connect(sigc::ptr_fun(&left_double_tap) );
 
+#if 1
         // SWAPFIX
         touchJoyLeft->registerTouchJoySWAPFIX( touchJoyRight );
         touchJoyRight->registerTouchJoySWAPFIX( touchJoyLeft );
+#endif
 
         tcGameMain->signal_button.connect(  sigc::ptr_fun(&gameButton) );
         tcGameMain->signal_settingsButton.connect(  sigc::ptr_fun(&gameSettingsButton) );
