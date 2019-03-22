@@ -410,8 +410,8 @@ static void automapButton(int state,int code)
     if( state && code == PORT_ACT_MAP && mapState == 0 )
     {
 #ifdef RETRO_DOOM // Turn on follow mode to allow movment in map mode
-        void AM_toggleFollowMode(void);
-        AM_toggleFollowMode();
+        void AM_ToggleFollowMode(void);
+        AM_ToggleFollowMode();
 #endif
         mapState = 1;
     }
