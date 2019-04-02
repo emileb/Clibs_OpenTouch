@@ -641,6 +641,7 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
     yaw_sens = settings.turnSensitivity;
 
     showSticks = settings.showJoysticks;
+    precisionShoot = settings.precisionShoot;
 
     joystickLookMode =  settings.joystickLookMode;
     autoHideInventory = settings.autoHideInventory;
