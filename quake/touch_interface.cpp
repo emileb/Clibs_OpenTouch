@@ -173,7 +173,7 @@ static void openGLStart()
     }
 #endif
 
-#if defined(FTEQW) || defined(QUAKE3) || defined(QUAKESPASM)
+#if defined(FTEQW) || defined(QUAKE3) || defined(QUAKESPASM) || defined(UHEXEN2)
 	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
 	glGetFloatv(GL_PROJECTION_MATRIX, projection);
 	glGetFloatv(GL_MODELVIEW_MATRIX, model);
@@ -818,7 +818,7 @@ void frameControls()
 
 //openGLStart();
 //openGLEnd();
-  controlsContainer.draw();
+    controlsContainer.draw();
 }
 
 void initControls(int width, int height,const char * graphics_path)
@@ -1201,6 +1201,15 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
 
     LOGI("Game type = %d", gameType );
 
+#ifdef UHEXEN2
+/*
+	setenv("LIBGL_ES","2",1);
+	setenv("LIBGL_GL","20",1);
+	setenv("LIBGL_DEFAULTWRAP","0",1);
+    touchcontrols::gl_setGLESVersion( 2 );
+    touchcontrols::gl_useGL4ES(); // GLES2 always uses GL4ES library
+*/
+#endif
 // Quake 2 does not use glGenTextures
 #if defined(QUAKE2)
 	touchcontrols::setTextureNumberStart( 5000 );
