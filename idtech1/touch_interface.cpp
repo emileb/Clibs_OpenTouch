@@ -19,6 +19,11 @@
 #include <jni.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"touch_interface", __VA_ARGS__))
 
+// Stupid LOCAL_SHORT_COMMANDS loses quotes on command line
+#ifdef GZDOOM_GL3
+#define ENGINE_NAME "gzdoom_dev"
+#endif
+
 extern "C"
 {
 
@@ -229,7 +234,7 @@ touchcontrols::gl_startRender();
 
 
 #if defined(GZDOOM_GL3)
-touchcontrols::gl_startGLES3();
+//touchcontrols::gl_startGLES3();
      //glBindBuffer(GL_ARRAY_BUFFER, 0);
      //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
      //glBindFramebuffer(GL_FRAMEBUFFER, 0);
