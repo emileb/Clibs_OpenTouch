@@ -69,7 +69,7 @@
 #include "d_netinf.h"
 #include "v_palette.h"
 #include "m_cheat.h"
-#include "compatibility.h"
+//#include "compatibility.h"
 #include "m_joy.h"
 #include "sc_man.h"
 #include "po_man.h"

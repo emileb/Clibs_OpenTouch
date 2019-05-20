@@ -153,7 +153,7 @@ video_mode_t V_GetMode(void);
     #define SW_SDL_RENDER 0
 #endif
 
-#if defined(GZDOOM)
+#if defined(GZDOOM) || defined(ZANDRONUM_30)
 
 #ifdef  GZDOOM_DEV // For the dev versions it is always OpenGL, even software mode uses ogl
 static int currentrenderer = 1;
@@ -173,29 +173,6 @@ static void openGLStart()
 
 touchcontrols::gl_startRender();
 
-#if defined(GZDOOM) && !defined(GZDOOM_GL3)
-    if(currentrenderer == 1)
-    {
-    /*
-        glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
-        glGetFloatv(GL_PROJECTION_MATRIX, projection);
-        glGetFloatv(GL_MODELVIEW_MATRIX, model);
-        */
-    }
-#endif
-
-
-#if defined(PRBOOM_DOOM)
-    if(V_GetMode() == VID_MODEGL)
-    {
-/*
-         glMatrixMode(GL_PROJECTION);
-         glPushMatrix();
-         glMatrixMode(GL_MODELVIEW);
-         glPushMatrix();
-*/
-    }
-#endif
 
 #if !defined(GZDOOM_GL3)
     if( touchcontrols::gl_getGLESVersion() == 1 )
@@ -228,8 +205,12 @@ touchcontrols::gl_startRender();
     }
 #endif
 
+#if defined(ZANDRONUM_30)
+    //glBindBuffer(GL_ARRAY_BUFFER, 0); //GZDoom binds a buffer, this unbinds it
+#endif
+
 #if defined(GZDOOM)  && !defined(GZDOOM_GL3)
-    glBindBuffer(GL_ARRAY_BUFFER, 0); //GZDoom binds a buffer, this unbinds it
+    //glBindBuffer(GL_ARRAY_BUFFER, 0); //GZDoom binds a buffer, this unbinds it
 #endif
 
 
@@ -259,30 +240,19 @@ bool sdlSWMode = (V_GetMode() != VID_MODEGL);
 bool sdlSWMode = false;
 #endif
 
-#if defined(GZDOOM) && !defined(GZDOOM_GL3)
+
+
+#if ( defined(GZDOOM) || defined(ZANDRONUM_30) )&& !defined(GZDOOM_GL3)
     if( touchcontrols::gl_getGLESVersion() == 1 )
     {
         if(currentrenderer == 1) //GL mode
         {
-        /*
-            glMatrixMode(GL_MODELVIEW);
-            glLoadMatrixf(model);
-            glMatrixMode(GL_PROJECTION);
-            glLoadMatrixf(projection);
-            glMatrixMode(matrixMode);
-        */
             void jwzgles_restore (void);
             jwzgles_restore();
         }
         else
         {
             sdlSWMode = true;
-            /*
-            glDisable (GL_BLEND);
-            glColor4f(1,1,1,1);
-            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-            glLoadIdentity();
-            */
         }
     }
     else
@@ -291,7 +261,7 @@ bool sdlSWMode = false;
     }
 #endif
 
-
+#if !defined(GZDOOM_GL3)
 // Setup for SDL Software rendering again
 if( SW_SDL_RENDER || sdlSWMode )
 {
@@ -301,7 +271,7 @@ if( SW_SDL_RENDER || sdlSWMode )
      glMatrixMode(GL_MODELVIEW);
      glLoadIdentity();
 }
-
+#endif
 
 #if defined(PRBOOM_DOOM)
     if(V_GetMode() == VID_MODEGL)
@@ -838,6 +808,7 @@ void frameControls()
     //static bool inited = false;
     if( SDL_NewEGLCreated() )
     {
+        LOGI("NEW EGL CONTEXT");
         touchcontrols::clearGlTexCache();
         controlsContainer.initGL();
     }
@@ -973,7 +944,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("attack_alt",touchcontrols::RectF(21,5,23,7),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt fire"));
 #endif
 
-#ifdef GZDOOM
+#if defined(GZDOOM) || defined(ZANDRONUM_30)
         tcGameMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(0,7,2,9),"custom_show",KEY_SHOW_CUSTOM,false,true,"Show custom"));
 #endif
         
@@ -981,7 +952,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
         tcGameMain->addControl(new touchcontrols::Button("prev_weapon",touchcontrols::RectF(0,5,3,7),"prev_weap",PORT_ACT_PREV_WEP,false,false,"Prev weapon"));
 
-#if defined(GZDOOM) || defined(RETRO_DOOM)
+#if defined(GZDOOM) || defined(RETRO_DOOM) || defined(ZANDRONUM_30)
         tcGameMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE,false,true,"Console"));
 #endif
 
@@ -1183,7 +1154,7 @@ void initControls(int width, int height,const char * graphics_path)
         controlsContainer.addControlGroup(tcInventory); // before gamemain so touches don't go through
         controlsContainer.addControlGroup(tcGamepadUtility); // before gamemain so touches don't go through
         controlsContainer.addControlGroup(tcDPadInventory);
-#ifdef GZDOOM
+#if defined(GZDOOM) || defined(ZANDRONUM_30)
         controlsContainer.addControlGroup(tcCutomButtons);
 #endif
         controlsContainer.addControlGroup(tcGameMain);
