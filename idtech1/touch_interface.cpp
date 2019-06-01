@@ -86,7 +86,9 @@ static float strafe_sens = 1;
 static float forward_sens = 1;
 static float pitch_sens = 1;
 static float yaw_sens = 1;
-    
+
+static float precisionSensitivty = 0.5;
+
 static bool m_shooting = false;
 
 // Show buttons in game
@@ -544,7 +546,7 @@ static void right_stick(float joy_x, float joy_y,float mouse_x, float mouse_y)
 {
     //LOGI(" mouse x = %f",mouse_x);
     int invert        = invertLook ? -1 : 1;
-    float scale       = (m_shooting && precisionShoot) ? 0.3 : 1;
+    float scale       = (m_shooting && precisionShoot) ? precisionSensitivty : 1;
     float pitchMouse       = mouse_y * pitch_sens * invert * scale;
     float pitchJoystick    = joy_y * pitch_sens * invert * scale * -2;
 
@@ -617,6 +619,7 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
 
     showSticks = settings.showJoysticks;
     precisionShoot = settings.precisionShoot;
+    precisionSensitivty = settings.precisionSenitivity;
 
     joystickLookMode =  settings.joystickLookMode;
     autoHideInventory = settings.autoHideInventory;
@@ -1226,6 +1229,9 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
         touchcontrols::gl_useGL4ES(); // GLES2 always uses GL4ES library
     }
 
+#ifdef GZDOOM_GL3
+    touchcontrols::gl_setGLESVersion( 3 );
+#endif
 
     gameType = game;
 
