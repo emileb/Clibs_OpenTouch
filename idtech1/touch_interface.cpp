@@ -1104,10 +1104,10 @@ void initControls(int width, int height,const char * graphics_path)
         tcCutomButtons->addControl(new touchcontrols::Button("E",touchcontrols::RectF(5,9,7,11),"Custom_5",PORT_ACT_CUSTOM_4,false,false,"Custom 5"));
         tcCutomButtons->addControl(new touchcontrols::Button("F",touchcontrols::RectF(7,9,9,11),"Custom_6",PORT_ACT_CUSTOM_5,false,false,"Custom 6"));
 
-        touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_8,PORT_ACT_CUSTOM_9,PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,false,"Quad Slide 1");
+        touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,false,"Quad Slide 1");
         tcCutomButtons->addControl(qs1);
 
-        touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,false,"Quad Slide 2");
+        touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,PORT_ACT_CUSTOM_16,PORT_ACT_CUSTOM_17,false,"Quad Slide 2");
         tcCutomButtons->addControl(qs2);
 
         //tcCutomButtons->setColor(0.7,0.7,1.f);

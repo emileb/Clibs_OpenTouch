@@ -158,6 +158,8 @@
 #define PORT_ACT_CUSTOM_13         163
 #define PORT_ACT_CUSTOM_14         164
 #define PORT_ACT_CUSTOM_15         165
+#define PORT_ACT_CUSTOM_16         166
+#define PORT_ACT_CUSTOM_17         167
 
 //strife VE
 #define PORT_ACT_INVSLOT0         170

@@ -134,10 +134,10 @@ void PortableAction(int state, int action)
 
 	if ((action >= PORT_ACT_CUSTOM_0) && (action <= PORT_ACT_CUSTOM_15))
     {
-        if( action <= PORT_ACT_CUSTOM_7 )
-            PortableKeyEvent(state, SDL_SCANCODE_KP_1 + action - PORT_ACT_CUSTOM_0, 0);
-        else if(action <= PORT_ACT_CUSTOM_15)
-             PortableKeyEvent(state, SDL_SCANCODE_A + action - PORT_ACT_CUSTOM_8, 0);
+         if( action <= PORT_ACT_CUSTOM_9 )
+             PortableKeyEvent(state, SDL_SCANCODE_KP_1 + action - PORT_ACT_CUSTOM_0, 0);
+         else if(action <= PORT_ACT_CUSTOM_17)
+              PortableKeyEvent(state, SDL_SCANCODE_A + action - PORT_ACT_CUSTOM_10, 0);
     }
 	else if(( PortableGetScreenMode() == TS_MENU ) || ( PortableGetScreenMode() == TS_BLANK ))
 	{
