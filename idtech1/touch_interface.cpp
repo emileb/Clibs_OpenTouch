@@ -42,6 +42,12 @@ int mobile_screen_height;
 
 touchscreemode_t currentScreenMode = TS_BLANK;
 
+#define COMMAND_SET_BACKLIGHT      0x8001
+#define COMMAND_SHOW_GYRO_OPTIONS  0x8002
+#define COMMAND_SHOW_KEYBOARD      0x8003
+#define COMMAND_SHOW_GAMEPAD       0x8004
+#define COMMAND_VIBRATE            0x8005
+
 #define KEY_SHOW_WEAPONS 0x1000
 #define KEY_SHOOT        0x1001
 
@@ -287,6 +293,11 @@ if( SW_SDL_RENDER || sdlSWMode )
 
 }
 
+static void vibrate( int duration )
+{
+    Android_JNI_SendMessage( COMMAND_VIBRATE, duration );
+}
+
 static void gameSettingsButton(int state)
 {
     if (state == 1)
@@ -444,6 +455,13 @@ static void weaponWheelSelected(int enabled)
 static void weaponWheel(int segment)
 {
     LOGI("weaponWheel %d",segment);
+
+    int number = 0;
+    if( segment == 9 ) // Press '0'
+        number = 0;
+    else
+        number = 1 + segment;
+
     PortableAction(1,PORT_ACT_WEAP1 + segment);
     PortableAction(0,PORT_ACT_WEAP1 + segment);
 }
@@ -475,13 +493,13 @@ static void menuButton(int state,int code)
     {
         // Show gyro options
         if (state)
-            Android_JNI_SendMessage( 0x8002, 0 );
+            Android_JNI_SendMessage( COMMAND_SHOW_GYRO_OPTIONS, 0 );
     }
     else  if(code == KEY_SHOW_GAMEPAD)
     {
         // Show gamepad options
         if (state)
-            Android_JNI_SendMessage( 0x8004, 0 );
+            Android_JNI_SendMessage( COMMAND_SHOW_GAMEPAD, 0 );
     }
     else if(code == PORT_ACT_CONSOLE)
     {
@@ -592,7 +610,7 @@ static void showHideKeyboard( int show )
     if( useSystemKeyboard )
     {
         if( show )
-            Android_JNI_SendMessage( 0x8003, 0 );
+            Android_JNI_SendMessage( COMMAND_SHOW_KEYBOARD, 0 );
     }
     else
     {
@@ -603,7 +621,7 @@ static void showHideKeyboard( int show )
 static void brightnessSlideMouse( int action, float x, float y, float dx, float dy )
 {
     y = 1 - y;
-    Android_JNI_SendMessage( 0x8001, y * 255 );
+    Android_JNI_SendMessage( COMMAND_SET_BACKLIGHT, y * 255 );
 }
 
 static void touchSettings( touchcontrols::tTouchSettings settings )
@@ -854,7 +872,9 @@ void initControls(int width, int height,const char * graphics_path)
     if (!controlsCreated)
     {
         LOGI("creating controls");
-        
+
+        touchcontrols::signal_vibrate.connect( sigc::ptr_fun( &vibrate ));
+
         touchcontrols::gl_setGraphicsBasePath(graphics_path);
         //setControlsContainer(&controlsContainer);
         
@@ -1003,10 +1023,11 @@ void initControls(int width, int height,const char * graphics_path)
         //Weapon wheel -------------------------------------------
         //------------------------------------------------------
         const char * weapon_wheel_gfx = "weapon_wheel";
-        int weaponWheelNbr = 8;
+        int weaponWheelNbr = 10;
         if( gameType == GAME_TYPE_HERETIC )
         {
             weapon_wheel_gfx = "weapon_wheel_heretic";
+            weaponWheelNbr = 8;
         }
         else if( gameType == GAME_TYPE_HEXEN )
         {
