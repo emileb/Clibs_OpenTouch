@@ -32,6 +32,13 @@ int mobile_screen_height;
 
 touchscreemode_t currentScreenMode = TS_BLANK;
 
+#define COMMAND_SET_BACKLIGHT      0x8001
+#define COMMAND_SHOW_GYRO_OPTIONS  0x8002
+#define COMMAND_SHOW_KEYBOARD      0x8003
+#define COMMAND_SHOW_GAMEPAD       0x8004
+#define COMMAND_VIBRATE            0x8005
+
+
 #define KEY_SHOW_WEAPONS     0x1000
 #define KEY_SHOOT            0x1001
 #define KEY_PRECISION_SHOOT  0x1002
@@ -174,29 +181,32 @@ static void openGLStart()
 #endif
 
 #if defined(FTEQW) || defined(QUAKE3) || defined(QUAKESPASM) || defined(UHEXEN2)
-	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
-	glGetFloatv(GL_PROJECTION_MATRIX, projection);
-	glGetFloatv(GL_MODELVIEW_MATRIX, model);
+    if( touchcontrols::gl_getGLESVersion() == 1 )
+    {
+        glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
+        glGetFloatv(GL_PROJECTION_MATRIX, projection);
+        glGetFloatv(GL_MODELVIEW_MATRIX, model);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glViewport(0, 0, mobile_screen_width, mobile_screen_height);
-    glOrthof(0.0f, mobile_screen_width, mobile_screen_height, 0.0f, -1.0f, 1.0f);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glViewport(0, 0, mobile_screen_width, mobile_screen_height);
+        glOrthof(0.0f, mobile_screen_width, mobile_screen_height, 0.0f, -1.0f, 1.0f);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
 
-    //-----------------
+        //-----------------
 
-    glDisableClientState(GL_COLOR_ARRAY);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY );
+        glDisableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY );
 
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glEnable (GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_TEXTURE_2D);
-    glDisable(GL_ALPHA_TEST);
-    glDisable(GL_DEPTH_TEST);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glEnable (GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_TEXTURE_2D);
+        glDisable(GL_ALPHA_TEST);
+        glDisable(GL_DEPTH_TEST);
+    }
 #endif
 
 #ifdef QUAKE2
@@ -241,15 +251,18 @@ static void openGLEnd()
 #endif
 
 #ifdef FTEQW
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(model);
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(projection);
-	glMatrixMode(matrixMode);
+    if( touchcontrols::gl_getGLESVersion() == 1 )
+    {
+        glMatrixMode(GL_MODELVIEW);
+        glLoadMatrixf(model);
+        glMatrixMode(GL_PROJECTION);
+        glLoadMatrixf(projection);
+        glMatrixMode(matrixMode);
 
-	glColor4f(1,1,1,1);
-	void BE_FixPointers();
-	BE_FixPointers();
+        glColor4f(1,1,1,1);
+        void BE_FixPointers();
+        BE_FixPointers();
+	}
 #endif
 
 #ifdef DARKPLACES
@@ -286,6 +299,11 @@ static void openGLEnd()
 
 	jwzgles_restore();
 #endif
+}
+
+static void vibrate( int duration )
+{
+    Android_JNI_SendMessage( COMMAND_VIBRATE, duration );
 }
 
 static void gameSettingsButton(int state)
@@ -473,13 +491,13 @@ static void menuButton(int state,int code)
     {
         // Show gyro options
         if (state)
-            Android_JNI_SendMessage( 0x8002, 0 );
+            Android_JNI_SendMessage( COMMAND_SHOW_GYRO_OPTIONS, 0 );
     }
     else  if(code == KEY_SHOW_GAMEPAD)
     {
         // Show gamepad options
         if (state)
-            Android_JNI_SendMessage( 0x8004, 0 );
+            Android_JNI_SendMessage( COMMAND_SHOW_GAMEPAD, 0 );
     }
     else
     {
@@ -576,7 +594,7 @@ static void showHideKeyboard( int show )
     if( useSystemKeyboard )
     {
         if( show )
-            Android_JNI_SendMessage( 0x8003, 0 );
+            Android_JNI_SendMessage( COMMAND_SHOW_KEYBOARD, 0 );
     }
     else
     {
@@ -587,7 +605,7 @@ static void showHideKeyboard( int show )
 static void brightnessSlideMouse( int action, float x, float y, float dx, float dy )
 {
     y = 1 - y;
-    Android_JNI_SendMessage( 0x8001, y * 255 );
+    Android_JNI_SendMessage( COMMAND_SET_BACKLIGHT, y * 255 );
 }
 
 #ifdef QUAKE3
@@ -835,7 +853,8 @@ void initControls(int width, int height,const char * graphics_path)
 
         touchcontrols::gl_setGraphicsBasePath(graphics_path);
         //setControlsContainer(&controlsContainer);
-        
+        touchcontrols::signal_vibrate.connect( sigc::ptr_fun( &vibrate ));
+
         controlsContainer.openGL_start.connect( sigc::ptr_fun(&openGLStart));
         controlsContainer.openGL_end.connect( sigc::ptr_fun(&openGLEnd));
 
