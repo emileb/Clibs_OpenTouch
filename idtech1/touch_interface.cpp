@@ -99,6 +99,7 @@ static bool m_shooting = false;
 
 // Show buttons in game
 static bool showCustomOn = false;
+static bool showWeaponNumbersOn = false;
 
 // Show custom buttons in the menu
 static bool showCustomMenu = false;
@@ -329,6 +330,7 @@ static void gameButton(int state,int code)
         {
             if (!tcGameWeapons->enabled)
             {
+                showWeaponNumbersOn = true;
                 tcGameWeapons->animateIn(5);
             }
         }
@@ -588,7 +590,10 @@ static void selectWeaponButton(int state, int code)
 {
     PortableAction(state,PORT_ACT_WEAP0 + code);
     if (autoHideNumbers && state == 0)
+    {
+        showWeaponNumbersOn = false;
         tcGameWeapons->animateOut(5);
+    }
 }
 
 static void automap_multitouch_mouse_move(int action,float x, float y,float dx, float dy)
@@ -792,6 +797,12 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                     {
                         tcCutomButtons->setEnabled(true);
                         tcCutomButtons->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
+                    }
+
+                    // Bring back weapon numbers
+                    if( showWeaponNumbersOn )
+                    {
+                        tcGameWeapons->animateIn(5);
                     }
                 }
                 break;
