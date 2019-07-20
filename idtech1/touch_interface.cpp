@@ -60,6 +60,8 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 #define KEY_BACK_BUTTON  0x100B
 #define KEY_SHOW_GYRO    0x100C
 #define KEY_SHOW_GAMEPAD 0x100D
+#define KEY_USE_MOUSE    0x100E
+#define KEY_LEFT_MOUSE   0x100F
 
 #define GAME_OPTION_AUTO_HIDE_GAMEPAD   0x1
 #define GAME_OPTION_HIDE_MENU_AND_GAME  0x2
@@ -97,6 +99,8 @@ static float precisionSensitivty = 0.5;
 
 static bool m_shooting = false;
 
+static bool useMouse = false;
+
 // Show buttons in game
 static bool showCustomOn = false;
 static bool showWeaponNumbersOn = false;
@@ -130,6 +134,7 @@ touchcontrols::TouchControls *tcCutomButtons=0;
 touchcontrols::TouchControls *tcDemo=0;
 touchcontrols::TouchControls *tcGamepadUtility=0;
 touchcontrols::TouchControls *tcDPadInventory=0;
+touchcontrols::TouchControls *tcMouse=0;
 
 // So can hide and show these buttons
 touchcontrols::TouchJoy *touchJoyLeft;
@@ -379,6 +384,13 @@ static void gameButton(int state,int code)
             mobileBackButton();
         }
     }
+    else if( code == KEY_USE_MOUSE)
+    {
+        if( state )
+        {
+            useMouse = true;
+        }
+    }
     else if( code == PORT_ACT_MAP )
     {
         if (state )
@@ -406,6 +418,7 @@ static void automapButton(int state,int code)
         mapState = 1;
     }
 }
+
 
 static void gameUtilitiesButton(int state,int code)
 {
@@ -715,6 +728,39 @@ static void keyboardKeyPressed( uint32_t key )
     }
 }
 
+static void mouse_move(int action,float x, float y,float mouse_x, float mouse_y)
+{
+#if defined(GZDOOM) || defined(ZANDRONUM_30)
+    if( action == TOUCHMOUSE_MOVE )
+	{
+	    PortableMouse(mouse_x,mouse_y);
+	}
+	/* // Dont do this because pressing the other buttons will cause a tap
+	else if( action == TOUCHMOUSE_TAP )
+	{
+	    PortableAction(1, PORT_ACT_MENU_SELECT);
+	    PortableAction(0, PORT_ACT_MENU_SELECT);
+	}
+	*/
+#endif
+}
+
+static void mouseButton(int state,int code)
+{
+#if defined(GZDOOM) || defined(ZANDRONUM_30)
+    // Auto hide the gamepad utilitie, except if showing consol
+    if( (code == KEY_BACK_BUTTON) && state )
+    {
+        useMouse = false;
+    }
+    else if( code == KEY_LEFT_MOUSE )
+    {
+        PortableMouseButton( state, 1, 0, 0 );
+    }
+    LOGI("usemOuse = %d",useMouse);
+#endif
+}
+
 
 static void setHideSticks(bool v)
 {
@@ -763,6 +809,10 @@ static void updateTouchScreenMode(touchscreemode_t mode)
             case TS_DEMO:
                 tcDemo->resetOutput();
                 tcDemo->fade(touchcontrols::FADE_OUT,DEFAULT_FADE_FRAMES);
+                break;
+            case TS_MOUSE:
+                tcMouse->resetOutput();
+                tcMouse->fade(touchcontrols::FADE_OUT,DEFAULT_FADE_FRAMES);
                 break;
             case TS_CONSOLE:
                 break;
@@ -826,6 +876,10 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                 tcDemo->setEnabled(true);
                 tcDemo->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
                 break;
+           case TS_MOUSE:
+                tcMouse->setEnabled(true);
+                tcMouse->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
+                break;
             case TS_CONSOLE:
                 break;
         }
@@ -864,6 +918,11 @@ void frameControls()
             demoControlsAlpha -= DEMO_ALPFA_DEC;
         }
         tcDemo->setAlpha(demoControlsAlpha);
+    }
+
+    if( (screenMode == TS_GAME) & useMouse ) // Show mouse screen
+    {
+        screenMode = TS_MOUSE;
     }
 
     updateTouchScreenMode(screenMode);
@@ -907,6 +966,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcDemo = new touchcontrols::TouchControls("demo_playback",false,false);
         tcGamepadUtility = new touchcontrols::TouchControls("gamepad_utility",false,false);
         tcDPadInventory = new touchcontrols::TouchControls("dpad_inventory",false,false);
+        tcMouse = new touchcontrols::TouchControls("mouse",false,false);
 
         //Menu -------------------------------------------
         //------------------------------------------------------
@@ -956,6 +1016,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD,false,false,"Quick load"));
         tcGameMain->addControl(new touchcontrols::Button("map",touchcontrols::RectF(2,0,4,2),"map",PORT_ACT_MAP,false,false,"Show map"));
         tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,true,"Show Keyboard"));
+        tcGameMain->addControl(new touchcontrols::Button("show_mouse",touchcontrols::RectF(4,0,6,2),"left_mouse",KEY_USE_MOUSE,false,true,"Use mouse"));
 
 #if defined(RETRO_DOOM) || defined(CHOCOLATE) || defined (PRBOOM_DOOM)
         tcGameMain->addControl(new touchcontrols::Button("gamma",touchcontrols::RectF(17,0,19,2),"gamma",PORT_ACT_GAMMA,false,false,"Gamma"));
@@ -1182,6 +1243,15 @@ void initControls(int width, int height,const char * graphics_path)
         tcDPadInventory->addControl( dpadInventory );
         tcDPadInventory->setAlpha(0.9);
 
+        // Mouse for GZDoom
+        touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse",touchcontrols::RectF(0,0,26,16),"");
+        mouse->setHideGraphics(true);
+        mouse->setEditable(false);
+        tcMouse->addControl(mouse);
+        mouse->signal_action.connect(sigc::ptr_fun(&mouse_move) );
+        tcMouse->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON,false,false,"Back"));
+        tcMouse->addControl(new touchcontrols::Button("left_button",touchcontrols::RectF(0,6,3,10),"left_mouse",KEY_LEFT_MOUSE,false,false,"Back"));
+        tcMouse->signal_button.connect( sigc::ptr_fun(&mouseButton) );
 
         //---------------------------------------------------------------
         //---------------------------------------------------------------
@@ -1201,6 +1271,7 @@ void initControls(int width, int height,const char * graphics_path)
         controlsContainer.addControlGroup(tcAutomap);
         controlsContainer.addControlGroup(tcBlank);
         controlsContainer.addControlGroup(tcDemo);
+        controlsContainer.addControlGroup(tcMouse);
 
         controlsCreated = 1;
 

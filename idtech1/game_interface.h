@@ -27,7 +27,8 @@ typedef enum
 	TS_CONSOLE,
     TS_Y_N,
 	TS_CUSTOM,
-	TS_DEMO
+	TS_DEMO,
+	TS_MOUSE,
 } touchscreemode_t;
 
 
@@ -44,6 +45,9 @@ void PortableMoveFwd(float fwd);
 void PortableMoveSide(float strafe);
 void PortableLookPitch(int mode, float pitch);
 void PortableLookYaw(int mode, float pitch);
+
+void PortableMouse(float dx,float dy);
+void PortableMouseButton(int state, int button, float dx,float dy);
 
 void PortableCommand(const char * cmd);
 void PortableAutomapControl(float zoom, float x, float y);

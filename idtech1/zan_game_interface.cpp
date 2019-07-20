@@ -80,6 +80,7 @@
 extern "C"
 {
     extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
+    void Android_OnMouse( int androidButton, int action, float x, float y);
 }
 
 //Move left/right fwd/back
@@ -126,6 +127,32 @@ void buttonChange(int state,FButtonStatus *button)
 		button->bWentUp = true;
 		button->bDown = false;
 	}
+}
+
+#define ACTION_DOWN 0
+#define ACTION_UP 1
+#define ACTION_MOVE 2
+#define ACTION_MOVE_REL 3
+#define ACTION_HOVER_MOVE 7
+#define ACTION_SCROLL 8
+#define BUTTON_PRIMARY 1
+#define BUTTON_SECONDARY 2
+#define BUTTON_TERTIARY 4
+#define BUTTON_BACK 8
+#define BUTTON_FORWARD 16
+
+void PortableMouse(float dx,float dy)
+{
+    //LOGI("%f %f",dx,dy);
+    Android_OnMouse(0, ACTION_MOVE_REL, -dx * 1000, -dy * 600);
+}
+
+void PortableMouseButton(int state, int button, float dx,float dy)
+{
+    if( state )
+        Android_OnMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0);
+    else
+        Android_OnMouse(BUTTON_PRIMARY, ACTION_UP,0, 0);
 }
 
 void PortableAction(int state, int action)
