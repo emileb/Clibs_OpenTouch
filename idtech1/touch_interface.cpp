@@ -1159,6 +1159,10 @@ void initControls(int width, int height,const char * graphics_path)
         //Blank -------------------------------------------
         //------------------------------------------------------
         tcBlank->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,0,26,16),"",0x123));
+#if defined(GZDOOM1_9) || defined(ZANDRONUM_30)
+        tcBlank->addControl(new touchcontrols::Button("fmod",touchcontrols::RectF(0,15,4,16),"fmod_logo",0));
+        tcBlank->setAlpha(0.8);
+#endif
         tcBlank->signal_button.connect(  sigc::ptr_fun(&blankButton) );
 
         //Demo -------------------------------------------
