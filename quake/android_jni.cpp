@@ -136,27 +136,46 @@ JAVA_FUNC(backButton) (JNIEnv *env, jobject obj)
 }
 
 void EXPORT_ME
-JAVA_FUNC(analogFwd) (JNIEnv *env, jobject obj,	jfloat v)
+JAVA_FUNC(analogFwd) (JNIEnv *env, jobject obj,	jfloat v, jfloat raw)
 {
+
+    if( axisValue(ANALOGUE_AXIS_FWD, raw) )
+        v = 0; // If the ui conrols used the value, set it to 0
+
 	PortableMoveFwd(v);
 }
 
 void EXPORT_ME
-JAVA_FUNC(analogSide) (JNIEnv *env, jobject obj,jfloat v)
+JAVA_FUNC(analogSide) (JNIEnv *env, jobject obj,jfloat v, jfloat raw)
 {
+
+    if( axisValue(ANALOGUE_AXIS_SIDE, raw) )
+        v = 0; // If the ui conrols used the value, set it to 0
+
 	PortableMoveSide(v);
 }
 
 void EXPORT_ME
-JAVA_FUNC(analogPitch) (JNIEnv *env, jobject obj,
-jint mode,jfloat v)
+JAVA_FUNC(analogPitch) (JNIEnv *env, jobject obj,jint mode,jfloat v, jfloat raw)
 {
+    if( mode == LOOK_MODE_JOYSTICK )
+    {
+        if( axisValue(ANALOGUE_AXIS_PITCH, raw) )
+            v = 0; // If the ui conrols used the value, set it to 0
+    }
+
     PortableLookPitch(mode, v);
 }
 
 void EXPORT_ME
-JAVA_FUNC(analogYaw) (JNIEnv *env, jobject obj,	jint mode,jfloat v)
+JAVA_FUNC(analogYaw) (JNIEnv *env, jobject obj,	jint mode,jfloat v, jfloat raw)
 {
+    if( mode == LOOK_MODE_JOYSTICK )
+    {
+        if( axisValue(ANALOGUE_AXIS_YAW, raw) )
+            v = 0; // If the ui conrols used the value, set it to 0
+    }
+
 	PortableLookYaw(mode, v);
 }
 

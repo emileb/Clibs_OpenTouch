@@ -121,6 +121,9 @@ touchcontrols::TouchJoy *touchJoyRight;
 // So gampad can control keyboard
 touchcontrols::UI_Keyboard *uiKeyboard;
 
+// So gamepad can access it
+touchcontrols::WheelSelect *wheelSelect;
+
 touchcontrols::ButtonGrid *uiInventoryButtonGrid;
 
 // Send message to JAVA SDL activity
@@ -1043,10 +1046,10 @@ void initControls(int width, int height,const char * graphics_path)
         const char * weapon_wheel_gfx = "weapon_wheel";
         int weaponWheelNbr = 10;
 
-        touchcontrols::WheelSelect *wheel = new touchcontrols::WheelSelect("weapon_wheel",touchcontrols::RectF(7,2,19,14),weapon_wheel_gfx,weaponWheelNbr);
-        wheel->signal_selected.connect(sigc::ptr_fun(&weaponWheel) );
-        wheel->signal_enabled.connect(sigc::ptr_fun(&weaponWheelSelected));
-        tcWeaponWheel->addControl(wheel);
+        wheelSelect = new touchcontrols::WheelSelect("weapon_wheel",touchcontrols::RectF(7,2,19,14),weapon_wheel_gfx,weaponWheelNbr);
+        wheelSelect->signal_selected.connect(sigc::ptr_fun(&weaponWheel) );
+        wheelSelect->signal_enabled.connect(sigc::ptr_fun(&weaponWheelSelected));
+        tcWeaponWheel->addControl(wheelSelect);
         tcWeaponWheel->setAlpha(0.8);
 
         // Inventory -------------------------------------------
@@ -1413,6 +1416,20 @@ void gamepadAction(int state, int action)
     }
 }
 
+bool axisValue(int axis, float value)
+{
+    static float x = 0;
+    static float y = 0;
+    if( axis == ANALOGUE_AXIS_YAW )
+        x = value;
+    else if( axis == ANALOGUE_AXIS_PITCH )
+        y = value;
+
+    if( wheelSelect )
+        wheelSelect->processGamepad( x, y );
+
+    return true;
+}
 
 TouchControlsInterface* mobileGetTouchInterface()
 {

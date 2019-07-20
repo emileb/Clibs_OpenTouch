@@ -17,6 +17,7 @@ extern "C"
 
     void mobileBackButton( void );
     void gamepadAction(int state, int action);
+    bool axisValue(int axis, float value);
 }
 
 #endif /* touch_interface_h */
