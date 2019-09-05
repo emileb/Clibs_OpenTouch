@@ -179,4 +179,10 @@ JAVA_FUNC(analogYaw) (JNIEnv *env, jobject obj,	jint mode,jfloat v, jfloat raw)
 	PortableLookYaw(mode, v);
 }
 
+void EXPORT_ME
+JAVA_FUNC(weaponWheelSettings) (JNIEnv *env, jobject obj, jint useMoveStick)
+{
+    LOGI("GAMEPAD WEAPON WHEEL: userMoveStick = %d",useMoveStick);
+}
+
 }

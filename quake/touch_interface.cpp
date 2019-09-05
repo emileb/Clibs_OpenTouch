@@ -1313,7 +1313,8 @@ static void hideControls( void )
         if (tcGameMain->isEnabled())
             tcGameMain->animateOut(30);
 
-        tcWeaponWheel->animateOut(1);
+        // Actually leave this enabled for the gamepad to use
+        // tcWeaponWheel->animateOut(1);
     }
 }
 
@@ -1401,6 +1402,10 @@ void gamepadAction(int state, int action)
             }
         }
     }
+    else if( action == PORT_ACT_USE_WEAPON_WHEEL && currentScreenMode == TS_GAME )
+    {
+        wheelSelect->gamepadActionButton( state );
+    }
     else if( action == PORT_ACT_MENU_SHOW )
     {
         if( state )
@@ -1416,19 +1421,36 @@ void gamepadAction(int state, int action)
     }
 }
 
+static bool weaponWheelMoveStick = true;
+
 bool axisValue(int axis, float value)
 {
     static float x = 0;
     static float y = 0;
-    if( axis == ANALOGUE_AXIS_YAW )
-        x = value;
-    else if( axis == ANALOGUE_AXIS_PITCH )
-        y = value;
+    if( weaponWheelMoveStick )
+    {
+        if( axis == ANALOGUE_AXIS_SIDE )
+            x = value;
+        else if( axis == ANALOGUE_AXIS_FWD )
+            y = value;
+    }
+    else
+    {
+        if( axis == ANALOGUE_AXIS_YAW )
+            x = value;
+        else if( axis == ANALOGUE_AXIS_PITCH )
+            y = value;
+    }
 
     if( wheelSelect )
-        wheelSelect->processGamepad( x, y );
+        return wheelSelect->processGamepad( x, y ); // return true is axis value was used
 
     return true;
+}
+
+void weaponWheelSettings(bool useMoveStick)
+{
+    weaponWheelMoveStick = useMoveStick;
 }
 
 TouchControlsInterface* mobileGetTouchInterface()

@@ -25,11 +25,13 @@
 #define PORT_ACT_INVNEXT   22
 #define PORT_ACT_HELPCOMP  23 //also RTCW, also Strife
 
-#define PORT_ACT_CONSOLE   25
-#define PORT_ACT_SHOW_KBRD 26
-#define PORT_ACT_SHOW_INV  27
-#define PORT_ACT_SHOW_GP_UTILS  28
-#define PORT_ACT_SHOW_DPAD_INV  29
+
+#define PORT_ACT_USE_WEAPON_WHEEL   24
+#define PORT_ACT_CONSOLE            25
+#define PORT_ACT_SHOW_KBRD          26
+#define PORT_ACT_SHOW_INV           27
+#define PORT_ACT_SHOW_GP_UTILS      28
+#define PORT_ACT_SHOW_DPAD_INV      29
 
 //Doom
 #define PORT_ACT_MAP         30
