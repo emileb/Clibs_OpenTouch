@@ -89,6 +89,11 @@ static bool showCustomMenu = false;
 
 static bool useSystemKeyboard = false;
 
+
+static bool weaponWheelMoveStick = true;
+static touchcontrols::WheelSelectMode weaponWheelGamepadMode = touchcontrols::WHEELSELECT_GP_MODE_HOLD;
+static int weaponWheelAutoTimout = 0;
+
 static int controlsCreated = 0;
 static touchcontrols::TouchControlsContainer controlsContainer;
 
@@ -1404,6 +1409,7 @@ void gamepadAction(int state, int action)
     }
     else if( action == PORT_ACT_USE_WEAPON_WHEEL && currentScreenMode == TS_GAME )
     {
+        wheelSelect->setGamepadMode( weaponWheelGamepadMode, weaponWheelAutoTimout );
         wheelSelect->gamepadActionButton( state );
     }
     else if( action == PORT_ACT_MENU_SHOW )
@@ -1421,9 +1427,8 @@ void gamepadAction(int state, int action)
     }
 }
 
-static bool weaponWheelMoveStick = true;
 
-bool axisValue(int axis, float value)
+void axisValue(int axis, float value)
 {
     static float x = 0;
     static float y = 0;
@@ -1443,14 +1448,22 @@ bool axisValue(int axis, float value)
     }
 
     if( wheelSelect )
-        return wheelSelect->processGamepad( x, y ); // return true is axis value was used
-
-    return true;
+        wheelSelect->processGamepad( x, y ); // return true is axis value was used
 }
 
-void weaponWheelSettings(bool useMoveStick)
+int blockGamepad( void )
+{
+    if( wheelSelect )
+        return wheelSelect->blockGamepad();
+    else
+        return false;
+}
+
+void weaponWheelSettings(bool useMoveStick, int mode, int autoTimeout)
 {
     weaponWheelMoveStick = useMoveStick;
+    weaponWheelGamepadMode = (touchcontrols::WheelSelectMode)mode;
+    weaponWheelAutoTimout = autoTimeout;
 }
 
 TouchControlsInterface* mobileGetTouchInterface()
