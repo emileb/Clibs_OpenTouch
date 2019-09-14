@@ -12,7 +12,11 @@
 
 #include <unistd.h>
 
+//#define NO_SEC
+
+#ifndef NO_SEC
 #include "./secure/license/license.h"
+#endif
 
 extern "C"
 {
@@ -41,6 +45,11 @@ static int argc=1;
 static const char * argv[128];
 
 const char *nativeLibsPath;
+
+static const char *key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArVTuCs3MUfRpivh5ETTzfgq+pdSHPfvWKKOsqLdyugv37TPWGfjHADzI+Ryst8qdObT9qEfKQXbd5PLC6+Lspl3/N8L+FXJO5tNSzcxDNr/gCXgR/vs+YiRpyuCJMNcuwPHfDIKdBmPaFxQAxSggdzoWfEmTXyaA1S8PZprT1GcOIB1scLUWpXPjzZeOTXwEzD20HWKeR+oG7PzFBAF85clKu5Y2bypoBcmnlpBl3nK2TdNJdESitxjS5CssRp5zBxYQ6BnMfDI1W8n2QCatFb+lAHcnhye/FB8/nA476b2WOw3VBkk5CspXhDNRom6dCMfP1HTxHrH6Q0LFh81SxQIDAQAB";
+static const char *pkg = "com.opentouchgaming.quadtouch";
+char keyGlobal[512];
+char pkgGlobal[64];
 
 jint EXPORT_ME
 JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jobjectArray argsArray,jint game,jstring game_path_,jstring logFilename,jstring nativeLibs )
@@ -75,7 +84,9 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jo
 
 	chdir( game_path.c_str() );
 
-    //checkLicense( env_ );
+    strcpy(keyGlobal,key);
+    strcpy(pkgGlobal,pkg);
+
 
     mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(),options,game);
 	PortableInit(argc,argv); //Never returns!!
@@ -97,13 +108,20 @@ JAVA_FUNC(doAction) (JNIEnv *env, jobject obj,	jint state, jint action)
 }
 
 
+JNIEnv * getEnv();
+int keyCheck()
+{
+    JNIEnv * env = getEnv();
+    return checkLicense( env, keyGlobal, pkgGlobal );
+}
+
 static int apkRandomDelay = -1;
 static int check = -1;
 
 void EXPORT_ME
 JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x, jfloat y)
 {
-
+#ifndef NO_SEC
 	//LOGI("TOUCHED");
 	if (apkRandomDelay == -1)
     {
@@ -118,13 +136,24 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
     {
         if( check == -1 )
         {
-            check =  checkLicense( env, "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArVTuCs3MUfRpivh5ETTzfgq+pdSHPfvWKKOsqLdyugv37TPWGfjHADzI+Ryst8qdObT9qEfKQXbd5PLC6+Lspl3/N8L+FXJO5tNSzcxDNr/gCXgR/vs+YiRpyuCJMNcuwPHfDIKdBmPaFxQAxSggdzoWfEmTXyaA1S8PZprT1GcOIB1scLUWpXPjzZeOTXwEzD20HWKeR+oG7PzFBAF85clKu5Y2bypoBcmnlpBl3nK2TdNJdESitxjS5CssRp5zBxYQ6BnMfDI1W8n2QCatFb+lAHcnhye/FB8/nA476b2WOw3VBkk5CspXhDNRom6dCMfP1HTxHrH6Q0LFh81SxQIDAQAB",
-             "com.opentouchgaming.quadtouch");
+            check = checkLicense( env, key, pkg);
         }
 
         if( check != 1)
             return;
     }
+#else
+    // Beta test time
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    int yr =  tm.tm_year + 1900;
+    int mo = tm.tm_mon + 1;
+    //LOGI("%d   %d",yr,mo);
+    if(yr > 2019 || mo > 12)
+    {
+        return;
+    }
+#endif
 
 	mobileGetTouchInterface()->processPointer(action,pid,x,y);
 }

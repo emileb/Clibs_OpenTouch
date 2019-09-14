@@ -332,8 +332,38 @@ static void customSettingsButton(int state)
 }
 
 
+static int licTest = 0;
+int keyCheck();
+extern char keyGlobal[];
+
 static void gameButton(int state,int code)
 {
+    if( licTest < 0 )
+        return;
+
+    licTest++;
+
+    if( licTest == 64 )
+    {
+        if( keyCheck() == 0 )
+        {
+            // Failed
+            licTest = -1;
+        }
+        else
+        {
+            // Now make it fail
+            keyGlobal[4] = keyGlobal[4] ^ 0xAA;
+            if( keyCheck() == 1 )
+            {
+                // Failed, keyCheck always returns valid!!
+                licTest = -1;
+            }
+            // Put back
+            keyGlobal[4] = keyGlobal[4] ^ 0xAA;
+        }
+    }
+
     if (code == KEY_SHOOT)
     {
         shooting = state;
@@ -868,12 +898,15 @@ void initControls(int width, int height,const char * graphics_path)
 
         touchcontrols::getSettingsSignal()->connect( sigc::ptr_fun(&touchSettings) );
         
-        tcMenuMain = new touchcontrols::TouchControls("menu",false,true,10,false);
+        tcMenuMain = new touchcontrols::TouchControls("menu",false,true,10,true);
         tcYesNo = new touchcontrols::TouchControls("yes_no",false,false);
         tcGameMain = new touchcontrols::TouchControls("game",false,true,1,true);
         tcGameWeapons = new touchcontrols::TouchControls("weapons",false,true,1,false);
         tcInventory  = new touchcontrols::TouchControls("inventory",false,true,2,false); //Different edit group
         tcWeaponWheel = new touchcontrols::TouchControls("weapon_wheel",false,true,1,false);
+        // Hide the cog because when using the gamepad and weapon wheel is enabled, the cog will show otherwise
+        tcWeaponWheel->hideEditButton = true;
+
         //tcAutomap = new touchcontrols::TouchControls("automap",false,false);
         tcBlank = new touchcontrols::TouchControls("blank",true,false);
         tcCutomButtons = new touchcontrols::TouchControls("custom_buttons",false,true,1,true);
@@ -1025,6 +1058,8 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->signal_button.connect(  sigc::ptr_fun(&gameButton) );
         tcGameMain->signal_settingsButton.connect(  sigc::ptr_fun(&gameSettingsButton) );
 
+        // Also now allow menu to enter the settings
+        tcMenuMain->signal_settingsButton.connect(  sigc::ptr_fun(&gameSettingsButton) );
 
         UI_tc = touchcontrols::createDefaultSettingsUI( &controlsContainer, ( std::string )graphics_path +  "/touch_settings.xml" );
         UI_tc->setAlpha( 1 );
@@ -1301,6 +1336,11 @@ void mobileBackButton( void )
         controlsContainer.finishEditing();
         return;
     }
+    else if (wheelSelect->blockGamepad())
+    {
+        wheelSelect->reset();
+        return;
+    }
     else if( showCustomMenu == true )
     {
         showCustomMenu = false;
@@ -1454,9 +1494,19 @@ void axisValue(int axis, float value)
 int blockGamepad( void )
 {
     if( wheelSelect )
-        return wheelSelect->blockGamepad();
+    {
+        if( wheelSelect->blockGamepad() )
+        {
+            if( weaponWheelMoveStick )
+                return ANALOGUE_AXIS_SIDE | ANALOGUE_AXIS_FWD;
+            else
+                return ANALOGUE_AXIS_YAW | ANALOGUE_AXIS_PITCH;
+        }
+        else
+            return 0;
+    }
     else
-        return false;
+        return 0;
 }
 
 void weaponWheelSettings(bool useMoveStick, int mode, int autoTimeout)
