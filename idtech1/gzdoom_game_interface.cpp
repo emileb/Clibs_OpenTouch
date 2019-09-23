@@ -74,7 +74,6 @@
 #include "sc_man.h"
 #include "po_man.h"
 #include "resourcefiles/resourcefile.h"
-#include "r_renderer.h"
 #include "p_local.h"
 #include "autosegs.h"
 #include "fragglescript/t_fs.h"
@@ -460,27 +459,36 @@ extern fixed_t			forwardmove[2], sidemove[2];
 //extern void G_AddViewPitch (int look);
 //void AddCommandString (char *cmd, int keynum=0);
 
+extern "C" int blockGamepad( void );
+
 void Mobile_IN_Move(ticcmd_t* cmd )
 {
-	cmd->ucmd.forwardmove  += forwardmove_android * forwardmove[1];
-	cmd->ucmd.sidemove  += sidemove_android   * sidemove[1];
+
+    int blockMove = blockGamepad() & ANALOGUE_AXIS_FWD;
+    int blockLook = blockGamepad() & ANALOGUE_AXIS_PITCH;
+
+
+    if( !blockMove )
+    {
+	    cmd->ucmd.forwardmove  += forwardmove_android * forwardmove[1];
+	    cmd->ucmd.sidemove  += sidemove_android   * sidemove[1];
+    }
 
 	//LOGI("Side: %d   %d",(int)(sidemove_android  * sidemove[1]),(int)(-look_yaw_joy * 100000));
 //LOGI("LOGX %f  %f  %f  %f  %f  %f",forwardmove_android,sidemove_android,look_pitch_mouse,look_pitch_joy,look_yaw_mouse,look_yaw_joy);
 
+    if( !blockLook )
+    {
+        // Add pitch
+        G_AddViewPitch(look_pitch_mouse * 30000);
+        look_pitch_mouse = 0;
+        G_AddViewPitch(-look_pitch_joy * 800);
 
-// Add pitch
-    G_AddViewPitch(look_pitch_mouse * 30000);
-    look_pitch_mouse = 0;
-
-    G_AddViewPitch(-look_pitch_joy * 800);
-
-// Add yaw
-    G_AddViewAngle(-look_yaw_mouse * 100000);
-    look_yaw_mouse = 0;
-
-    G_AddViewAngle(-look_yaw_joy * 1000);
-
+        // Add yaw
+        G_AddViewAngle(-look_yaw_mouse * 100000);
+        look_yaw_mouse = 0;
+        G_AddViewAngle(-look_yaw_joy * 1000);
+    }
 
 	if (cmd_to_run)
 	{

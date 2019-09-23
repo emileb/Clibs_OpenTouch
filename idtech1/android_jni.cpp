@@ -12,6 +12,7 @@
 
 #include <unistd.h>
 
+//#define NO_SEC
 
 #ifndef NO_SEC
 #include "./secure/license/license.h"
@@ -56,8 +57,15 @@ __attribute__((visibility("default"))) jint JNI_OnLoad(JavaVM* vm, void* reserve
 static int argc=1;
 static const char * argv[128];
 
+const char *nativeLibsPath;
+
+static const char *key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Ty9fat4Mag+a/UAncpVM8lNDrAQxk754HupOlYbJt3ALv6Fqagjj2vzPK8570aALqw2XEk5JxPAazdTQJ+W5aEVM8N2Ij1SbqN/yF+HfqDG+hHfszddwAZzKzWUlAkkeqW6qiIEy4L/TTOgj2vQv24ix4YcpO3eea2Ltz2UDyq+o0+K1cOCMqtuGL/GQbFS92zp3dnH9CpgtWFsbvVarjntJWiI6RrZpqpTTsuZWckK1ztMBjzNNnD1w6QbgTRqoGU7xmsHImWjk5MtwxiDqKL1EFOBvQDqOXxVc/jmT8StqAjk1ItCWStvJLZTzejNoGdTisxBQT/P3Xyppo8/MwIDAQAB";
+static const char *pkg = "com.opentouchgaming.deltatouch";
+char keyGlobal[512];
+char pkgGlobal[64];
+
 jint EXPORT_ME
-JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jobjectArray argsArray,jint game,jstring game_path_,jstring logFilename )
+JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jobjectArray argsArray,jint game,jstring game_path_,jstring logFilename,jstring nativeLibs )
 {
 	env_ = env;
 
@@ -90,8 +98,9 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jo
 	setenv("LIBGL_DEFAULTWRAP","0",1);
 
 	chdir( game_path.c_str() );
+	strcpy(keyGlobal,key);
+    strcpy(pkgGlobal,pkg);
 
-    //checkLicense( env_ );
 
     mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(),options,game);
 	PortableInit(argc,argv); //Never returns!!
@@ -112,6 +121,13 @@ JAVA_FUNC(doAction) (JNIEnv *env, jobject obj,	jint state, jint action)
 	gamepadAction(state,action);
 }
 
+
+JNIEnv * getEnv();
+int keyCheck()
+{
+    JNIEnv * env = getEnv();
+    return checkLicense( env, keyGlobal, pkgGlobal );
+}
 
 static int apkRandomDelay = -1;
 static int check = -1;
@@ -134,8 +150,7 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
     {
         if( check == -1 )
         {
-            check =  checkLicense( env,"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Ty9fat4Mag+a/UAncpVM8lNDrAQxk754HupOlYbJt3ALv6Fqagjj2vzPK8570aALqw2XEk5JxPAazdTQJ+W5aEVM8N2Ij1SbqN/yF+HfqDG+hHfszddwAZzKzWUlAkkeqW6qiIEy4L/TTOgj2vQv24ix4YcpO3eea2Ltz2UDyq+o0+K1cOCMqtuGL/GQbFS92zp3dnH9CpgtWFsbvVarjntJWiI6RrZpqpTTsuZWckK1ztMBjzNNnD1w6QbgTRqoGU7xmsHImWjk5MtwxiDqKL1EFOBvQDqOXxVc/jmT8StqAjk1ItCWStvJLZTzejNoGdTisxBQT/P3Xyppo8/MwIDAQAB",
-             "com.opentouchgaming.deltatouch");
+            check = checkLicense( env, key, pkg);
         }
 
         if( check != 1)
@@ -148,11 +163,12 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
     int yr =  tm.tm_year + 1900;
     int mo = tm.tm_mon + 1;
     //LOGI("%d   %d",yr,mo);
-    if(yr > 2019 || mo > 6)
+    if(yr > 2020 || mo > 12)
     {
         return;
     }
 #endif
+
 	mobileGetTouchInterface()->processPointer(action,pid,x,y);
 }
 
@@ -163,28 +179,45 @@ JAVA_FUNC(backButton) (JNIEnv *env, jobject obj)
 }
 
 void EXPORT_ME
-JAVA_FUNC(analogFwd) (JNIEnv *env, jobject obj,	jfloat v)
+JAVA_FUNC(analogFwd) (JNIEnv *env, jobject obj,	jfloat v, jfloat raw)
 {
+    axisValue(ANALOGUE_AXIS_FWD, raw);
 	PortableMoveFwd(v);
 }
 
 void EXPORT_ME
-JAVA_FUNC(analogSide) (JNIEnv *env, jobject obj,jfloat v)
+JAVA_FUNC(analogSide) (JNIEnv *env, jobject obj,jfloat v, jfloat raw)
 {
+    axisValue(ANALOGUE_AXIS_SIDE, raw);
 	PortableMoveSide(v);
 }
 
 void EXPORT_ME
-JAVA_FUNC(analogPitch) (JNIEnv *env, jobject obj,
-jint mode,jfloat v)
+JAVA_FUNC(analogPitch) (JNIEnv *env, jobject obj,jint mode,jfloat v, jfloat raw)
 {
+    if( mode == LOOK_MODE_JOYSTICK )
+        axisValue(ANALOGUE_AXIS_PITCH, raw);
+
     PortableLookPitch(mode, v);
 }
 
 void EXPORT_ME
-JAVA_FUNC(analogYaw) (JNIEnv *env, jobject obj,	jint mode,jfloat v)
+JAVA_FUNC(analogYaw) (JNIEnv *env, jobject obj,	jint mode,jfloat v, jfloat raw)
 {
+    if( mode == LOOK_MODE_JOYSTICK )
+        axisValue(ANALOGUE_AXIS_YAW, raw);
+
 	PortableLookYaw(mode, v);
 }
 
+
+void EXPORT_ME
+JAVA_FUNC(weaponWheelSettings) (JNIEnv *env, jobject obj, jint useMoveStick, jint mode, jint autoTimeout)
+{
+    LOGI("GAMEPAD WEAPON WHEEL: userMoveStick = %d, mode = %d, timeout = %d", useMoveStick, mode, autoTimeout);
+    weaponWheelSettings( useMoveStick, mode, autoTimeout );
 }
+
+
+}
+

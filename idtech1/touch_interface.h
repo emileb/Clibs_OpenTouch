@@ -17,6 +17,9 @@ extern "C"
 
     void mobileBackButton( void );
     void gamepadAction(int state, int action);
+    void axisValue(int axis, float value);
+    void weaponWheelSettings(bool useMoveStick, int mode, int autoTimeout);
+    int blockGamepad( void );
 }
 
 #endif /* touch_interface_h */
