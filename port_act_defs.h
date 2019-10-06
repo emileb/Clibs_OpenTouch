@@ -209,3 +209,8 @@
 
 
 
+#define GAME_OPTION_AUTO_HIDE_GAMEPAD   1
+#define GAME_OPTION_HIDE_MENU_AND_GAME  2
+#define GAME_OPTION_USE_SYSTEM_KEYBOARD 4
+#define GAME_OPTION_GLES2               8
+#define GAME_OPTION_GLES3               16

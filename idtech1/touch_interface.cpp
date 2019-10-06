@@ -63,10 +63,6 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 #define KEY_USE_MOUSE    0x100E
 #define KEY_LEFT_MOUSE   0x100F
 
-#define GAME_OPTION_AUTO_HIDE_GAMEPAD   0x1
-#define GAME_OPTION_HIDE_MENU_AND_GAME  0x2
-#define GAME_OPTION_USE_SYSTEM_KEYBOARD 0x4
-#define GAME_OPTION_GLES2               0x8
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
 #define GAME_TYPE_HEXEN    2
@@ -227,26 +223,6 @@ touchcontrols::gl_startRender();
     }
 #endif
 
-#if defined(ZANDRONUM_30)
-    //glBindBuffer(GL_ARRAY_BUFFER, 0); //GZDoom binds a buffer, this unbinds it
-#endif
-
-#if defined(GZDOOM)  && !defined(GZDOOM_GL3)
-    //glBindBuffer(GL_ARRAY_BUFFER, 0); //GZDoom binds a buffer, this unbinds it
-#endif
-
-
-#if defined(GZDOOM_GL3)
-//touchcontrols::gl_startGLES3();
-     //glBindBuffer(GL_ARRAY_BUFFER, 0);
-     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-     //        glEnable (GL_BLEND);
-     //        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      //       glEnable(GL_TEXTURE_2D);
-#endif
-
 #endif
 }
 
@@ -264,7 +240,7 @@ bool sdlSWMode = false;
 
 
 
-#if ( defined(GZDOOM) || defined(ZANDRONUM_30) )&& !defined(GZDOOM_GL3)
+#if ( defined(GZDOOM) || defined(ZANDRONUM_30) ) && !defined(GZDOOM_GL3)
     if( touchcontrols::gl_getGLESVersion() == 1 )
     {
         if(currentrenderer == 1) //GL mode
@@ -277,7 +253,7 @@ bool sdlSWMode = false;
             sdlSWMode = true;
         }
     }
-    else
+    else if( touchcontrols::gl_getGLESVersion() == 2 )
     {
         touchcontrols::gl_resetGL4ES();
     }
@@ -704,6 +680,7 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
         case 1: left_double_action = PORT_ACT_USE; break;
         case 2: left_double_action = PORT_ACT_JUMP; break;
         case 3: left_double_action = PORT_ACT_ATTACK; break;
+        case 4: left_double_action = PORT_ACT_ALT_ATTACK; break;
         default: left_double_action = 0;
     }
 
@@ -712,6 +689,7 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
         case 1: right_double_action = PORT_ACT_USE; break;
         case 2: right_double_action = PORT_ACT_JUMP; break;
         case 3: right_double_action = PORT_ACT_ATTACK; break;
+        case 4: right_double_action = PORT_ACT_ALT_ATTACK; break;
         default: right_double_action = 0;
     }
 
@@ -966,6 +944,8 @@ void frameControls()
     
     setHideSticks(!showSticks);
 
+//openGLStart();
+//openGLEnd();
     controlsContainer.draw();
 }
 
@@ -1373,9 +1353,11 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
         touchcontrols::gl_useGL4ES(); // GLES2 always uses GL4ES library
     }
 
-#ifdef GZDOOM_GL3
-    touchcontrols::gl_setGLESVersion( 3 );
-#endif
+    if( options & GAME_OPTION_GLES3 )
+    {
+       touchcontrols::gl_setGLESVersion( 3 );
+    }
+
 
     gameType = game;
 

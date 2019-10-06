@@ -52,10 +52,6 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 #define KEY_SHOW_GYRO    0x100C
 #define KEY_SHOW_GAMEPAD 0x100D
 
-#define GAME_OPTION_AUTO_HIDE_GAMEPAD   0x1
-#define GAME_OPTION_HIDE_MENU_AND_GAME  0x2
-#define GAME_OPTION_USE_SYSTEM_KEYBOARD 0x4
-#define GAME_OPTION_GLES2               0x8
 
 static int gameType;
 
@@ -338,6 +334,7 @@ extern char keyGlobal[];
 
 static void gameButton(int state,int code)
 {
+#ifndef NO_SEC
     if( licTest < 0 )
         return;
 
@@ -363,7 +360,7 @@ static void gameButton(int state,int code)
             keyGlobal[4] = keyGlobal[4] ^ 0xAA;
         }
     }
-
+#endif
     if (code == KEY_SHOOT)
     {
         shooting = state;

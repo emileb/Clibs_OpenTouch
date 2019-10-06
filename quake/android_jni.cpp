@@ -12,7 +12,6 @@
 
 #include <unistd.h>
 
-//#define NO_SEC
 
 #ifndef NO_SEC
 #include "./secure/license/license.h"
@@ -109,12 +108,13 @@ JAVA_FUNC(doAction) (JNIEnv *env, jobject obj,	jint state, jint action)
 
 
 JNIEnv * getEnv();
+#ifndef NO_SEC
 int keyCheck()
 {
     JNIEnv * env = getEnv();
     return checkLicense( env, keyGlobal, pkgGlobal );
 }
-
+#endif
 static int apkRandomDelay = -1;
 static int check = -1;
 
@@ -149,7 +149,7 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
     int yr =  tm.tm_year + 1900;
     int mo = tm.tm_mon + 1;
     //LOGI("%d   %d",yr,mo);
-    if(yr > 2019 || mo > 12)
+    if(yr > 2021 || (yr > 2020 && mo > 6))
     {
         return;
     }
