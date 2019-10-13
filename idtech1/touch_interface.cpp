@@ -984,6 +984,8 @@ void initControls(int width, int height,const char * graphics_path)
         tcGamepadUtility = new touchcontrols::TouchControls("gamepad_utility",false,false);
         tcDPadInventory = new touchcontrols::TouchControls("dpad_inventory",false,false);
         tcMouse = new touchcontrols::TouchControls("mouse",false,false);
+        // Hide the cog because when using the gamepad and weapon wheel is enabled, the cog will show otherwise
+        tcWeaponWheel->hideEditButton = true;
 
         //Menu -------------------------------------------
         //------------------------------------------------------
