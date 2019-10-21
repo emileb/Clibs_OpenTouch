@@ -72,7 +72,9 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jo
 	static std::string game_path = (char *)(env)->GetStringUTFChars( game_path_, 0);
 	static std::string graphics_path = (char *)(env)->GetStringUTFChars( graphics_dir, 0);
     static std::string log_filename_path = (char *)(env)->GetStringUTFChars( logFilename, 0);
+    static std::string native_libs_path = (char *)(env)->GetStringUTFChars( nativeLibs, 0);
 
+	nativeLibsPath = native_libs_path.c_str();
 
     LogWritter_Init( log_filename_path.c_str());
 

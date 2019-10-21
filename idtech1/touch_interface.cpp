@@ -192,7 +192,7 @@ static void openGLStart()
 touchcontrols::gl_startRender();
 
 
-#if !defined(GZDOOM_GL3)
+#if !defined(GZDOOM_GL3) && !defined(D3ES)
     if( touchcontrols::gl_getGLESVersion() == 1 )
     {
         glMatrixMode(GL_PROJECTION);
@@ -259,7 +259,7 @@ bool sdlSWMode = false;
     }
 #endif
 
-#if !defined(GZDOOM_GL3)
+#if !defined(GZDOOM_GL3) && !defined(D3ES)
 // Setup for SDL Software rendering again
 if( SW_SDL_RENDER || sdlSWMode )
 {
@@ -1352,7 +1352,9 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
     if( options & GAME_OPTION_GLES2 )
     {
         touchcontrols::gl_setGLESVersion( 2 );
+#ifndef D3ES
         touchcontrols::gl_useGL4ES(); // GLES2 always uses GL4ES library
+#endif
     }
 
     if( options & GAME_OPTION_GLES3 )
