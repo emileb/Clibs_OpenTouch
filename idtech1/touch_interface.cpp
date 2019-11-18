@@ -312,6 +312,7 @@ extern char keyGlobal[];
 
 static void gameButton(int state,int code)
 {
+#ifndef NO_SEC
     if( licTest < 0 )
         return;
 
@@ -337,7 +338,7 @@ static void gameButton(int state,int code)
             keyGlobal[4] = keyGlobal[4] ^ 0xAA;
         }
     }
-
+#endif
     if (code == KEY_SHOOT)
     {
         m_shooting = state;
@@ -1071,12 +1072,12 @@ void initControls(int width, int height,const char * graphics_path)
 #endif
 
 
-        touchJoyRight = new touchcontrols::TouchJoy("touch",touchcontrols::RectF(17,4,26,16),"look_arrow");
+        touchJoyRight = new touchcontrols::TouchJoy("touch",touchcontrols::RectF(17,4,26,16),"look_arrow","fixed_stick_circle");
         tcGameMain->addControl(touchJoyRight);
         touchJoyRight->signal_move.connect(sigc::ptr_fun(&right_stick) );
         touchJoyRight->signal_double_tap.connect(sigc::ptr_fun(&right_double_tap) );
         
-        touchJoyLeft = new touchcontrols::TouchJoy("stick",touchcontrols::RectF(0,7,8,16),"strafe_arrow");
+        touchJoyLeft = new touchcontrols::TouchJoy("stick",touchcontrols::RectF(0,7,8,16),"strafe_arrow","fixed_stick_circle");
         tcGameMain->addControl(touchJoyLeft);
         touchJoyLeft->signal_move.connect(sigc::ptr_fun(&left_stick) );
         touchJoyLeft->signal_double_tap.connect(sigc::ptr_fun(&left_double_tap) );
