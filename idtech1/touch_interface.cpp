@@ -696,6 +696,18 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
 
     tcGameMain->setAlpha(gameControlsAlpha);
     touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
+
+    controlsContainer.setColour(settings.defaultColor);
+	tcYesNo->setColour(settings.defaultColor);
+	tcGameMain->setColour(settings.defaultColor);
+	tcGameWeapons->setColour(settings.defaultColor);
+	tcWeaponWheel->setColour(settings.defaultColor);
+	tcInventory->setColour(settings.defaultColor);
+	tcAutomap->setColour(settings.defaultColor);
+	tcCutomButtons->setColour(settings.defaultColor);
+	tcGamepadUtility->setColour(settings.defaultColor);
+	tcDPadInventory->setColour(settings.defaultColor);
+
 }
 
 extern SDL_Scancode SDLCALL SDL_GetScancodeFromKey(SDL_Keycode key);
@@ -1114,20 +1126,18 @@ void initControls(int width, int height,const char * graphics_path)
         
         //Weapon wheel -------------------------------------------
         //------------------------------------------------------
-        const char * weapon_wheel_gfx = "weapon_wheel";
+
         int weaponWheelNbr = 10;
         if( gameType == GAME_TYPE_HERETIC )
         {
-            weapon_wheel_gfx = "weapon_wheel_heretic";
             weaponWheelNbr = 8;
         }
         else if( gameType == GAME_TYPE_HEXEN )
         {
-            weapon_wheel_gfx = "weapon_wheel_hexen";
             weaponWheelNbr = 4;
         }
 
-        wheelSelect = new touchcontrols::WheelSelect("weapon_wheel",touchcontrols::RectF(7,2,19,14),weapon_wheel_gfx,weaponWheelNbr);
+        wheelSelect = new touchcontrols::WheelSelect("weapon_wheel",touchcontrols::RectF(7,2,19,14),"weapon_wheel_%d",weaponWheelNbr);
         wheelSelect->signal_selected.connect(sigc::ptr_fun(&weaponWheel) );
         wheelSelect->signal_enabled.connect(sigc::ptr_fun(&weaponWheelSelected));
         tcWeaponWheel->addControl(wheelSelect);
@@ -1213,18 +1223,18 @@ void initControls(int width, int height,const char * graphics_path)
 
         //Custom Controls -------------------------------------------
         //------------------------------------------------------
-        tcCutomButtons->addControl(new touchcontrols::Button("A",touchcontrols::RectF(5,5,7,7),"Custom_1",PORT_ACT_CUSTOM_0,false,false,"Custom 1"));
-        tcCutomButtons->addControl(new touchcontrols::Button("B",touchcontrols::RectF(7,5,9,7),"Custom_2",PORT_ACT_CUSTOM_1,false,false,"Custom 2"));
-        tcCutomButtons->addControl(new touchcontrols::Button("C",touchcontrols::RectF(5,7,7,9),"Custom_3",PORT_ACT_CUSTOM_2,false,false,"Custom 3"));
+        tcCutomButtons->addControl(new touchcontrols::Button("A",touchcontrols::RectF(5,5,7,7),"Custom_1",PORT_ACT_CUSTOM_0,false,false,"Custom 1 (KP1)",touchcontrols::COLOUR_RED2));
+        tcCutomButtons->addControl(new touchcontrols::Button("B",touchcontrols::RectF(7,5,9,7),"Custom_2",PORT_ACT_CUSTOM_1,false,false,"Custom 2 (KP2)",touchcontrols::COLOUR_RED2));
+        tcCutomButtons->addControl(new touchcontrols::Button("C",touchcontrols::RectF(5,7,7,9),"Custom_3",PORT_ACT_CUSTOM_2,false,false,"Custom 3 (KP3)",touchcontrols::COLOUR_BLUE1));
         
-        tcCutomButtons->addControl(new touchcontrols::Button("D",touchcontrols::RectF(7,7,9,9),"Custom_4",PORT_ACT_CUSTOM_3,false,false,"Custom 4"));
-        tcCutomButtons->addControl(new touchcontrols::Button("E",touchcontrols::RectF(5,9,7,11),"Custom_5",PORT_ACT_CUSTOM_4,false,false,"Custom 5"));
-        tcCutomButtons->addControl(new touchcontrols::Button("F",touchcontrols::RectF(7,9,9,11),"Custom_6",PORT_ACT_CUSTOM_5,false,false,"Custom 6"));
+        tcCutomButtons->addControl(new touchcontrols::Button("D",touchcontrols::RectF(7,7,9,9),"Custom_4",PORT_ACT_CUSTOM_3,false,false,"Custom 4 (KP4)",touchcontrols::COLOUR_BLUE1));
+        tcCutomButtons->addControl(new touchcontrols::Button("E",touchcontrols::RectF(5,9,7,11),"Custom_5",PORT_ACT_CUSTOM_4,false,false,"Custom 5 (KP5)",touchcontrols::COLOUR_GREEN2));
+        tcCutomButtons->addControl(new touchcontrols::Button("F",touchcontrols::RectF(7,9,9,11),"Custom_6",PORT_ACT_CUSTOM_5,false,false,"Custom 6 (KP6)",touchcontrols::COLOUR_GREEN2));
 
-        touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,false,"Quad Slide 1");
+        touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,false,"Quad Slide 1 (A - D)");
         tcCutomButtons->addControl(qs1);
 
-        touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,PORT_ACT_CUSTOM_16,PORT_ACT_CUSTOM_17,false,"Quad Slide 2");
+        touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,PORT_ACT_CUSTOM_16,PORT_ACT_CUSTOM_17,false,"Quad Slide 2 (E - H)");
         tcCutomButtons->addControl(qs2);
 
         //tcCutomButtons->setColor(0.7,0.7,1.f);
