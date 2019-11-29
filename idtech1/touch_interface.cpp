@@ -1009,10 +1009,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcMenuMain->addControl(new touchcontrols::Button("right_arrow",touchcontrols::RectF(23,13,26,16),"arrow_right",PORT_ACT_MENU_RIGHT));
         tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,10,6,16),"enter",PORT_ACT_MENU_SELECT));
         tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
-#if defined(GZDOOM) || defined(RETRO_DOOM)
-		// Consoel does not work properly in menu
-        //tcMenuMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE));
-#endif
+
 #ifndef CHOC_SETUP
         tcMenuMain->addControl(new touchcontrols::Button("gamepad",touchcontrols::RectF(22,0,24,2),"gamepad",KEY_SHOW_GAMEPAD));
         tcMenuMain->addControl(new touchcontrols::Button("gyro",touchcontrols::RectF(24,0,26,2),"gyro",KEY_SHOW_GYRO));
@@ -1028,10 +1025,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcMenuMain->addControl( brightnessSlide );
 #endif
 
-#ifdef GZDOOM
-        // Actually this isn't needed now
-        //tcMenuMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(24,0,26,2),"custom_show",KEY_SHOW_CUSTOM,false,false));
-#endif
+
         tcMenuMain->signal_button.connect(  sigc::ptr_fun(&menuButton) );
         tcMenuMain->setAlpha(0.8);
         tcMenuMain->setFixAspect(false);
@@ -1047,7 +1041,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE,false,false,"Quick save"));
         tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD,false,false,"Quick load"));
         tcGameMain->addControl(new touchcontrols::Button("map",touchcontrols::RectF(2,0,4,2),"map",PORT_ACT_MAP,false,false,"Show map"));
-        tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,true,"Show Keyboard"));
+        tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,false,"Show k eyboard"));
         tcGameMain->addControl(new touchcontrols::Button("show_mouse",touchcontrols::RectF(4,0,6,2),"left_mouse",KEY_USE_MOUSE,false,true,"Use mouse"));
 
 #if defined(RETRO_DOOM) || defined(CHOCOLATE) || defined (PRBOOM_DOOM)
@@ -1066,22 +1060,15 @@ void initControls(int width, int height,const char * graphics_path)
 
         tcGameMain->addControl(new touchcontrols::Button("use_inventory",touchcontrols::RectF(0,9,2,11),"inventory",KEY_SHOW_INV,false,hideInventory,"Show Inventory"));
 
-#ifndef CHOCOLATE
+
         tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,true,"Crouch"));
         tcGameMain->addControl(new touchcontrols::Button("attack_alt",touchcontrols::RectF(21,5,23,7),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt fire"));
-#endif
-
-#if defined(GZDOOM) || defined(ZANDRONUM_30)
         tcGameMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(0,7,2,9),"custom_show",KEY_SHOW_CUSTOM,false,true,"Show custom"));
-#endif
-        
         tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(12,14,14,16),"show_weapons",KEY_SHOW_WEAPONS,false,false,"Show numbers"));
         tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
         tcGameMain->addControl(new touchcontrols::Button("prev_weapon",touchcontrols::RectF(0,5,3,7),"prev_weap",PORT_ACT_PREV_WEP,false,false,"Prev weapon"));
-
-#if defined(GZDOOM) || defined(RETRO_DOOM) || defined(ZANDRONUM_30)
         tcGameMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE,false,true,"Console"));
-#endif
+
 
 
         touchJoyRight = new touchcontrols::TouchJoy("touch",touchcontrols::RectF(17,4,26,16),"look_arrow","fixed_stick_circle");
@@ -1298,13 +1285,10 @@ void initControls(int width, int height,const char * graphics_path)
         controlsContainer.addControlGroup(tcInventory); // before gamemain so touches don't go through
         controlsContainer.addControlGroup(tcGamepadUtility); // before gamemain so touches don't go through
         controlsContainer.addControlGroup(tcDPadInventory);
-#if defined(GZDOOM) || defined(ZANDRONUM_30)
         controlsContainer.addControlGroup(tcCutomButtons);
-#endif
         controlsContainer.addControlGroup(tcGameMain);
         controlsContainer.addControlGroup(tcYesNo);
         controlsContainer.addControlGroup(tcGameWeapons);
-
         controlsContainer.addControlGroup(tcMenuMain);
         controlsContainer.addControlGroup(tcWeaponWheel);
         controlsContainer.addControlGroup(tcAutomap);
