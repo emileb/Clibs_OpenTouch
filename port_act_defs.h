@@ -42,6 +42,7 @@
 #define PORT_ACT_MAP_ZOOM_IN 35
 #define PORT_ACT_MAP_ZOOM_OUT 36
 #define PORT_ACT_ALWAYS_RUN  37
+#define PORT_ACT_TOGGLE_CROUCH  38
 
 // Hexen 2
 #define PORT_ACT_CROUCH    40

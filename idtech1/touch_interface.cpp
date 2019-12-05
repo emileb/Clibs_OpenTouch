@@ -1041,7 +1041,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE,false,false,"Quick save"));
         tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD,false,false,"Quick load"));
         tcGameMain->addControl(new touchcontrols::Button("map",touchcontrols::RectF(2,0,4,2),"map",PORT_ACT_MAP,false,false,"Show map"));
-        tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,false,"Show k eyboard"));
+        tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,false,"Show keyboard"));
         tcGameMain->addControl(new touchcontrols::Button("show_mouse",touchcontrols::RectF(4,0,6,2),"left_mouse",KEY_USE_MOUSE,false,true,"Use mouse"));
 
 #if defined(RETRO_DOOM) || defined(CHOCOLATE) || defined (PRBOOM_DOOM)
@@ -1062,6 +1062,7 @@ void initControls(int width, int height,const char * graphics_path)
 
 
         tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,true,"Crouch"));
+        tcGameMain->addControl(new touchcontrols::Button("crouch_toggle",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_TOGGLE_CROUCH,false,true,"Crouch (toggle)"));
         tcGameMain->addControl(new touchcontrols::Button("attack_alt",touchcontrols::RectF(21,5,23,7),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt fire"));
         tcGameMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(0,7,2,9),"custom_show",KEY_SHOW_CUSTOM,false,true,"Show custom"));
         tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(12,14,14,16),"show_weapons",KEY_SHOW_WEAPONS,false,false,"Show numbers"));
@@ -1177,7 +1178,7 @@ void initControls(int width, int height,const char * graphics_path)
         //------------------------------------------------------
         tcBlank->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,0,26,16),"",0x123));
 #if defined(GZDOOM1_9) || defined(ZANDRONUM_30)
-        tcBlank->addControl(new touchcontrols::Button("fmod",touchcontrols::RectF(0,15,4,16),"fmod_logo",0));
+        tcBlank->addControl(new touchcontrols::Button("fmod",touchcontrols::RectF(22,0,26,1),"fmod_logo",0));
         tcBlank->setAlpha(0.8);
 #endif
         tcBlank->signal_button.connect(  sigc::ptr_fun(&blankButton) );

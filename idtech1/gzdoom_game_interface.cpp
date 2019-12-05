@@ -117,7 +117,7 @@ void PortableBackButton()
 }
 
 
-void buttonChange(int state,FButtonStatus *button)
+static void buttonChange(int state,FButtonStatus *button)
 {
 	if (state)
 	{
@@ -221,6 +221,15 @@ void PortableAction(int state, int action)
             break;
         case PORT_ACT_DOWN:
             buttonChange(state,&Button_Crouch);
+            break;
+        case PORT_ACT_TOGGLE_CROUCH:
+            if( state)
+            {
+                if(Button_Crouch.bDown)
+                    buttonChange(0,&Button_Crouch);
+                else
+                    buttonChange(1,&Button_Crouch);
+            }
             break;
         case PORT_ACT_NEXT_WEP:
             if (state)
