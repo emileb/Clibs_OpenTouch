@@ -75,7 +75,8 @@ static float forward_sens = 1;
 static float pitch_sens = 1;
 static float yaw_sens = 1;
     
-static bool shooting = false;
+static bool m_shooting = false;
+static float precisionSensitivty = 0.5;
 
 // Show buttons in game
 static bool showCustomOn = false;
@@ -95,9 +96,6 @@ static touchcontrols::TouchControlsContainer controlsContainer;
 
 static int mapState = 0;
 
-#define DEMO_ALPHA_RESET      30
-#define DEMO_ALPFA_DEC        0.1f
-static float demoControlsAlpha; // Used to fade out demo controls
 
 touchcontrols::UI_Controls *UI_tc = 0;
 
@@ -363,12 +361,8 @@ static void gameButton(int state,int code)
 #endif
     if (code == KEY_SHOOT)
     {
-        shooting = state;
+        m_shooting = state;
         PortableAction(state,PORT_ACT_ATTACK);
-    }
-    else if( code == KEY_PRECISION_SHOOT )
-    {
-        precisionShoot = state;
     }
     else if (code == KEY_SHOW_WEAPONS)
     {
@@ -443,7 +437,7 @@ static void gameButton(int state,int code)
 static void gameUtilitiesButton(int state,int code)
 {
     // Auto hide the gamepad utilitie, except if showing consol
-    if( (code != PORT_ACT_CONSOLE) && (tcGamepadUtility->isEnabled()) )
+    if( tcGamepadUtility->isEnabled() && ((code == KEY_SHOW_KBRD) || (code != PORT_ACT_CONSOLE &&  !state))) // Hide on button up
     {
         tcGamepadUtility->setEnabled( false );
     }
@@ -538,8 +532,6 @@ static void menuButton(int state,int code)
     {
         PortableAction(state, code);
     }
-
-     demoControlsAlpha = DEMO_ALPHA_RESET;
 }
 
 static void inventoryButton(int state,int code)
@@ -593,8 +585,7 @@ static void right_stick(float joy_x, float joy_y,float mouse_x, float mouse_y)
 {
     //LOGI(" mouse x = %f",mouse_x);
     int invert        = invertLook ? -1 : 1;
-    //float scale       = (shooting && precisionShoot) ? 0.3 : 1;
-    float scale       = (precisionShoot) ? 0.3 : 1; // Actually always do this when pressed, not just when shooting
+    float scale       = (m_shooting && precisionShoot) ? precisionSensitivty : 1;
     float pitchMouse       = mouse_y * pitch_sens * invert * scale;
     float pitchJoystick    = joy_y * pitch_sens * invert * scale * -2;
 
@@ -673,6 +664,8 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
     yaw_sens = settings.turnSensitivity;
 
     showSticks = settings.showJoysticks;
+    precisionShoot = settings.precisionShoot;
+    precisionSensitivty = settings.precisionSenitivity;
 
     joystickLookMode =  settings.joystickLookMode;
     autoHideInventory = settings.autoHideInventory;
@@ -697,6 +690,19 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
 
     tcGameMain->setAlpha(gameControlsAlpha);
     touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
+
+	controlsContainer.setColour(settings.defaultColor);
+	controlsContainer.setAlpha(gameControlsAlpha);
+
+	tcYesNo->setColour(settings.defaultColor);
+	tcGameMain->setColour(settings.defaultColor);
+	tcGameWeapons->setColour(settings.defaultColor);
+	tcWeaponWheel->setColour(settings.defaultColor);
+	tcInventory->setColour(settings.defaultColor);
+	tcCutomButtons->setColour(settings.defaultColor);
+	tcGamepadUtility->setColour(settings.defaultColor);
+	tcDPadInventory->setColour(settings.defaultColor);
+
 }
 
 extern SDL_Scancode SDLCALL SDL_GetScancodeFromKey(SDL_Keycode key);
@@ -1022,7 +1028,6 @@ void initControls(int width, int height,const char * graphics_path)
         {
             tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
             tcGameMain->addControl(new touchcontrols::Button("prev_weapon",touchcontrols::RectF(0,5,3,7),"prev_weap",PORT_ACT_PREV_WEP,false,false,"Prev weapon"));
-            tcGameMain->addControl(new touchcontrols::Button("precision_shoot",touchcontrols::RectF(0,7,2,9),"precision_shoot",KEY_PRECISION_SHOOT,false,true,"Precision aim"));
         }
         else // MALICE
         {
@@ -1038,12 +1043,12 @@ void initControls(int width, int height,const char * graphics_path)
         	tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(22,3,24,5),"use",PORT_SMD_USE,false,false,"Use"));
         }
 
-        touchJoyRight = new touchcontrols::TouchJoy("touch",touchcontrols::RectF(17,4,26,16),"look_arrow");
+        touchJoyRight = new touchcontrols::TouchJoy("touch",touchcontrols::RectF(17,4,26,16),"look_arrow","fixed_stick_circle");
         tcGameMain->addControl(touchJoyRight);
         touchJoyRight->signal_move.connect(sigc::ptr_fun(&right_stick) );
         touchJoyRight->signal_double_tap.connect(sigc::ptr_fun(&right_double_tap) );
         
-        touchJoyLeft = new touchcontrols::TouchJoy("stick",touchcontrols::RectF(0,7,8,16),"strafe_arrow");
+        touchJoyLeft = new touchcontrols::TouchJoy("stick",touchcontrols::RectF(0,7,8,16),"strafe_arrow","fixed_stick_circle");
         tcGameMain->addControl(touchJoyLeft);
         touchJoyLeft->signal_move.connect(sigc::ptr_fun(&left_stick) );
         touchJoyLeft->signal_double_tap.connect(sigc::ptr_fun(&left_double_tap) );
@@ -1128,13 +1133,18 @@ void initControls(int width, int height,const char * graphics_path)
 
         //Custom Controls -------------------------------------------
         //------------------------------------------------------
-        tcCutomButtons->addControl(new touchcontrols::Button("A",touchcontrols::RectF(5,5,7,7),"Custom_1",PORT_ACT_CUSTOM_0,false,false,"Custom 1 (H)"));
-        tcCutomButtons->addControl(new touchcontrols::Button("B",touchcontrols::RectF(7,5,9,7),"Custom_2",PORT_ACT_CUSTOM_1,false,false,"Custom 2 (I)"));
-        tcCutomButtons->addControl(new touchcontrols::Button("C",touchcontrols::RectF(5,7,7,9),"Custom_3",PORT_ACT_CUSTOM_2,false,false,"Custom 3 (J)"));
-        
-        tcCutomButtons->addControl(new touchcontrols::Button("D",touchcontrols::RectF(7,7,9,9),"Custom_4",PORT_ACT_CUSTOM_3,false,false,"Custom 4 (K)"));
-        tcCutomButtons->addControl(new touchcontrols::Button("E",touchcontrols::RectF(5,9,7,11),"Custom_5",PORT_ACT_CUSTOM_4,false,false,"Custom 5 (L)"));
-        tcCutomButtons->addControl(new touchcontrols::Button("F",touchcontrols::RectF(7,9,9,11),"Custom_6",PORT_ACT_CUSTOM_5,false,false,"Custom 6 (M)"));
+        tcCutomButtons->addControl(new touchcontrols::Button("A",touchcontrols::RectF(5,5,7,7),"Custom_1",PORT_ACT_CUSTOM_0,false,false,"Custom 1 (H)",touchcontrols::COLOUR_RED2));
+        tcCutomButtons->addControl(new touchcontrols::Button("B",touchcontrols::RectF(7,5,9,7),"Custom_2",PORT_ACT_CUSTOM_1,false,false,"Custom 2 (I)",touchcontrols::COLOUR_RED2));
+        tcCutomButtons->addControl(new touchcontrols::Button("C",touchcontrols::RectF(5,7,7,9),"Custom_3",PORT_ACT_CUSTOM_2,false,false,"Custom 3 (J)",touchcontrols::COLOUR_BLUE1));
+
+        tcCutomButtons->addControl(new touchcontrols::Button("D",touchcontrols::RectF(7,7,9,9),"Custom_4",PORT_ACT_CUSTOM_3,false,false,"Custom 4 (K)",touchcontrols::COLOUR_BLUE1));
+        tcCutomButtons->addControl(new touchcontrols::Button("E",touchcontrols::RectF(5,9,7,11),"Custom_5",PORT_ACT_CUSTOM_4,false,false,"Custom 5 (L)",touchcontrols::COLOUR_GREEN2));
+        tcCutomButtons->addControl(new touchcontrols::Button("F",touchcontrols::RectF(7,9,9,11),"Custom_6",PORT_ACT_CUSTOM_5,false,false,"Custom 6 (M)",touchcontrols::COLOUR_GREEN2));
+
+        tcCutomButtons->addControl(new touchcontrols::Button("G",touchcontrols::RectF(5,11,7,13),"custom_a",PORT_ACT_CUSTOM_6,false,true,"Custom 7 (N)",touchcontrols::COLOUR_NONE));
+        tcCutomButtons->addControl(new touchcontrols::Button("H",touchcontrols::RectF(7,11,9,13),"custom_b",PORT_ACT_CUSTOM_7,false,true,"Custom 8 (O)",touchcontrols::COLOUR_NONE));
+        tcCutomButtons->addControl(new touchcontrols::Button("I",touchcontrols::RectF(5,13,7,15),"custom_c",PORT_ACT_CUSTOM_8,false,true,"Custom 9 (P)",touchcontrols::COLOUR_NONE));
+        tcCutomButtons->addControl(new touchcontrols::Button("J",touchcontrols::RectF(7,13,9,15),"custom_d",PORT_ACT_CUSTOM_9,false,true,"Custom 10 (Q)",touchcontrols::COLOUR_NONE));
 
         //touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_8,PORT_ACT_CUSTOM_9,PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,false,"Quad Slide 1");
         //tcCutomButtons->addControl(qs1);
