@@ -203,4 +203,15 @@ JAVA_FUNC(weaponWheelSettings) (JNIEnv *env, jobject obj, jint useMoveStick, jin
     weaponWheelSettings( useMoveStick, mode, autoTimeout );
 }
 
+int AUDIO_OVERRIDE_FREQ = 0;
+int AUDIO_OVERRIDE_SAMPLES = 0;
+
+void EXPORT_ME
+JAVA_FUNC(audioOverride) (JNIEnv *env, jobject obj, jint freq, jint samples)
+{
+    LOGI("Sound settings: freq = %d, samples = %d", freq, samples);
+    AUDIO_OVERRIDE_FREQ = freq;
+    AUDIO_OVERRIDE_SAMPLES = samples;
+}
+
 }
