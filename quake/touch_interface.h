@@ -13,7 +13,7 @@
 
 extern "C"
 {
-    void mobile_init(int width, int height, const char *pngPath, int options, int game);
+    void mobile_init(int width, int height, const char *pngPath, int options, int wheelNbr, int game);
 
     TouchControlsInterface* mobileGetTouchInterface();
 

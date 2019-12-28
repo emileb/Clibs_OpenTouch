@@ -51,7 +51,7 @@ char keyGlobal[512];
 char pkgGlobal[64];
 
 jint EXPORT_ME
-JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jobjectArray argsArray,jint game,jstring game_path_,jstring logFilename,jstring nativeLibs )
+JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options, jint wheelNbr, jobjectArray argsArray,jint game,jstring game_path_,jstring logFilename,jstring nativeLibs )
 {
 	env_ = env;
 
@@ -87,7 +87,7 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jo
     strcpy(pkgGlobal,pkg);
 
 
-    mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(),options,game);
+    mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(),options, wheelNbr,game);
 	PortableInit(argc,argv); //Never returns!!
 
 	return 0;

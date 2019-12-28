@@ -54,6 +54,7 @@ touchscreemode_t currentScreenMode = TS_BLANK;
 
 
 static int gameType;
+static int wheelNbr = 10;
 
 static float gameControlsAlpha = 0.5;
 static bool joystickLookMode = false;
@@ -1085,10 +1086,7 @@ void initControls(int width, int height,const char * graphics_path)
         
         //Weapon wheel -------------------------------------------
         //------------------------------------------------------
-        const char * weapon_wheel_gfx = "weapon_wheel";
-        int weaponWheelNbr = 10;
-
-        wheelSelect = new touchcontrols::WheelSelect("weapon_wheel",touchcontrols::RectF(7,2,19,14),weapon_wheel_gfx,weaponWheelNbr);
+        wheelSelect = new touchcontrols::WheelSelect("weapon_wheel",touchcontrols::RectF(7,2,19,14),"weapon_wheel_%d",wheelNbr);
         wheelSelect->signal_selected.connect(sigc::ptr_fun(&weaponWheel) );
         wheelSelect->signal_enabled.connect(sigc::ptr_fun(&weaponWheelSelected));
         tcWeaponWheel->addControl(wheelSelect);
@@ -1255,7 +1253,7 @@ const char * getGamePath()
 }
 
 
-void mobile_init(int width, int height, const char *pngPath,int options, int game)
+void mobile_init(int width, int height, const char *pngPath,int options,int wheelNbr_, int game)
 {
     if( options & GAME_OPTION_AUTO_HIDE_GAMEPAD )
         gamepadHideTouch = true;
@@ -1267,6 +1265,7 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
         useSystemKeyboard = true;
 
     gameType = game;
+	wheelNbr = wheelNbr_;
 
     LOGI("Game type = %d", gameType );
 
