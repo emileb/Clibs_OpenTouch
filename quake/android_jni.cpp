@@ -64,7 +64,7 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options, j
 
     LogWritter_Init( log_filename_path.c_str());
 
-	argv[0] = "doom";
+	argv[0] = "quake";
 	int argCount = (env)->GetArrayLength( argsArray);
 	LOGI("argCount = %d",argCount);
 	for (int i=0; i<argCount; i++) {
