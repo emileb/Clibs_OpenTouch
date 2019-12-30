@@ -698,6 +698,8 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
     touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
 
     controlsContainer.setColour(settings.defaultColor);
+   	controlsContainer.setAlpha(gameControlsAlpha);
+
 	tcYesNo->setColour(settings.defaultColor);
 	tcGameMain->setColour(settings.defaultColor);
 	tcGameWeapons->setColour(settings.defaultColor);
