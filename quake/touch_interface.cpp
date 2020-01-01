@@ -1293,6 +1293,10 @@ void mobile_init(int width, int height, const char *pngPath,int options,int whee
         touchcontrols::gl_setGLESVersion( 2 );
     }
 
+    if( options & GAME_OPTION_GLES3 )
+    {
+       touchcontrols::gl_setGLESVersion( 3 );
+    }
 
 #ifdef DARKPLACES
     touchcontrols::gl_setGLESVersion( 2 );
