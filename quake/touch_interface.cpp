@@ -437,8 +437,9 @@ static void gameButton(int state,int code)
 
 static void gameUtilitiesButton(int state,int code)
 {
-    // Auto hide the gamepad utilitie, except if showing consol
-    if( tcGamepadUtility->isEnabled() && ((code == KEY_SHOW_KBRD) || (code != PORT_ACT_CONSOLE &&  !state))) // Hide on button up
+    // Auto hide the gamepad utilitie, except if showing console
+    // Hide immidiatly if keyboard or back button, otherwise they won't work
+    if( tcGamepadUtility->isEnabled() && ((code == KEY_SHOW_KBRD) || (code == KEY_BACK_BUTTON) || (code != PORT_ACT_CONSOLE &&  !state))) // Hide on button up
     {
         tcGamepadUtility->setEnabled( false );
     }
