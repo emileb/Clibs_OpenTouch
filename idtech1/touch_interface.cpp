@@ -5,11 +5,8 @@
 #include "SDL.h"
 //#include "ios_interface.h"
 
-#if defined(GZDOOM_GL3)
-   #include <GLES3/gl3.h>
-#else
-    #include <GLES/gl.h>
-#endif
+#include <GLES/gl.h>
+
 
 #include "UI_TouchDefaultSettings.h"
 #include "UI_ButtonListWindow.h"
@@ -192,7 +189,7 @@ static void openGLStart()
 touchcontrols::gl_startRender();
 
 
-#if !defined(GZDOOM_GL3) && !defined(D3ES)
+#if !defined(D3ES)
     if( touchcontrols::gl_getGLESVersion() == 1 )
     {
         glMatrixMode(GL_PROJECTION);
@@ -216,10 +213,6 @@ touchcontrols::gl_startRender();
     //    glDisable(GL_CULL_FACE);
         glDisable(GL_ALPHA_TEST);
     //    glDisable(GL_DEPTH_TEST);
-    }
-    else
-    {
-
     }
 #endif
 
@@ -1065,7 +1058,8 @@ void initControls(int width, int height,const char * graphics_path)
 
         tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,true,"Crouch"));
         tcGameMain->addControl(new touchcontrols::Button("crouch_toggle",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_TOGGLE_CROUCH,false,true,"Crouch (toggle)"));
-        tcGameMain->addControl(new touchcontrols::Button("attack_alt",touchcontrols::RectF(21,5,23,7),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt fire"));
+        tcGameMain->addControl(new touchcontrols::Button("attack_alt",touchcontrols::RectF(21,5,23,7),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt attack"));
+        tcGameMain->addControl(new touchcontrols::Button("attack_alt2",touchcontrols::RectF(4,3,6,5),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt attack (duplicate)"));
         tcGameMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(0,7,2,9),"custom_show",KEY_SHOW_CUSTOM,false,true,"Show custom"));
         tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(12,14,14,16),"show_weapons",KEY_SHOW_WEAPONS,false,false,"Show numbers"));
         tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));

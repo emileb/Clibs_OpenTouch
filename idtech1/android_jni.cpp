@@ -64,7 +64,7 @@ char keyGlobal[512];
 char pkgGlobal[64];
 
 jint EXPORT_ME
-JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jobjectArray argsArray,jint game,jstring game_path_,jstring logFilename,jstring nativeLibs )
+JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,jint wheelNbr,jobjectArray argsArray,jint game,jstring game_path_,jstring logFilename,jstring nativeLibs )
 {
 	env_ = env;
 
@@ -223,6 +223,16 @@ JAVA_FUNC(weaponWheelSettings) (JNIEnv *env, jobject obj, jint useMoveStick, jin
     weaponWheelSettings( useMoveStick, mode, autoTimeout );
 }
 
+int AUDIO_OVERRIDE_FREQ = 0;
+int AUDIO_OVERRIDE_SAMPLES = 0;
+
+void EXPORT_ME
+JAVA_FUNC(audioOverride) (JNIEnv *env, jobject obj, jint freq, jint samples)
+{
+    LOGI("Sound settings: freq = %d, samples = %d", freq, samples);
+    AUDIO_OVERRIDE_FREQ = freq;
+    AUDIO_OVERRIDE_SAMPLES = samples;
+}
 
 }
 
