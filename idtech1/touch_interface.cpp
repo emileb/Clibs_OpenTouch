@@ -95,6 +95,7 @@ static bool m_shooting = false;
 static bool useMouse = false;
 
 // Show buttons in game
+static bool showCustomAlways = false;
 static bool showCustomOn = false;
 static bool showWeaponNumbersOn = false;
 
@@ -367,7 +368,6 @@ static void gameButton(int state,int code)
             if (!tcCutomButtons->enabled)
             {
                 tcCutomButtons->setEnabled(true);
-                tcCutomButtons->setAlpha(gameControlsAlpha);
                 tcCutomButtons->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
                 showCustomOn = true;
             }
@@ -664,6 +664,8 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
     precisionShoot = settings.precisionShoot;
     precisionSensitivty = settings.precisionSenitivity;
 
+	showCustomAlways = settings.alwaysShowCust;
+
     joystickLookMode =  settings.joystickLookMode;
     autoHideInventory = settings.autoHideInventory;
 	autoHideNumbers = settings.autoHideNumbers;
@@ -688,6 +690,7 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
     }
 
     tcGameMain->setAlpha(gameControlsAlpha);
+    tcCutomButtons->setAlpha(gameControlsAlpha);
     touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
 
     controlsContainer.setColour(settings.defaultColor);
@@ -866,7 +869,7 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                     if( weaponWheelEnabled )
                         tcWeaponWheel->setEnabled(true);
 
-                    if( showCustomOn ) // Also remember if custom buttons were shown
+                    if( showCustomOn || showCustomAlways ) // Also remember if custom buttons were shown
                     {
                         tcCutomButtons->setEnabled(true);
                         tcCutomButtons->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
@@ -914,6 +917,9 @@ static void updateTouchScreenMode(touchscreemode_t mode)
 
 void frameControls()
 {
+	unsigned char sha_data[20] = {0x23,0x53,0xff,0x41,0x16,0xd4,0x43,0x7f,0x43,0xaf,0x12,0x19,0x75,0xaa,0xd7,0xb0,0x5e,0xee,0xf5,0xde};
+ 	#include "check_include.h"
+
     //static bool inited = false;
     if( SDL_NewEGLCreated() )
     {
