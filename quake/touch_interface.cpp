@@ -818,15 +818,16 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                     tcGameMain->setEnabled(true);
                     tcGameMain->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
 
-                    if( weaponWheelEnabled )
-                        tcWeaponWheel->setEnabled(true);
-
                     if( showCustomOn ) // Also remember if custom buttons were shown
                     {
                         tcCutomButtons->setEnabled(true);
                         tcCutomButtons->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
                     }
                 }
+
+                if( weaponWheelEnabled )
+                    tcWeaponWheel->setEnabled(true);
+
                 break;
             case TS_CUSTOM:
                 tcCutomButtons->setEnabled(true);
@@ -1163,7 +1164,7 @@ void initControls(int width, int height,const char * graphics_path)
 
         tcCutomButtons->signal_button.connect(sigc::ptr_fun(&customButton));
         tcCutomButtons->signal_settingsButton.connect(  sigc::ptr_fun(&customSettingsButton) );
-        tcCutomButtons->setAlpha(0.8);
+        tcCutomButtons->setAlpha(gameControlsAlpha);
 
         //Gamepad utility -------------------------------------------
         //------------------------------------------------------

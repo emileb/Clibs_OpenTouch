@@ -866,9 +866,6 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                     tcGameMain->setEnabled(true);
                     tcGameMain->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
 
-                    if( weaponWheelEnabled )
-                        tcWeaponWheel->setEnabled(true);
-
                     if( showCustomOn || showCustomAlways ) // Also remember if custom buttons were shown
                     {
                         tcCutomButtons->setEnabled(true);
@@ -881,6 +878,11 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                         tcGameWeapons->animateIn(5);
                     }
                 }
+
+                // Always enable wheel
+                if( weaponWheelEnabled )
+                    tcWeaponWheel->setEnabled(true);
+
                 break;
             case TS_MAP:
                 { // This is a bit of hack. We want the map button to be in the same place as the game map button
@@ -1238,7 +1240,7 @@ void initControls(int width, int height,const char * graphics_path)
         qs2->signal.connect(sigc::ptr_fun(&customButton));
         tcCutomButtons->signal_button.connect(sigc::ptr_fun(&customButton));
         tcCutomButtons->signal_settingsButton.connect(  sigc::ptr_fun(&customSettingsButton) );
-        tcCutomButtons->setAlpha(0.8);
+      	tcCutomButtons->setAlpha(gameControlsAlpha);
 
         //Gamepad utility -------------------------------------------
         //------------------------------------------------------
