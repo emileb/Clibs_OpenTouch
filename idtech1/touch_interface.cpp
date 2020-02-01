@@ -147,6 +147,18 @@ touchcontrols::WheelSelect *wheelSelect;
 
 touchcontrols::ButtonGrid *uiInventoryButtonGrid;
 
+static std::string graphicpath;
+const char * getFilesPath()
+{
+    return graphicpath.c_str(); //graphics path is the same as files path
+}
+
+std::string game_path;
+const char * getGamePath()
+{
+    return game_path.c_str();
+}
+
 // Send message to JAVA SDL activity
 int Android_JNI_SendMessage(int command, int param);
 
@@ -920,7 +932,7 @@ static void updateTouchScreenMode(touchscreemode_t mode)
 void frameControls()
 {
 	unsigned char sha_data[20] = {0x23,0x53,0xff,0x41,0x16,0xd4,0x43,0x7f,0x43,0xaf,0x12,0x19,0x75,0xaa,0xd7,0xb0,0x5e,0xee,0xf5,0xde};
- 	#include "check_include.h"
+ 	#include "./secure/check_include.h"
 
     //static bool inited = false;
     if( SDL_NewEGLCreated() )
@@ -1068,6 +1080,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("crouch_toggle",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_TOGGLE_CROUCH,false,true,"Crouch (toggle)"));
         tcGameMain->addControl(new touchcontrols::Button("attack_alt",touchcontrols::RectF(21,5,23,7),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt attack"));
         tcGameMain->addControl(new touchcontrols::Button("attack_alt2",touchcontrols::RectF(4,3,6,5),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt attack (duplicate)"));
+        tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle",touchcontrols::RectF(21,5,23,7),"shoot_alt",PORT_ACT_TOGGLE_ALT_ATTACK,false,true,"Alt attack (toggle)"));
         tcGameMain->addControl(new touchcontrols::Button("show_custom",touchcontrols::RectF(0,7,2,9),"custom_show",KEY_SHOW_CUSTOM,false,true,"Show custom"));
         tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(12,14,14,16),"show_weapons",KEY_SHOW_WEAPONS,false,false,"Show numbers"));
         tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
@@ -1330,17 +1343,7 @@ void initControls(int width, int height,const char * graphics_path)
 
 
 
-static std::string graphicpath;
-const char * getFilesPath()
-{
-    return graphicpath.c_str(); //graphics path is the same as files path
-}
 
-std::string game_path;
-const char * getGamePath()
-{
-    return game_path.c_str();
-}
 
 
 void mobile_init(int width, int height, const char *pngPath,int options, int game)

@@ -212,6 +212,15 @@ void PortableAction(int state, int action)
         case PORT_ACT_ALT_ATTACK:
             buttonChange(state,&Button_AltAttack);
             break;
+        case PORT_ACT_TOGGLE_ALT_ATTACK:
+            if( state)
+			{
+			   if(Button_AltAttack.bDown)
+			       buttonChange(0,&Button_AltAttack);
+			   else
+			       buttonChange(1,&Button_AltAttack);
+			}
+			break;
         case PORT_ACT_JUMP:
             buttonChange(state,&Button_Jump);
             break;
