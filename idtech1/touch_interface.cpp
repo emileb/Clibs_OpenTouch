@@ -6,7 +6,9 @@
 //#include "ios_interface.h"
 
 #include <GLES/gl.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "UI_TouchDefaultSettings.h"
 #include "UI_ButtonListWindow.h"
@@ -159,6 +161,9 @@ const char * getGamePath()
     return game_path.c_str();
 }
 
+// Needed for Doom 3
+extern const char *nativeLibsPath;
+
 // Send message to JAVA SDL activity
 int Android_JNI_SendMessage(int command, int param);
 
@@ -201,10 +206,10 @@ static void openGLStart()
 
 touchcontrols::gl_startRender();
 
-
 #if !defined(D3ES)
     if( touchcontrols::gl_getGLESVersion() == 1 )
     {
+
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glViewport(0, 0, mobile_screen_width, mobile_screen_height);
@@ -223,9 +228,7 @@ touchcontrols::gl_startRender();
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_TEXTURE_2D);
 
-    //    glDisable(GL_CULL_FACE);
         glDisable(GL_ALPHA_TEST);
-    //    glDisable(GL_DEPTH_TEST);
     }
 #endif
 
