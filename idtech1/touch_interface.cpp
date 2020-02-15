@@ -670,8 +670,8 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
 
     invertLook = settings.invertLook;
 
-    strafe_sens = settings.moveSensitivity;
-    forward_sens = settings.moveSensitivity;
+    strafe_sens = settings.strafeSensitivity;
+    forward_sens = settings.fwdSensitivity;
     pitch_sens = settings.lookSensitivity;
     yaw_sens = settings.turnSensitivity;
 
