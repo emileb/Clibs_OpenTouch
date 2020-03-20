@@ -1068,7 +1068,7 @@ void initControls(int width, int height,const char * graphics_path)
 #endif
 
         bool hideJump = true;
-        if(( gameType == GAME_TYPE_STRIFE ) || (gameType == GAME_TYPE_HEXEN ) || (gameType == GAME_TYPE_HERETIC))
+        if(( gameType == GAME_TYPE_STRIFE ) || (gameType == GAME_TYPE_HEXEN ))
             hideJump = false;
 
         tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,hideJump,"Jump"));
