@@ -4,7 +4,9 @@
 #include "SDL_beloko_extra.h"
 #include "SDL.h"
 //#include "ios_interface.h"
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "UI_TouchDefaultSettings.h"
 #include "UI_ButtonListWindow.h"
@@ -80,6 +82,7 @@ static bool m_shooting = false;
 static float precisionSensitivty = 0.5;
 
 // Show buttons in game
+static bool showCustomAlways = false;
 static bool showCustomOn = false;
 
 // Show custom buttons in the menu
@@ -125,6 +128,21 @@ touchcontrols::UI_Keyboard *uiKeyboard;
 touchcontrols::WheelSelect *wheelSelect;
 
 touchcontrols::ButtonGrid *uiInventoryButtonGrid;
+
+static std::string graphicpath;
+const char * getFilesPath()
+{
+    return graphicpath.c_str(); //graphics path is the same as files path
+}
+
+std::string game_path;
+const char * getGamePath()
+{
+    return game_path.c_str();
+}
+
+
+extern const char *nativeLibsPath;
 
 // Send message to JAVA SDL activity
 int Android_JNI_SendMessage(int command, int param);
@@ -243,6 +261,8 @@ static void openGLStart()
 
 static void openGLEnd()
 {
+	touchcontrols::gl_endRender();
+
 #ifdef YQUAKE2
     if( yquake2Renderer != 3 )
     {
@@ -301,6 +321,10 @@ static void openGLEnd()
 	glMatrixMode(matrixMode);
 
 	jwzgles_restore();
+#endif
+
+#ifdef QUAKESPASM_SPIKED
+	touchcontrols::gl_resetGL4ES();
 #endif
 }
 
@@ -394,7 +418,6 @@ static void gameButton(int state,int code)
             if (!tcCutomButtons->enabled)
             {
                 tcCutomButtons->setEnabled(true);
-                tcCutomButtons->setAlpha(gameControlsAlpha);
                 tcCutomButtons->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
                 showCustomOn = true;
             }
@@ -660,14 +683,16 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
 
     invertLook = settings.invertLook;
 
-    strafe_sens = settings.moveSensitivity;
-    forward_sens = settings.moveSensitivity;
+    strafe_sens = settings.strafeSensitivity;
+    forward_sens = settings.fwdSensitivity;
     pitch_sens = settings.lookSensitivity;
     yaw_sens = settings.turnSensitivity;
 
     showSticks = settings.showJoysticks;
     precisionShoot = settings.precisionShoot;
     precisionSensitivty = settings.precisionSenitivity;
+
+	showCustomAlways = settings.alwaysShowCust;
 
     joystickLookMode =  settings.joystickLookMode;
     autoHideInventory = settings.autoHideInventory;
@@ -691,6 +716,7 @@ static void touchSettings( touchcontrols::tTouchSettings settings )
     }
 
     tcGameMain->setAlpha(gameControlsAlpha);
+    tcCutomButtons->setAlpha(gameControlsAlpha);
     touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
 
 	controlsContainer.setColour(settings.defaultColor);
@@ -818,7 +844,7 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                     tcGameMain->setEnabled(true);
                     tcGameMain->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
 
-                    if( showCustomOn ) // Also remember if custom buttons were shown
+                    if( showCustomOn || showCustomAlways ) // Also remember if custom buttons were shown
                     {
                         tcCutomButtons->setEnabled(true);
                         tcCutomButtons->fade(touchcontrols::FADE_IN,DEFAULT_FADE_FRAMES);
@@ -850,7 +876,8 @@ static void updateTouchScreenMode(touchscreemode_t mode)
 void frameControls()
 {
 	unsigned char sha_data[20] = {0xe6,0xb7,0xcc,0xd2,0x3f,0x61,0xe2,0xb3,0xee,0x41,0x93,0xef,0xc6,0x3b,0xad,0x68,0xf2,0xc2,0xe6,0x7a};
-	#include "check_include.h"
+ 	#include "./secure/check_include.h"
+
 
     //LOGI("frameControls");
     //static bool inited = false;
@@ -883,8 +910,6 @@ void frameControls()
     
     setHideSticks(!showSticks);
 
-//openGLStart();
-//openGLEnd();
     controlsContainer.draw();
 }
 
@@ -1008,7 +1033,7 @@ void initControls(int width, int height,const char * graphics_path)
         tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE,false,false,"Quick save"));
         tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD,false,false,"Quick load"));
 #endif
-        tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,true,"Show Keyboard"));
+        tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,false,"Show Keyboard"));
         tcGameMain->addControl(new touchcontrols::Button("showscores",touchcontrols::RectF(17,0,19,2),"scores",PORT_ACT_MP_SCORES,false,true,"Show Scores"));
         tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,false,"Jump/Swim up"));
 
@@ -1016,6 +1041,8 @@ void initControls(int width, int height,const char * graphics_path)
             tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_CROUCH,false,false,"Crouch/Swim down"));
         else
             tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,false,"Crouch/Swim down"));
+
+        tcGameMain->addControl(new touchcontrols::Button("attack_alt",touchcontrols::RectF(21,5,23,7),"shoot_alt",PORT_ACT_ALT_ATTACK,false,true,"Alt attack (Mouse 2)"));
 
 #if defined(QUAKE2) || defined(YQUAKE2)
         tcGameMain->addControl(new touchcontrols::Button("use_inventory",touchcontrols::RectF(0,9,2,11),"inventory",KEY_SHOW_INV,false,false,"Show Inventory"));
@@ -1246,20 +1273,6 @@ void initControls(int width, int height,const char * graphics_path)
 
 
 
-
-static std::string graphicpath;
-const char * getFilesPath()
-{
-    return graphicpath.c_str(); //graphics path is the same as files path
-}
-
-std::string game_path;
-const char * getGamePath()
-{
-    return game_path.c_str();
-}
-
-
 void mobile_init(int width, int height, const char *pngPath,int options,int wheelNbr_, int game)
 {
     if( options & GAME_OPTION_AUTO_HIDE_GAMEPAD )
@@ -1276,15 +1289,7 @@ void mobile_init(int width, int height, const char *pngPath,int options,int whee
 
     LOGI("Game type = %d", gameType );
 
-#ifdef UHEXEN2
-/*
-	setenv("LIBGL_ES","2",1);
-	setenv("LIBGL_GL","20",1);
-	setenv("LIBGL_DEFAULTWRAP","0",1);
-    touchcontrols::gl_setGLESVersion( 2 );
-    touchcontrols::gl_useGL4ES(); // GLES2 always uses GL4ES library
-*/
-#endif
+
 // Quake 2 does not use glGenTextures
 #if defined(QUAKE2)
 	touchcontrols::setTextureNumberStart( 5000 );
@@ -1300,9 +1305,12 @@ void mobile_init(int width, int height, const char *pngPath,int options,int whee
        touchcontrols::gl_setGLESVersion( 3 );
     }
 
-#ifdef DARKPLACES
+
+#ifdef QUAKESPASM_SPIKED
     touchcontrols::gl_setGLESVersion( 2 );
+    touchcontrols::gl_useGL4ES();
 #endif
+
 
 #ifdef __ANDROID__
     mobile_screen_width = width;
@@ -1313,20 +1321,8 @@ void mobile_init(int width, int height, const char *pngPath,int options,int whee
     putenv((char*)"TIMIDITY_CFG=./audiopack/snd_timidity/timidity.cfg");
 
     initControls(mobile_screen_width,-mobile_screen_height,graphicpath.c_str());
-
 #endif
-#ifdef __IOS__
-    mobile_screen_width = 1152;
-    mobile_screen_height = 640;
-    
-    static std::string pngPath = getPngDirectory();
-   //pngPath += "/../png/";
-    LOGI("PNG Path = %s\n",pngPath.c_str());
-    
-    initControls(mobile_screen_width,-mobile_screen_height,pngPath.c_str());
 
-    SDL_SetTouchControlsInterface(&controlsContainer);
-#endif
 }
 
 void mobileBackButton( void )

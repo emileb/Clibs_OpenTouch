@@ -81,6 +81,15 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options, j
 
 	setenv("HOME", game_path.c_str(),1);
 
+
+// quakespasm spiked AND Hexen2 uses GL4ES. But Hexen uses it in GLES1 mode
+#ifdef QUAKESPASM_SPIKED
+	setenv("LIBGL_ES","2",1);
+	setenv("LIBGL_GL","21",1);
+	setenv("LIBGL_DEFAULTWRAP","0",1);
+    setenv("LIBGL_USEVBO","0",1);
+#endif
+
 	chdir( game_path.c_str() );
 
     strcpy(keyGlobal,key);
