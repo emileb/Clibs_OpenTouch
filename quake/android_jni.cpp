@@ -88,6 +88,12 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options, j
 	setenv("LIBGL_GL","21",1);
 	setenv("LIBGL_DEFAULTWRAP","0",1);
     setenv("LIBGL_USEVBO","0",1);
+    setenv("LIBGL_NOINTOVLHACK","1",1);
+
+    //setenv("LIBGL_NOCLEAN","1",1);
+	//setenv("LIBGL_NOES2COMPAT","1",1);
+	//setenv("LIBGL_GLXRECYCLE","1",1);
+
 #endif
 
 	chdir( game_path.c_str() );

@@ -1347,9 +1347,6 @@ void initControls(int width, int height,const char * graphics_path)
 
 
 
-
-
-
 void mobile_init(int width, int height, const char *pngPath,int options, int game)
 {
     if( options & GAME_OPTION_AUTO_HIDE_GAMEPAD )

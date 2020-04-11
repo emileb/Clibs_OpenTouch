@@ -1012,6 +1012,10 @@ void initControls(int width, int height,const char * graphics_path)
         mouse->setEditable(false);
         tcMenuMain->addControl(mouse);
         mouse->signal_action.connect(sigc::ptr_fun(&mouse_move) );
+
+		touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24,3,26,11), "brightness_slider" );
+		brightnessSlide->signal_action.connect(  sigc::ptr_fun(& brightnessSlideMouse ) );
+		tcMenuMain->addControl( brightnessSlide );
 #endif
 
         tcMenuMain->signal_button.connect(  sigc::ptr_fun(&menuButton) );

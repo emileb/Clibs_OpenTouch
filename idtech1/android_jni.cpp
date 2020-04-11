@@ -23,6 +23,7 @@
 extern "C"
 {
 
+
 static int android_screen_width;
 static int android_screen_height;
 
@@ -100,6 +101,7 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint options,ji
 	//setenv("LIBGL_BATCH","100",1);
     //setenv("LIBGL_ALPHAHACK","1",1);
     setenv("LIBGL_USEVBO","0",1);
+    setenv("LIBGL_NOINTOVLHACK","1",1);
 
 	chdir( game_path.c_str() );
 	strcpy(keyGlobal,key);
@@ -162,6 +164,7 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
             return;
     }
 #else
+/*
     // Beta test time
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
@@ -172,6 +175,7 @@ JAVA_FUNC(touchEvent) (JNIEnv *env, jobject obj,jint action, jint pid, jfloat x,
     {
         return;
     }
+*/
 #endif
 
 	mobileGetTouchInterface()->processPointer(action,pid,x,y);
