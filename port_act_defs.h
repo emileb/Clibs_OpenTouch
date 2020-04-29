@@ -182,7 +182,8 @@
 #define PORT_ACT_DEMO_CAMERA      184
 
 
-
+//Doom 3
+#define PORT_ACT_FLASH_LIGHT      200
 
 
 #define PORT_ACT_MENU_UP                  0x200 //512

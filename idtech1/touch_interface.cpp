@@ -120,37 +120,37 @@ static int mapState = 0;
 #define DEMO_ALPFA_DEC        0.1f
 static float demoControlsAlpha; // Used to fade out demo controls
 
-touchcontrols::UI_Controls *UI_tc = 0;
+static touchcontrols::UI_Controls *UI_tc = 0;
 
-touchcontrols::TouchControls *tcMenuMain=0;
-touchcontrols::TouchControls *tcYesNo=0;
-touchcontrols::TouchControls *tcGameMain=0;
-touchcontrols::TouchControls *tcGameWeapons=0;
-touchcontrols::TouchControls *tcWeaponWheel=0;
-touchcontrols::TouchControls *tcInventory=0;
-touchcontrols::TouchControls *tcAutomap=0;
-touchcontrols::TouchControls *tcBlank=0;
-touchcontrols::TouchControls *tcKeyboard=0;
-touchcontrols::TouchControls *tcCutomButtons=0;
-touchcontrols::TouchControls *tcDemo=0;
-touchcontrols::TouchControls *tcGamepadUtility=0;
-touchcontrols::TouchControls *tcDPadInventory=0;
-touchcontrols::TouchControls *tcMouse=0;
+static touchcontrols::TouchControls *tcMenuMain=0;
+static touchcontrols::TouchControls *tcYesNo=0;
+static touchcontrols::TouchControls *tcGameMain=0;
+static touchcontrols::TouchControls *tcGameWeapons=0;
+static touchcontrols::TouchControls *tcWeaponWheel=0;
+static touchcontrols::TouchControls *tcInventory=0;
+static touchcontrols::TouchControls *tcAutomap=0;
+static touchcontrols::TouchControls *tcBlank=0;
+static touchcontrols::TouchControls *tcKeyboard=0;
+static touchcontrols::TouchControls *tcCutomButtons=0;
+static touchcontrols::TouchControls *tcDemo=0;
+static touchcontrols::TouchControls *tcGamepadUtility=0;
+static touchcontrols::TouchControls *tcDPadInventory=0;
+static touchcontrols::TouchControls *tcMouse=0;
 
 // So can hide and show these buttons
-touchcontrols::TouchJoy *touchJoyLeft;
-touchcontrols::TouchJoy *touchJoyRight;
+static touchcontrols::TouchJoy *touchJoyLeft;
+static touchcontrols::TouchJoy *touchJoyRight;
 
 // So gampad can control keyboard
-touchcontrols::UI_Keyboard *uiKeyboard;
+static touchcontrols::UI_Keyboard *uiKeyboard;
 
 // So gamepad can access it
-touchcontrols::WheelSelect *wheelSelect;
+static touchcontrols::WheelSelect *wheelSelect;
 
-touchcontrols::ButtonGrid *uiInventoryButtonGrid;
+static touchcontrols::ButtonGrid *uiInventoryButtonGrid;
 
 static std::string graphicpath;
-const char * getFilesPath()
+static const char * getFilesPath()
 {
     return graphicpath.c_str(); //graphics path is the same as files path
 }
@@ -771,7 +771,7 @@ static void keyboardKeyPressed( uint32_t key )
 
 static void mouse_move(int action,float x, float y,float mouse_x, float mouse_y)
 {
-#if defined(GZDOOM) || defined(ZANDRONUM_30)
+#if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES)
     if( action == TOUCHMOUSE_MOVE )
 	{
 	    PortableMouse(mouse_x,mouse_y);
@@ -788,7 +788,7 @@ static void mouse_move(int action,float x, float y,float mouse_x, float mouse_y)
 
 static void mouseButton(int state,int code)
 {
-#if defined(GZDOOM) || defined(ZANDRONUM_30)
+#if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES)
     // Auto hide the gamepad utilitie, except if showing consol
     if( (code == KEY_BACK_BUTTON) && state )
     {
@@ -834,10 +834,16 @@ static void updateTouchScreenMode(touchscreemode_t mode)
                 tcGameMain->fade(touchcontrols::FADE_OUT,DEFAULT_FADE_FRAMES);
                 tcGameWeapons->setEnabled(false);
                 tcWeaponWheel->setEnabled(false);
-                tcCutomButtons->resetOutput();
-                tcCutomButtons->setEnabled(false);
-                tcInventory->resetOutput();
-                tcInventory->setEnabled(false);
+                if(tcCutomButtons)
+                {
+                	tcCutomButtons->resetOutput();
+                	tcCutomButtons->setEnabled(false);
+                }
+                if(tcInventory)
+                {
+                	tcInventory->resetOutput();
+                	tcInventory->setEnabled(false);
+				}
                 break;
             case TS_MAP:
                 tcAutomap->resetOutput();
@@ -979,6 +985,153 @@ void frameControls()
 //openGLStart();
 //openGLEnd();
     controlsContainer.draw();
+}
+
+
+
+void initControlsDoom3(int width, int height,const char * graphics_path)
+{
+   	touchcontrols::GLScaleWidth = (float)width;
+    touchcontrols::GLScaleHeight = (float)height;
+
+    LOGI("initControls %d x %d,x path = %s",width,height,graphics_path);
+
+    if (!controlsCreated)
+    {
+        LOGI("creating controls");
+
+        touchcontrols::signal_vibrate.connect( sigc::ptr_fun( &vibrate ));
+
+        touchcontrols::gl_setGraphicsBasePath(graphics_path);
+        //setControlsContainer(&controlsContainer);
+
+        controlsContainer.openGL_start.connect( sigc::ptr_fun(&openGLStart));
+        controlsContainer.openGL_end.connect( sigc::ptr_fun(&openGLEnd));
+
+   		tcMenuMain = new touchcontrols::TouchControls("menu",false,true,10,false);
+        tcGameMain = new touchcontrols::TouchControls("game",false,true,1,true);
+        tcGameWeapons = new touchcontrols::TouchControls("weapons",false,true,1,false);
+        tcWeaponWheel = new touchcontrols::TouchControls("weapon_wheel",false,true,1,false);
+        tcBlank = new touchcontrols::TouchControls("blank",true,false);
+        tcKeyboard = new touchcontrols::TouchControls("keyboard",false,false);
+        // Hide the cog because when using the gamepad and weapon wheel is enabled, the cog will show otherwise
+        tcWeaponWheel->hideEditButton = true;
+
+  		touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse",touchcontrols::RectF(0,0,26,16),"");
+        mouse->setHideGraphics(true);
+        mouse->setEditable(false);
+        tcMenuMain->addControl(mouse);
+        mouse->signal_action.connect(sigc::ptr_fun(&mouse_move) );
+        tcMenuMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON,false,false,"Back"));
+        tcMenuMain->addControl(new touchcontrols::Button("left_button",touchcontrols::RectF(0,6,3,10),"left_mouse",KEY_LEFT_MOUSE,false,false,"Back"));
+        tcMenuMain->signal_button.connect( sigc::ptr_fun(&mouseButton) );
+
+		// GAME------------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------------
+		tcGameMain->setAlpha(gameControlsAlpha);
+		tcGameMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON,false,false,"Show menu"));
+		tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(20,7,23,10),"shoot",KEY_SHOOT,false,false,"Attack!"));
+		tcGameMain->addControl(new touchcontrols::Button("attack2",touchcontrols::RectF(3,5,6,8),"shoot",KEY_SHOOT,false,true,"Attack! (duplicate)"));
+		tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE,false,false,"Quick save"));
+		tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD,false,false,"Quick load"));
+		tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(8,0,10,2),"keyboard",KEY_SHOW_KBRD,false,false,"Show keyboard"));
+
+		tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,false,"Jump"));
+		tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,false,"Crouch"));
+		tcGameMain->addControl(new touchcontrols::Button("crouch_toggle",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_TOGGLE_CROUCH,false,false,"Crouch (toggle)"));
+		tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
+		tcGameMain->addControl(new touchcontrols::Button("prev_weapon",touchcontrols::RectF(0,5,3,7),"prev_weap",PORT_ACT_PREV_WEP,false,false,"Prev weapon"));
+		tcGameMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE,false,true,"Console"));
+
+
+        touchJoyRight = new touchcontrols::TouchJoy("touch",touchcontrols::RectF(17,4,26,16),"look_arrow","fixed_stick_circle");
+        tcGameMain->addControl(touchJoyRight);
+        touchJoyRight->signal_move.connect(sigc::ptr_fun(&right_stick) );
+        touchJoyRight->signal_double_tap.connect(sigc::ptr_fun(&right_double_tap) );
+
+        touchJoyLeft = new touchcontrols::TouchJoy("stick",touchcontrols::RectF(0,7,8,16),"strafe_arrow","fixed_stick_circle");
+        tcGameMain->addControl(touchJoyLeft);
+        touchJoyLeft->signal_move.connect(sigc::ptr_fun(&left_stick) );
+        touchJoyLeft->signal_double_tap.connect(sigc::ptr_fun(&left_double_tap) );
+
+        // SWAPFIX
+        touchJoyLeft->registerTouchJoySWAPFIX( touchJoyRight );
+        touchJoyRight->registerTouchJoySWAPFIX( touchJoyLeft );
+
+
+        tcGameMain->signal_button.connect(  sigc::ptr_fun(&gameButton) );
+        tcGameMain->signal_settingsButton.connect(  sigc::ptr_fun(&gameSettingsButton) );
+
+
+   		//Weapons -------------------------------------------
+        //------------------------------------------------------
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon1",touchcontrols::RectF(1,14,3,16),"key_1",1));
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon2",touchcontrols::RectF(3,14,5,16),"key_2",2));
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon3",touchcontrols::RectF(5,14,7,16),"key_3",3));
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon4",touchcontrols::RectF(7,14,9,16),"key_4",4));
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon5",touchcontrols::RectF(9,14,11,16),"key_5",5));
+
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon6",touchcontrols::RectF(15,14,17,16),"key_6",6));
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon7",touchcontrols::RectF(17,14,19,16),"key_7",7));
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon8",touchcontrols::RectF(19,14,21,16),"key_8",8));
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon9",touchcontrols::RectF(21,14,23,16),"key_9",9));
+        tcGameWeapons->addControl(new touchcontrols::Button("weapon0",touchcontrols::RectF(23,14,25,16),"key_0",0));
+
+        tcGameWeapons->signal_button.connect(  sigc::ptr_fun(&selectWeaponButton) );
+        tcGameWeapons->setAlpha(0.8);
+
+      //Weapon wheel -------------------------------------------
+        //------------------------------------------------------
+
+        int weaponWheelNbr = 10;
+
+        wheelSelect = new touchcontrols::WheelSelect("weapon_wheel",touchcontrols::RectF(7,2,19,14),"weapon_wheel_%d",weaponWheelNbr);
+        wheelSelect->signal_selected.connect(sigc::ptr_fun(&weaponWheel) );
+        wheelSelect->signal_enabled.connect(sigc::ptr_fun(&weaponWheelSelected));
+        tcWeaponWheel->addControl(wheelSelect);
+        tcWeaponWheel->setAlpha(0.8);
+
+        //Keyboard -------------------------------------------
+        //------------------------------------------------------
+        uiKeyboard = new touchcontrols::UI_Keyboard("keyboard",touchcontrols::RectF(0,8,26,16),"font_dual",0,0,0);
+        uiKeyboard->signal.connect(  sigc::ptr_fun(&keyboardKeyPressed) );
+        tcKeyboard->addControl( uiKeyboard );
+        // We want touch to pass through only where there is no keyboard
+        tcKeyboard->setPassThroughTouch( touchcontrols::TouchControls::PassThrough::NO_CONTROL );
+
+
+        UI_tc = touchcontrols::createDefaultSettingsUI( &controlsContainer, ( std::string )graphics_path +  "/touch_settings_doom3.xml" );
+        UI_tc->setAlpha( 1 );
+    //---------------------------------------------------------------
+        //---------------------------------------------------------------
+        controlsContainer.addControlGroup(tcKeyboard);
+        controlsContainer.addControlGroup(tcMenuMain);
+        controlsContainer.addControlGroup(tcGameMain);
+        controlsContainer.addControlGroup(tcGameWeapons);
+        controlsContainer.addControlGroup(tcWeaponWheel);
+
+
+        controlsCreated = 1;
+
+        // Doom type stays the same so existing user keep original config
+        if( gameType == GAME_TYPE_HEXEN )
+            touchcontrols::setGlobalXmlAppend(".hexen");
+        else if( gameType == GAME_TYPE_HERETIC )
+            touchcontrols::setGlobalXmlAppend(".heretic");
+        else if( gameType == GAME_TYPE_STRIFE )
+            touchcontrols::setGlobalXmlAppend(".strife");
+
+		tcMenuMain->setXMLFile((std::string)graphics_path +  "/menu_d3es.xml");
+        tcGameMain->setXMLFile((std::string)graphics_path +  "/game_d3es.xml");
+        tcWeaponWheel->setXMLFile((std::string)graphics_path +  "/weaponwheel_d3es.xml");
+        tcGameWeapons->setXMLFile((std::string)graphics_path +  "/weapons_d3es.xml");
+    }
+    else
+        LOGI("NOT creating controls");
+
+    SDL_SetSwapBufferCallBack(frameControls);
+
+    SDL_SetShowKeyboardCallBack(showHideKeyboard);
 }
 
 void initControls(int width, int height,const char * graphics_path)
@@ -1384,7 +1537,12 @@ void mobile_init(int width, int height, const char *pngPath,int options, int gam
 
     putenv((char*)"TIMIDITY_CFG=./audiopack/snd_timidity/timidity.cfg");
 
+#ifdef D3ES
+	initControlsDoom3(mobile_screen_width,-mobile_screen_height,graphicpath.c_str());
+#else
     initControls(mobile_screen_width,-mobile_screen_height,graphicpath.c_str());
+#endif
+
 
 #endif
 #ifdef __IOS__
@@ -1408,24 +1566,24 @@ void mobileBackButton( void )
     {
         SDL_StopTextInput();
     }
-    else if( tcInventory->isEnabled() )
+    else if( tcInventory && tcInventory->isEnabled() )
     {
          tcInventory->animateOut(5);
     }
-    else if( tcGamepadUtility->isEnabled() )
+    else if( tcGamepadUtility && tcGamepadUtility->isEnabled() )
     {
          tcGamepadUtility->animateOut(5);
     }
-    else if( tcDPadInventory->isEnabled() )
+    else if( tcDPadInventory && tcDPadInventory->isEnabled() )
     {
         tcDPadInventory->animateOut(5);
     }
-    else if (controlsContainer.isEditing())
+    else if( controlsContainer.isEditing() )
     {
         controlsContainer.finishEditing();
         return;
     }
-    else if (wheelSelect->blockGamepad())
+    else if( wheelSelect->blockGamepad())
     {
         wheelSelect->reset();
         return;
@@ -1486,15 +1644,15 @@ void gamepadAction(int state, int action)
     {
         // Do nothing for now, stops multiple controls opening
     }
-    else if( tcInventory->isEnabled() )
+    else if( tcInventory && tcInventory->isEnabled() )
     {
         // Do nothing for now, stops multiple controls opening
     }
-    else if( tcGamepadUtility->isEnabled() )
+    else if( tcGamepadUtility && tcGamepadUtility->isEnabled() )
     {
      // Do nothing for now, stops multiple controls opening
     }
-    else if( tcDPadInventory->isEnabled() )
+    else if( tcDPadInventory && tcDPadInventory->isEnabled() )
     {
      // Do nothing for now, stops multiple controls opening
     }
