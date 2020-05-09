@@ -362,6 +362,11 @@ static void gameButton(int state,int code)
                 showWeaponNumbersOn = true;
                 tcGameWeapons->animateIn(5);
             }
+            else
+            {
+				showWeaponNumbersOn = false;
+				tcGameWeapons->animateOut(5);
+            }
         }
     }
     else if (code == KEY_SHOW_INV)
@@ -540,8 +545,14 @@ static void menuButton(int state,int code)
     }
     else if(code == PORT_ACT_CONSOLE)
     {
-         PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
+		PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
     }
+	else if( code == KEY_LEFT_MOUSE )
+	{
+#ifdef D3ES
+		PortableMouseButton( state, 1, 0, 0 );
+#endif
+	}
     else
     {
         PortableAction(state, code);
@@ -1024,7 +1035,7 @@ void initControlsDoom3(int width, int height,const char * graphics_path)
         mouse->signal_action.connect(sigc::ptr_fun(&mouse_move) );
         tcMenuMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON,false,false,"Back"));
         tcMenuMain->addControl(new touchcontrols::Button("left_button",touchcontrols::RectF(0,6,3,10),"left_mouse",KEY_LEFT_MOUSE,false,false,"Back"));
-        tcMenuMain->signal_button.connect( sigc::ptr_fun(&mouseButton) );
+        tcMenuMain->signal_button.connect( sigc::ptr_fun(&menuButton) );
 
 		// GAME------------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------------
@@ -1039,9 +1050,12 @@ void initControlsDoom3(int width, int height,const char * graphics_path)
 		tcGameMain->addControl(new touchcontrols::Button("jump",touchcontrols::RectF(24,3,26,5),"jump",PORT_ACT_JUMP,false,false,"Jump"));
 		tcGameMain->addControl(new touchcontrols::Button("crouch",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_DOWN,false,false,"Crouch"));
 		tcGameMain->addControl(new touchcontrols::Button("crouch_toggle",touchcontrols::RectF(24,14,26,16),"crouch",PORT_ACT_TOGGLE_CROUCH,false,false,"Crouch (toggle)"));
+		tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(12,14,14,16),"show_weapons",KEY_SHOW_WEAPONS,false,false,"Show numbers"));
 		tcGameMain->addControl(new touchcontrols::Button("next_weapon",touchcontrols::RectF(0,3,3,5),"next_weap",PORT_ACT_NEXT_WEP,false,false,"Next weapon"));
 		tcGameMain->addControl(new touchcontrols::Button("prev_weapon",touchcontrols::RectF(0,5,3,7),"prev_weap",PORT_ACT_PREV_WEP,false,false,"Prev weapon"));
+		tcGameMain->addControl(new touchcontrols::Button("reload",touchcontrols::RectF(3,4,5,6),"reload",PORT_ACT_RELOAD,false,false,"Reload"));
 		tcGameMain->addControl(new touchcontrols::Button("console",touchcontrols::RectF(6,0,8,2),"tild",PORT_ACT_CONSOLE,false,true,"Console"));
+		tcGameMain->addControl(new touchcontrols::Button("flashlight",touchcontrols::RectF(21,3,23,5),"flashlight",PORT_ACT_FLASH_LIGHT,false,false,"Flashlight"));
 
 
         touchJoyRight = new touchcontrols::TouchJoy("touch",touchcontrols::RectF(17,4,26,16),"look_arrow","fixed_stick_circle");
