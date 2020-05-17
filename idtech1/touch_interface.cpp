@@ -795,6 +795,14 @@ static void mouse_move(int action,float x, float y,float mouse_x, float mouse_y)
 	}
 	*/
 #endif
+
+#if defined(D3ES)
+    if( action == TOUCHMOUSE_TAP )
+	{
+	   	PortableMouseButton( 1, 1, 0, 0 );
+	   	PortableMouseButton( 0, 1, 0, 0 );
+	}
+#endif
 }
 
 static void mouseButton(int state,int code)
@@ -1034,7 +1042,11 @@ void initControlsDoom3(int width, int height,const char * graphics_path)
         tcMenuMain->addControl(mouse);
         mouse->signal_action.connect(sigc::ptr_fun(&mouse_move) );
         tcMenuMain->addControl(new touchcontrols::Button("back",touchcontrols::RectF(0,0,2,2),"ui_back_arrow",KEY_BACK_BUTTON,false,false,"Back"));
-        tcMenuMain->addControl(new touchcontrols::Button("left_button",touchcontrols::RectF(0,6,3,10),"left_mouse",KEY_LEFT_MOUSE,false,false,"Back"));
+     	tcMenuMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(2,0,4,2),"keyboard",KEY_SHOW_KBRD));
+
+        // Hide mouse button, try to use tap for now..
+        //tcMenuMain->addControl(new touchcontrols::Button("left_button",touchcontrols::RectF(0,6,3,10),"left_mouse",KEY_LEFT_MOUSE,false,false,"Back"));
+
         tcMenuMain->signal_button.connect( sigc::ptr_fun(&menuButton) );
 
 		// GAME------------------------------------------------------------------------------
