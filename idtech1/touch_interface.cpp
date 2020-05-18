@@ -1139,13 +1139,7 @@ void initControlsDoom3(int width, int height,const char * graphics_path)
 
         controlsCreated = 1;
 
-        // Doom type stays the same so existing user keep original config
-        if( gameType == GAME_TYPE_HEXEN )
-            touchcontrols::setGlobalXmlAppend(".hexen");
-        else if( gameType == GAME_TYPE_HERETIC )
-            touchcontrols::setGlobalXmlAppend(".heretic");
-        else if( gameType == GAME_TYPE_STRIFE )
-            touchcontrols::setGlobalXmlAppend(".strife");
+
 
 		tcMenuMain->setXMLFile((std::string)graphics_path +  "/menu_d3es.xml");
         tcGameMain->setXMLFile((std::string)graphics_path +  "/game_d3es.xml");
@@ -1793,5 +1787,6 @@ TouchControlsInterface* mobileGetTouchInterface()
 {
     return &controlsContainer;
 }
+
 
 }
