@@ -81,8 +81,8 @@
 
 extern "C"
 {
-    extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
-    void Android_OnMouse( int androidButton, int action, float x, float y);
+	extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
+	void Android_OnMouse(int androidButton, int action, float x, float y);
 }
 
 //Move left/right fwd/back
@@ -98,10 +98,11 @@ static float look_yaw_mouse = 0;
 static float look_yaw_joy = 0;
 
 
-int PortableKeyEvent(int state, int code, int unicode){
-	LOGI("PortableKeyEvent %d %d %d\n",state,code,unicode);
+int PortableKeyEvent(int state, int code, int unicode)
+{
+	LOGI("PortableKeyEvent %d %d %d\n", state, code, unicode);
 
-	if (state)
+	if(state)
 		SDL_SendKeyboardKey(SDL_PRESSED, (SDL_Scancode)code);
 	else
 		SDL_SendKeyboardKey(SDL_RELEASED, (SDL_Scancode) code);
@@ -112,14 +113,14 @@ int PortableKeyEvent(int state, int code, int unicode){
 
 void PortableBackButton()
 {
-    PortableKeyEvent(1, SDL_SCANCODE_ESCAPE, 0);
-    PortableKeyEvent(0, SDL_SCANCODE_ESCAPE, 0);
+	PortableKeyEvent(1, SDL_SCANCODE_ESCAPE, 0);
+	PortableKeyEvent(0, SDL_SCANCODE_ESCAPE, 0);
 }
 
 
-static void buttonChange(int state,FButtonStatus *button)
+static void buttonChange(int state, FButtonStatus *button)
 {
-	if (state)
+	if(state)
 	{
 		button->bDown = true;
 		button->bWentDown  = true;
@@ -131,7 +132,7 @@ static void buttonChange(int state,FButtonStatus *button)
 	}
 }
 
-void Android_OnMouse( int androidButton, int action, float x, float y);
+void Android_OnMouse(int androidButton, int action, float x, float y);
 
 #define ACTION_DOWN 0
 #define ACTION_UP 1
@@ -145,195 +146,256 @@ void Android_OnMouse( int androidButton, int action, float x, float y);
 #define BUTTON_BACK 8
 #define BUTTON_FORWARD 16
 
-void PortableMouse(float dx,float dy)
+void PortableMouse(float dx, float dy)
 {
-    //LOGI("%f %f",dx,dy);
-    Android_OnMouse(0, ACTION_MOVE_REL, -dx * 1000, -dy * 400);
+	//LOGI("%f %f",dx,dy);
+	Android_OnMouse(0, ACTION_MOVE_REL, -dx * 1000, -dy * 400);
 }
 
-void PortableMouseButton(int state, int button, float dx,float dy)
+void PortableMouseButton(int state, int button, float dx, float dy)
 {
-    if( state )
-        Android_OnMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0);
-    else
-        Android_OnMouse(BUTTON_PRIMARY, ACTION_UP,0, 0);
+	if(state)
+		Android_OnMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0);
+	else
+		Android_OnMouse(BUTTON_PRIMARY, ACTION_UP, 0, 0);
 }
 
 void PortableAction(int state, int action)
 {
-	LOGI("PortableAction %d   %d",state,action);
+	LOGI("PortableAction %d   %d", state, action);
 
-	if ((action >= PORT_ACT_CUSTOM_0) && (action <= PORT_ACT_CUSTOM_17))
-    {
-        if( action <= PORT_ACT_CUSTOM_9 )
-            PortableKeyEvent(state, SDL_SCANCODE_KP_1 + action - PORT_ACT_CUSTOM_0, 0);
-        else if(action <= PORT_ACT_CUSTOM_17)
-             PortableKeyEvent(state, SDL_SCANCODE_A + action - PORT_ACT_CUSTOM_10, 0);
-    }
-	else if(( PortableGetScreenMode() == TS_MENU ) || ( PortableGetScreenMode() == TS_BLANK ))
+	if((action >= PORT_ACT_CUSTOM_0) && (action <= PORT_ACT_CUSTOM_17))
 	{
-		if (action >= PORT_ACT_MENU_UP && action <= PORT_ACT_MENU_BACK)
+		if(action <= PORT_ACT_CUSTOM_9)
+			PortableKeyEvent(state, SDL_SCANCODE_KP_1 + action - PORT_ACT_CUSTOM_0, 0);
+		else if(action <= PORT_ACT_CUSTOM_17)
+			PortableKeyEvent(state, SDL_SCANCODE_A + action - PORT_ACT_CUSTOM_10, 0);
+	}
+	else if((PortableGetScreenMode() == TS_MENU) || (PortableGetScreenMode() == TS_BLANK))
+	{
+		if(action >= PORT_ACT_MENU_UP && action <= PORT_ACT_MENU_BACK)
 		{
 
 			int sdl_code [] = { SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT,
-					SDL_SCANCODE_RIGHT, SDL_SCANCODE_RETURN, SDL_SCANCODE_ESCAPE };
-			PortableKeyEvent(state, sdl_code[action-PORT_ACT_MENU_UP], 0);
+			                    SDL_SCANCODE_RIGHT, SDL_SCANCODE_RETURN, SDL_SCANCODE_ESCAPE
+			                  };
+			PortableKeyEvent(state, sdl_code[action - PORT_ACT_MENU_UP], 0);
 			return;
 		}
-		else if( action == PORT_ACT_USE ) // This is sent from the blank screen
+		else if(action == PORT_ACT_USE)   // This is sent from the blank screen
 		{
-		    buttonChange(state,&Button_Use);
+			buttonChange(state, &Button_Use);
 		}
 	}
-    else
+	else
 	{
-        switch (action)
-        {
-        case PORT_ACT_LEFT:
-            buttonChange(state,&Button_Left);
-            break;
-        case PORT_ACT_RIGHT:
-            buttonChange(state,&Button_Right);
-            break;
-        case PORT_ACT_FWD:
-            buttonChange(state,&Button_Forward);
-            break;
-        case PORT_ACT_BACK:
-            buttonChange(state,&Button_Back);
-            break;
-        case PORT_ACT_MOVE_LEFT:
-            buttonChange(state,&Button_MoveLeft);
-            break;
-        case PORT_ACT_MOVE_RIGHT:
-            buttonChange(state,&Button_MoveRight);
-            break;
-        case PORT_ACT_USE:
-            buttonChange(state,&Button_Use);
-            break;
-        case PORT_ACT_ATTACK:
-            buttonChange(state,&Button_Attack);
-            break;
-        case PORT_ACT_ALT_ATTACK:
-            buttonChange(state,&Button_AltAttack);
-            break;
-        case PORT_ACT_TOGGLE_ALT_ATTACK:
-            if( state)
-			{
-			   if(Button_AltAttack.bDown)
-			       buttonChange(0,&Button_AltAttack);
-			   else
-			       buttonChange(1,&Button_AltAttack);
-			}
+		switch(action)
+		{
+		case PORT_ACT_LEFT:
+			buttonChange(state, &Button_Left);
 			break;
-        case PORT_ACT_JUMP:
-            buttonChange(state,&Button_Jump);
-            break;
-        case PORT_ACT_DOWN:
-            buttonChange(state,&Button_Crouch);
-            break;
-        case PORT_ACT_TOGGLE_CROUCH:
-            if( state)
-            {
-                if(Button_Crouch.bDown)
-                    buttonChange(0,&Button_Crouch);
-                else
-                    buttonChange(1,&Button_Crouch);
-            }
-            break;
-        case PORT_ACT_NEXT_WEP:
-            if (state)
-                PortableCommand("weapnext");
-            break;
-        case PORT_ACT_PREV_WEP:
-            if (state)
-                PortableCommand("weapprev");
-            break;
-        case PORT_ACT_MAP:
-            if (state)
-                PortableCommand("togglemap");
-            break;
-        case PORT_ACT_QUICKLOAD:
-            if (state)
-                PortableCommand("quickload");
-            break;
-        case PORT_ACT_QUICKSAVE:
-            if (state)
-                PortableCommand("quicksave");
-            break;
-        case PORT_ACT_WEAP0:
-            if (state)
-                PortableCommand("slot 0");
-            break;
-        case PORT_ACT_WEAP1:
-            if (state)
-                PortableCommand("slot 1");
-            break;
-        case PORT_ACT_WEAP2:
-            if (state)
-                PortableCommand("slot 2");
-            break;
-        case PORT_ACT_WEAP3:
-            if (state)
-                PortableCommand("slot 3");
-            break;
-        case PORT_ACT_WEAP4:
-            if (state)
-                PortableCommand("slot 4");
-            break;
-        case PORT_ACT_WEAP5:
-            if (state)
-                PortableCommand("slot 5");
-            break;
-        case PORT_ACT_WEAP6:
-            if (state)
-                PortableCommand("slot 6");
-            break;
-        case PORT_ACT_WEAP7:
-            if (state)
-                PortableCommand("slot 7");
-            break;
-        case PORT_ACT_WEAP8:
-            if (state)
-                PortableCommand("slot 8");
-            break;
-        case PORT_ACT_WEAP9:
-            if (state)
-                PortableCommand("slot 9");
-            break;
-        case PORT_ACT_CONSOLE:
-            if (state)
-                PortableCommand("toggleconsole");
-            break;
-        case PORT_ACT_INVUSE:
-           if (state)
-                PortableCommand("invuse");
-            break;
-        case PORT_ACT_INVDROP:
-           if (state)
-                PortableCommand("invdrop");
-            break;
-        case PORT_ACT_INVPREV:
-           if (state)
-                PortableCommand("invprev");
-            break;
-        case PORT_ACT_INVNEXT:
-           if (state)
-                PortableCommand("invnext");
-            break;
+
+		case PORT_ACT_RIGHT:
+			buttonChange(state, &Button_Right);
+			break;
+
+		case PORT_ACT_FWD:
+			buttonChange(state, &Button_Forward);
+			break;
+
+		case PORT_ACT_BACK:
+			buttonChange(state, &Button_Back);
+			break;
+
+		case PORT_ACT_MOVE_LEFT:
+			buttonChange(state, &Button_MoveLeft);
+			break;
+
+		case PORT_ACT_MOVE_RIGHT:
+			buttonChange(state, &Button_MoveRight);
+			break;
+
+		case PORT_ACT_USE:
+			buttonChange(state, &Button_Use);
+			break;
+
+		case PORT_ACT_ATTACK:
+			buttonChange(state, &Button_Attack);
+			break;
+
+		case PORT_ACT_ALT_ATTACK:
+			buttonChange(state, &Button_AltAttack);
+			break;
+
+		case PORT_ACT_TOGGLE_ALT_ATTACK:
+			if(state)
+			{
+				if(Button_AltAttack.bDown)
+					buttonChange(0, &Button_AltAttack);
+				else
+					buttonChange(1, &Button_AltAttack);
+			}
+
+			break;
+
+		case PORT_ACT_JUMP:
+			buttonChange(state, &Button_Jump);
+			break;
+
+		case PORT_ACT_DOWN:
+			buttonChange(state, &Button_Crouch);
+			break;
+
+		case PORT_ACT_TOGGLE_CROUCH:
+			if(state)
+			{
+				if(Button_Crouch.bDown)
+					buttonChange(0, &Button_Crouch);
+				else
+					buttonChange(1, &Button_Crouch);
+			}
+
+			break;
+
+		case PORT_ACT_NEXT_WEP:
+			if(state)
+				PortableCommand("weapnext");
+
+			break;
+
+		case PORT_ACT_PREV_WEP:
+			if(state)
+				PortableCommand("weapprev");
+
+			break;
+
+		case PORT_ACT_MAP:
+			if(state)
+				PortableCommand("togglemap");
+
+			break;
+
+		case PORT_ACT_QUICKLOAD:
+			if(state)
+				PortableCommand("quickload");
+
+			break;
+
+		case PORT_ACT_QUICKSAVE:
+			if(state)
+				PortableCommand("quicksave");
+
+			break;
+
+		case PORT_ACT_WEAP0:
+			if(state)
+				PortableCommand("slot 0");
+
+			break;
+
+		case PORT_ACT_WEAP1:
+			if(state)
+				PortableCommand("slot 1");
+
+			break;
+
+		case PORT_ACT_WEAP2:
+			if(state)
+				PortableCommand("slot 2");
+
+			break;
+
+		case PORT_ACT_WEAP3:
+			if(state)
+				PortableCommand("slot 3");
+
+			break;
+
+		case PORT_ACT_WEAP4:
+			if(state)
+				PortableCommand("slot 4");
+
+			break;
+
+		case PORT_ACT_WEAP5:
+			if(state)
+				PortableCommand("slot 5");
+
+			break;
+
+		case PORT_ACT_WEAP6:
+			if(state)
+				PortableCommand("slot 6");
+
+			break;
+
+		case PORT_ACT_WEAP7:
+			if(state)
+				PortableCommand("slot 7");
+
+			break;
+
+		case PORT_ACT_WEAP8:
+			if(state)
+				PortableCommand("slot 8");
+
+			break;
+
+		case PORT_ACT_WEAP9:
+			if(state)
+				PortableCommand("slot 9");
+
+			break;
+
+		case PORT_ACT_CONSOLE:
+			if(state)
+				PortableCommand("toggleconsole");
+
+			break;
+
+		case PORT_ACT_INVUSE:
+			if(state)
+				PortableCommand("invuse");
+
+			break;
+
+		case PORT_ACT_INVDROP:
+			if(state)
+				PortableCommand("invdrop");
+
+			break;
+
+		case PORT_ACT_INVPREV:
+			if(state)
+				PortableCommand("invprev");
+
+			break;
+
+		case PORT_ACT_INVNEXT:
+			if(state)
+				PortableCommand("invnext");
+
+			break;
+
 		case PORT_ACT_HELPCOMP:
-           if (state)
-                PortableCommand("showpop 1");
-            break;
+			if(state)
+				PortableCommand("showpop 1");
+
+			break;
+
 		case PORT_ACT_SHOW_WEAPONS:
-           if (state)
-                PortableCommand("showpop 3");
-            break;;
+			if(state)
+				PortableCommand("showpop 3");
+
+			break;;
+
 		case PORT_ACT_SHOW_KEYS:
-           if (state)
-                PortableCommand("showpop 2");
-            break;
-            break;
-        }
+			if(state)
+				PortableCommand("showpop 2");
+
+			break;
+			break;
+		}
 	}
 }
 
@@ -343,9 +405,9 @@ void PortableAction(int state, int action)
 
 void PortableMoveFwd(float fwd)
 {
-	if (fwd > 1)
+	if(fwd > 1)
 		fwd = 1;
-	else if (fwd < -1)
+	else if(fwd < -1)
 		fwd = -1;
 
 	forwardmove_android = fwd;
@@ -353,9 +415,9 @@ void PortableMoveFwd(float fwd)
 
 void PortableMoveSide(float strafe)
 {
-	if (strafe > 1)
+	if(strafe > 1)
 		strafe = 1;
-	else if (strafe < -1)
+	else if(strafe < -1)
 		strafe = -1;
 
 	sidemove_android = strafe;
@@ -377,6 +439,7 @@ void PortableLookPitch(int mode, float pitch)
 	case LOOK_MODE_MOUSE:
 		look_pitch_mouse += pitch;
 		break;
+
 	case LOOK_MODE_JOYSTICK:
 		look_pitch_joy = pitch;
 		break;
@@ -391,6 +454,7 @@ void PortableLookYaw(int mode, float yaw)
 	case LOOK_MODE_MOUSE:
 		look_yaw_mouse += yaw;
 		break;
+
 	case LOOK_MODE_JOYSTICK:
 		look_yaw_joy = yaw;
 		break;
@@ -399,10 +463,11 @@ void PortableLookYaw(int mode, float yaw)
 
 
 // Start game, does not return!
-void PortableInit(int argc,const char ** argv){
+void PortableInit(int argc, const char ** argv)
+{
 
-    extern int main_android(int argc, char **argv);
-	main_android(argc,(char **)argv);
+	extern int main_android(int argc, char **argv);
+	main_android(argc, (char **)argv);
 
 }
 
@@ -411,16 +476,16 @@ bool            g_bindingbutton = false;
 
 touchscreemode_t PortableGetScreenMode()
 {
-	if (menuactive != MENU_Off)
+	if(menuactive != MENU_Off)
 	{
-		if (g_bindingbutton)
+		if(g_bindingbutton)
 			return TS_CUSTOM;
 		else
 			return TS_MENU;
 	}
-	else if (gamestate == GS_LEVEL) // In a game
+	else if(gamestate == GS_LEVEL)  // In a game
 	{
-		if (automapactive)
+		if(automapactive)
 			return TS_MAP;
 		else
 			return TS_GAME;
@@ -454,13 +519,14 @@ void PortableAutomapControl(float zoom, float x, float y)
 }
 
 
-void Mobile_AM_controls(double *zoom, double *pan_x, double *pan_y )
+void Mobile_AM_controls(double *zoom, double *pan_x, double *pan_y)
 {
-	if (am_zoom)
+	if(am_zoom)
 	{
-		if (am_zoom > 0)
+		if(am_zoom > 0)
 			*zoom = 1 + am_zoom;
-		if (am_zoom < 0)
+
+		if(am_zoom < 0)
 			*zoom = -1 + am_zoom;
 
 		am_zoom = 0;
@@ -477,40 +543,40 @@ extern fixed_t			forwardmove[2], sidemove[2];
 //extern void G_AddViewPitch (int look);
 //void AddCommandString (char *cmd, int keynum=0);
 
-extern "C" int blockGamepad( void );
+extern "C" int blockGamepad(void);
 
-void Mobile_IN_Move(ticcmd_t* cmd )
+void Mobile_IN_Move(ticcmd_t* cmd)
 {
 
-    int blockMove = blockGamepad() & ANALOGUE_AXIS_FWD;
-    int blockLook = blockGamepad() & ANALOGUE_AXIS_PITCH;
+	int blockMove = blockGamepad() & ANALOGUE_AXIS_FWD;
+	int blockLook = blockGamepad() & ANALOGUE_AXIS_PITCH;
 
 
-    if( !blockMove )
-    {
-	    cmd->ucmd.forwardmove  += forwardmove_android * forwardmove[1];
-	    cmd->ucmd.sidemove  += sidemove_android   * sidemove[1];
-    }
+	if(!blockMove)
+	{
+		cmd->ucmd.forwardmove  += forwardmove_android * forwardmove[1];
+		cmd->ucmd.sidemove  += sidemove_android   * sidemove[1];
+	}
 
 	//LOGI("Side: %d   %d",(int)(sidemove_android  * sidemove[1]),(int)(-look_yaw_joy * 100000));
 //LOGI("LOGX %f  %f  %f  %f  %f  %f",forwardmove_android,sidemove_android,look_pitch_mouse,look_pitch_joy,look_yaw_mouse,look_yaw_joy);
 
-    if( !blockLook )
-    {
-        // Add pitch
-        G_AddViewPitch(look_pitch_mouse * 30000);
-        look_pitch_mouse = 0;
-        G_AddViewPitch(-look_pitch_joy * 800);
-
-        // Add yaw
-        G_AddViewAngle(-look_yaw_mouse * 100000);
-        look_yaw_mouse = 0;
-        G_AddViewAngle(-look_yaw_joy * 1000);
-    }
-
-	if (cmd_to_run)
+	if(!blockLook)
 	{
-		AddCommandString((char*)cmd_to_run,0);
+		// Add pitch
+		G_AddViewPitch(look_pitch_mouse * 30000);
+		look_pitch_mouse = 0;
+		G_AddViewPitch(-look_pitch_joy * 800);
+
+		// Add yaw
+		G_AddViewAngle(-look_yaw_mouse * 100000);
+		look_yaw_mouse = 0;
+		G_AddViewAngle(-look_yaw_joy * 1000);
+	}
+
+	if(cmd_to_run)
+	{
+		AddCommandString((char*)cmd_to_run, 0);
 		cmd_to_run = NULL;
 	}
 }

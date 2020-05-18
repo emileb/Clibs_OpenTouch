@@ -25,19 +25,19 @@ typedef enum
 	TS_GAME,
 	TS_MAP,
 	TS_CONSOLE,
-    TS_Y_N,
+	TS_Y_N,
 	TS_CUSTOM,
 	TS_DEMO,
 	TS_MOUSE,
 } touchscreemode_t;
 
 
-void PortableInit(int argc,const char ** argv);
+void PortableInit(int argc, const char ** argv);
 
 
 void PortableBackButton();
 
-int PortableKeyEvent(int state, int code ,int unitcode);
+int PortableKeyEvent(int state, int code, int unitcode);
 void PortableAction(int state, int action);
 
 void PortableMove(float fwd, float strafe);
@@ -46,8 +46,8 @@ void PortableMoveSide(float strafe);
 void PortableLookPitch(int mode, float pitch);
 void PortableLookYaw(int mode, float pitch);
 
-void PortableMouse(float dx,float dy);
-void PortableMouseButton(int state, int button, float dx,float dy);
+void PortableMouse(float dx, float dy);
+void PortableMouseButton(int state, int button, float dx, float dy);
 
 void PortableCommand(const char * cmd);
 void PortableAutomapControl(float zoom, float x, float y);
