@@ -58,6 +58,7 @@ extern "C"
 	static const char * argv[128];
 
 	const char *nativeLibsPath;
+	std::string userFilesPath;
 
 	static const char *key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Ty9fat4Mag+a/UAncpVM8lNDrAQxk754HupOlYbJt3ALv6Fqagjj2vzPK8570aALqw2XEk5JxPAazdTQJ+W5aEVM8N2Ij1SbqN/yF+HfqDG+hHfszddwAZzKzWUlAkkeqW6qiIEy4L/TTOgj2vQv24ix4YcpO3eea2Ltz2UDyq+o0+K1cOCMqtuGL/GQbFS92zp3dnH9CpgtWFsbvVarjntJWiI6RrZpqpTTsuZWckK1ztMBjzNNnD1w6QbgTRqoGU7xmsHImWjk5MtwxiDqKL1EFOBvQDqOXxVc/jmT8StqAjk1ItCWStvJLZTzejNoGdTisxBQT/P3Xyppo8/MwIDAQAB";
 	static const char *pkg = "com.opentouchgaming.deltatouch";
@@ -65,7 +66,7 @@ extern "C"
 	char pkgGlobal[64];
 
 	jint EXPORT_ME
-	JAVA_FUNC(init)(JNIEnv* env,	jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs)
+	JAVA_FUNC(init)(JNIEnv* env,	jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles)
 	{
 		env_ = env;
 
@@ -73,6 +74,7 @@ extern "C"
 		static std::string graphics_path = (char *)(env)->GetStringUTFChars(graphics_dir, 0);
 		static std::string log_filename_path = (char *)(env)->GetStringUTFChars(logFilename, 0);
 		static std::string native_libs_path = (char *)(env)->GetStringUTFChars(nativeLibs, 0);
+		userFilesPath = (char *)(env)->GetStringUTFChars(userFiles, 0);
 
 		nativeLibsPath = native_libs_path.c_str();
 
@@ -242,5 +244,29 @@ extern "C"
 		AUDIO_OVERRIDE_SAMPLES = samples;
 	}
 
+
+	int EXPORT_ME
+	JAVA_FUNC(loadTouchSettings)(JNIEnv *env, jobject obj, jstring filename)
+	{
+		const char * filename_c = (const char *)(env)->GetStringUTFChars(filename, 0);
+		LOGI("loadTouchSettings %s", filename_c);
+
+		loadControlSettings(filename_c);
+
+		env->ReleaseStringUTFChars(filename, filename_c);
+		return 0;
+	}
+
+	int EXPORT_ME
+	JAVA_FUNC(saveTouchSettings)(JNIEnv *env, jobject obj, jstring filename)
+	{
+		const char * filename_c = (const char *)(env)->GetStringUTFChars(filename, 0);
+		LOGI("saveTouchSettings %s", filename_c);
+
+		saveControlSettings(filename_c);
+
+		env->ReleaseStringUTFChars(filename, filename_c);
+		return 0;
+	}
 }
 

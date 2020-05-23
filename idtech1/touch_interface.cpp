@@ -46,6 +46,7 @@ extern "C"
 #define COMMAND_SHOW_KEYBOARD      0x8003
 #define COMMAND_SHOW_GAMEPAD       0x8004
 #define COMMAND_VIBRATE            0x8005
+#define COMMAND_LOAD_SAVE_CONTROLS 0x8006
 
 #define KEY_SHOW_WEAPONS 0x1000
 #define KEY_SHOOT        0x1001
@@ -61,6 +62,7 @@ extern "C"
 #define KEY_SHOW_GAMEPAD 0x100D
 #define KEY_USE_MOUSE    0x100E
 #define KEY_LEFT_MOUSE   0x100F
+#define KEY_LOAD_SAVE_CONTROLS 0x1010
 
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
@@ -163,6 +165,8 @@ extern "C"
 
 // Needed for Doom 3
 	extern const char *nativeLibsPath;
+
+	extern std::string userFilesPath;
 
 // Send message to JAVA SDL activity
 	int Android_JNI_SendMessage(int command, int param);
@@ -553,6 +557,12 @@ extern "C"
 			// Show gyro options
 			if(state)
 				Android_JNI_SendMessage(COMMAND_SHOW_GYRO_OPTIONS, 0);
+		}
+		else  if(code == KEY_LOAD_SAVE_CONTROLS)
+		{
+			// Show load save controls
+			if(state)
+				Android_JNI_SendMessage(COMMAND_LOAD_SAVE_CONTROLS, 0);
 		}
 		else  if(code == KEY_SHOW_GAMEPAD)
 		{
@@ -1285,6 +1295,7 @@ extern "C"
 #ifndef CHOC_SETUP
 			tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 			tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
+			tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
 #endif
 			//tcMenuMain->addControl(new touchcontrols::Button("brightness",touchcontrols::RectF(21,0,23,2),"brightness",KEY_BRIGHTNESS));
 #ifdef CHOC_SETUP
@@ -1880,4 +1891,40 @@ extern "C"
 	}
 
 
+	bool saveControlSettings(std::string path)
+	{
+		std::string settings = path + "/settings.xml";
+		touchcontrols::touchSettings_save(settings);
+
+		tcGameMain->saveXML(path + "/tcGameMain.xml");
+		tcInventory->saveXML(path + "/tcInventory.xml");
+		tcWeaponWheel->saveXML(path + "/tcWeaponWheel.xml");
+		tcGameWeapons->saveXML(path + "/tcGameWeapons.xml");
+		tcCutomButtons->saveXML(path + "/tcCustomButtons.xml");
+		return false;
+	}
+
+	bool loadControlSettings(std::string path)
+	{
+		std::string settings = path + "/settings.xml";
+	 	touchcontrols::touchSettings_load(settings);
+		touchcontrols::touchSettings_save(); // Save over current settings
+
+		tcGameMain->loadXML(path + "/tcGameMain.xml");
+		tcGameMain->save(); // Save the newly loaded
+
+		tcInventory->loadXML(path + "/tcInventory.xml");
+		tcInventory->save();
+
+		tcWeaponWheel->loadXML(path + "/tcWeaponWheel.xml");
+		tcWeaponWheel->save();
+
+		tcGameWeapons->loadXML(path + "/tcGameWeapons.xml");
+		tcGameWeapons->save();
+
+		tcCutomButtons->loadXML(path + "/tcCustomButtons.xml");
+		tcCutomButtons->save();
+
+	 	return false;
+	}
 }
