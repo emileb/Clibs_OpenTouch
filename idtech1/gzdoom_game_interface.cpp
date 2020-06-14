@@ -16,14 +16,14 @@
 #include "SDL.h"
 #include "SDL_keycode.h"
 
-#include "doomerrors.h"
+#//include "doomerrors.h"
 
 #include "d_gui.h"
 #include "m_random.h"
 #include "doomdef.h"
 #include "doomstat.h"
 #include "gstrings.h"
-#include "w_wad.h"
+//#include "w_wad.h"
 #include "s_sound.h"
 #include "v_video.h"
 #include "intermission/intermission.h"
@@ -73,7 +73,7 @@
 #include "m_joy.h"
 #include "sc_man.h"
 #include "po_man.h"
-#include "resourcefiles/resourcefile.h"
+//#include "resourcefiles/resourcefile.h"
 #include "p_local.h"
 #include "autosegs.h"
 #include "fragglescript/t_fs.h"
@@ -117,9 +117,16 @@ void PortableBackButton()
 	PortableKeyEvent(0, SDL_SCANCODE_ESCAPE, 0);
 }
 
+#ifdef GZDOOM_GL3
 
-static void buttonChange(int state, FButtonStatus *button)
+#include "d_buttons.h"
+#include "c_buttons.h"
+
+extern ButtonMap buttonMap;
+
+static void buttonChange(int state, int buttonId)
 {
+	FButtonStatus* button = buttonMap.GetButton(buttonId);
 	if(state)
 	{
 		button->bDown = true;
@@ -131,6 +138,36 @@ static void buttonChange(int state, FButtonStatus *button)
 		button->bDown = false;
 	}
 }
+
+static bool buttonDown(int buttonId)
+{
+	FButtonStatus* button = buttonMap.GetButton(buttonId);
+	return button->bDown;
+}
+
+#else
+
+static void buttonChange(int state, FButtonStatus &button)
+{
+	if(state)
+	{
+		button.bDown = true;
+		button.bWentDown  = true;
+	}
+	else
+	{
+		button.bWentUp = true;
+		button.bDown = false;
+	}
+}
+
+
+static bool buttonDown(FButtonStatus &button)
+{
+	return button.bDown;
+}
+
+#endif
 
 void Android_OnMouse(int androidButton, int action, float x, float y);
 
@@ -184,7 +221,7 @@ void PortableAction(int state, int action)
 		}
 		else if(action == PORT_ACT_USE)   // This is sent from the blank screen
 		{
-			buttonChange(state, &Button_Use);
+			buttonChange(state, Button_Use);
 		}
 	}
 	else
@@ -192,67 +229,67 @@ void PortableAction(int state, int action)
 		switch(action)
 		{
 		case PORT_ACT_LEFT:
-			buttonChange(state, &Button_Left);
+			buttonChange(state, Button_Left);
 			break;
 
 		case PORT_ACT_RIGHT:
-			buttonChange(state, &Button_Right);
+			buttonChange(state, Button_Right);
 			break;
 
 		case PORT_ACT_FWD:
-			buttonChange(state, &Button_Forward);
+			buttonChange(state, Button_Forward);
 			break;
 
 		case PORT_ACT_BACK:
-			buttonChange(state, &Button_Back);
+			buttonChange(state, Button_Back);
 			break;
 
 		case PORT_ACT_MOVE_LEFT:
-			buttonChange(state, &Button_MoveLeft);
+			buttonChange(state, Button_MoveLeft);
 			break;
 
 		case PORT_ACT_MOVE_RIGHT:
-			buttonChange(state, &Button_MoveRight);
+			buttonChange(state, Button_MoveRight);
 			break;
 
 		case PORT_ACT_USE:
-			buttonChange(state, &Button_Use);
+			buttonChange(state, Button_Use);
 			break;
 
 		case PORT_ACT_ATTACK:
-			buttonChange(state, &Button_Attack);
+			buttonChange(state, Button_Attack);
 			break;
 
 		case PORT_ACT_ALT_ATTACK:
-			buttonChange(state, &Button_AltAttack);
+			buttonChange(state, Button_AltAttack);
 			break;
 
 		case PORT_ACT_TOGGLE_ALT_ATTACK:
 			if(state)
 			{
-				if(Button_AltAttack.bDown)
-					buttonChange(0, &Button_AltAttack);
+				if(buttonDown(Button_AltAttack))
+					buttonChange(0, Button_AltAttack);
 				else
-					buttonChange(1, &Button_AltAttack);
+					buttonChange(1, Button_AltAttack);
 			}
 
 			break;
 
 		case PORT_ACT_JUMP:
-			buttonChange(state, &Button_Jump);
+			buttonChange(state, Button_Jump);
 			break;
 
 		case PORT_ACT_DOWN:
-			buttonChange(state, &Button_Crouch);
+			buttonChange(state, Button_Crouch);
 			break;
 
 		case PORT_ACT_TOGGLE_CROUCH:
 			if(state)
 			{
-				if(Button_Crouch.bDown)
-					buttonChange(0, &Button_Crouch);
+				if(buttonDown(Button_Crouch))
+					buttonChange(0, Button_Crouch);
 				else
-					buttonChange(1, &Button_Crouch);
+					buttonChange(1, Button_Crouch);
 			}
 
 			break;
