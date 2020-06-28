@@ -47,6 +47,7 @@ extern "C"
 #define COMMAND_SHOW_KEYBOARD      0x8003
 #define COMMAND_SHOW_GAMEPAD       0x8004
 #define COMMAND_VIBRATE            0x8005
+#define COMMAND_LOAD_SAVE_CONTROLS 0x8006
 
 #define KEY_SHOW_WEAPONS 0x1000
 #define KEY_SHOOT        0x1001
@@ -62,6 +63,7 @@ extern "C"
 #define KEY_SHOW_GAMEPAD 0x100D
 #define KEY_USE_MOUSE    0x100E
 #define KEY_LEFT_MOUSE   0x100F
+#define KEY_LOAD_SAVE_CONTROLS 0x1010
 
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
@@ -98,6 +100,7 @@ extern "C"
 	static bool useMouse = false;
 
 // Show buttons in game
+	static bool showCustomAlways = false;
 	static bool showCustomOn = false;
 	static bool showWeaponNumbersOn = false;
 
@@ -120,34 +123,51 @@ extern "C"
 #define DEMO_ALPFA_DEC        0.1f
 	static float demoControlsAlpha; // Used to fade out demo controls
 
-	touchcontrols::UI_Controls *UI_tc = 0;
+	static touchcontrols::UI_Controls *UI_tc = 0;
 
-	touchcontrols::TouchControls *tcMenuMain = 0;
-	touchcontrols::TouchControls *tcYesNo = 0;
-	touchcontrols::TouchControls *tcGameMain = 0;
-	touchcontrols::TouchControls *tcGameWeapons = 0;
-	touchcontrols::TouchControls *tcWeaponWheel = 0;
-	touchcontrols::TouchControls *tcInventory = 0;
-	touchcontrols::TouchControls *tcAutomap = 0;
-	touchcontrols::TouchControls *tcBlank = 0;
-	touchcontrols::TouchControls *tcKeyboard = 0;
-	touchcontrols::TouchControls *tcCutomButtons = 0;
-	touchcontrols::TouchControls *tcDemo = 0;
-	touchcontrols::TouchControls *tcGamepadUtility = 0;
-	touchcontrols::TouchControls *tcDPadInventory = 0;
-	touchcontrols::TouchControls *tcMouse = 0;
+	static touchcontrols::TouchControls *tcMenuMain = 0;
+	static touchcontrols::TouchControls *tcYesNo = 0;
+	static touchcontrols::TouchControls *tcGameMain = 0;
+	static touchcontrols::TouchControls *tcGameWeapons = 0;
+	static touchcontrols::TouchControls *tcWeaponWheel = 0;
+	static touchcontrols::TouchControls *tcInventory = 0;
+	static touchcontrols::TouchControls *tcAutomap = 0;
+	static touchcontrols::TouchControls *tcBlank = 0;
+	static touchcontrols::TouchControls *tcKeyboard = 0;
+	static touchcontrols::TouchControls *tcCutomButtons = 0;
+	static touchcontrols::TouchControls *tcDemo = 0;
+	static touchcontrols::TouchControls *tcGamepadUtility = 0;
+	static touchcontrols::TouchControls *tcDPadInventory = 0;
+	static touchcontrols::TouchControls *tcMouse = 0;
 
 // So can hide and show these buttons
-	touchcontrols::TouchJoy *touchJoyLeft;
-	touchcontrols::TouchJoy *touchJoyRight;
+	static touchcontrols::TouchJoy *touchJoyLeft;
+	static touchcontrols::TouchJoy *touchJoyRight;
 
 // So gampad can control keyboard
-	touchcontrols::UI_Keyboard *uiKeyboard;
+	static touchcontrols::UI_Keyboard *uiKeyboard;
 
 // So gamepad can access it
-	touchcontrols::WheelSelect *wheelSelect;
+	static touchcontrols::WheelSelect *wheelSelect;
 
-	touchcontrols::ButtonGrid *uiInventoryButtonGrid;
+	static touchcontrols::ButtonGrid *uiInventoryButtonGrid;
+
+	static std::string graphicpath;
+	static const char * getFilesPath()
+	{
+		return graphicpath.c_str(); //graphics path is the same as files path
+	}
+
+	std::string game_path;
+	const char * getGamePath()
+	{
+		return game_path.c_str();
+	}
+
+// Needed for Doom 3
+	extern const char *nativeLibsPath;
+
+	extern std::string userFilesPath;
 
 // Send message to JAVA SDL activity
 	int Android_JNI_SendMessage(int command, int param);
@@ -283,6 +303,11 @@ extern "C"
 					showWeaponNumbersOn = true;
 					tcGameWeapons->animateIn(5);
 				}
+				else
+				{
+					showWeaponNumbersOn = false;
+					tcGameWeapons->animateOut(5);
+				}
 			}
 		}
 		else if(code == KEY_SHOW_INV)
@@ -304,7 +329,6 @@ extern "C"
 				if(!tcCutomButtons->enabled)
 				{
 					tcCutomButtons->setEnabled(true);
-					tcCutomButtons->setAlpha(gameControlsAlpha);
 					tcCutomButtons->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 					showCustomOn = true;
 				}
@@ -457,6 +481,12 @@ extern "C"
 			if(state)
 				Android_JNI_SendMessage(COMMAND_SHOW_GYRO_OPTIONS, 0);
 		}
+		else  if(code == KEY_LOAD_SAVE_CONTROLS)
+		{
+			// Show load save controls
+			if(state)
+				Android_JNI_SendMessage(COMMAND_LOAD_SAVE_CONTROLS, 0);
+		}
 		else  if(code == KEY_SHOW_GAMEPAD)
 		{
 			// Show gamepad options
@@ -596,14 +626,16 @@ extern "C"
 
 		invertLook = settings.invertLook;
 
-		strafe_sens = settings.moveSensitivity;
-		forward_sens = settings.moveSensitivity;
+		strafe_sens = settings.strafeSensitivity;
+		forward_sens = settings.fwdSensitivity;
 		pitch_sens = settings.lookSensitivity;
 		yaw_sens = settings.turnSensitivity;
 
 		showSticks = settings.showJoysticks;
 		precisionShoot = settings.precisionShoot;
 		precisionSensitivty = settings.precisionSenitivity;
+
+		showCustomAlways = settings.alwaysShowCust;
 
 		joystickLookMode =  settings.joystickLookMode;
 		autoHideInventory = settings.autoHideInventory;
@@ -655,6 +687,7 @@ extern "C"
 		}
 
 		tcGameMain->setAlpha(gameControlsAlpha);
+		tcCutomButtons->setAlpha(gameControlsAlpha);
 		touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
 
 		controlsContainer.setColour(settings.defaultColor);
@@ -851,10 +884,7 @@ extern "C"
 					tcGameMain->setEnabled(true);
 					tcGameMain->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 
-					if(weaponWheelEnabled)
-						tcWeaponWheel->setEnabled(true);
-
-					if(showCustomOn)   // Also remember if custom buttons were shown
+					if(showCustomOn || showCustomAlways)   // Also remember if custom buttons were shown
 					{
 						tcCutomButtons->setEnabled(true);
 						tcCutomButtons->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
@@ -866,6 +896,10 @@ extern "C"
 						tcGameWeapons->animateIn(5);
 					}
 				}
+
+				// Always enable wheel
+				if(weaponWheelEnabled)
+					tcWeaponWheel->setEnabled(true);
 
 				break;
 
@@ -995,7 +1029,7 @@ extern "C"
 
 			//Menu -------------------------------------------
 			//------------------------------------------------------
-			tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", PORT_ACT_MENU_BACK));
+			tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON));
 			tcMenuMain->addControl(new touchcontrols::Button("down_arrow", touchcontrols::RectF(20, 13, 23, 16), "arrow_down", PORT_ACT_MENU_DOWN));
 			tcMenuMain->addControl(new touchcontrols::Button("up_arrow", touchcontrols::RectF(20, 10, 23, 13), "arrow_up", PORT_ACT_MENU_UP));
 			tcMenuMain->addControl(new touchcontrols::Button("left_arrow", touchcontrols::RectF(17, 13, 20, 16), "arrow_left", PORT_ACT_MENU_LEFT));
@@ -1006,6 +1040,7 @@ extern "C"
 #ifndef CHOC_SETUP
 			tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 			tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
+			tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
 #endif
 			//tcMenuMain->addControl(new touchcontrols::Button("brightness",touchcontrols::RectF(21,0,23,2),"brightness",KEY_BRIGHTNESS));
 #ifdef CHOC_SETUP
@@ -1232,7 +1267,7 @@ extern "C"
 			qs2->signal.connect(sigc::ptr_fun(&customButton));
 			tcCutomButtons->signal_button.connect(sigc::ptr_fun(&customButton));
 			tcCutomButtons->signal_settingsButton.connect(sigc::ptr_fun(&customSettingsButton));
-			tcCutomButtons->setAlpha(0.8);
+			tcCutomButtons->setAlpha(gameControlsAlpha);
 
 			//Gamepad utility -------------------------------------------
 			//------------------------------------------------------
@@ -1322,19 +1357,6 @@ extern "C"
 
 
 
-	static std::string graphicpath;
-	const char * getFilesPath()
-	{
-		return graphicpath.c_str(); //graphics path is the same as files path
-	}
-
-	std::string game_path;
-	const char * getGamePath()
-	{
-		return game_path.c_str();
-	}
-
-
 	void mobile_init(int width, int height, const char *pngPath, int options, int game)
 	{
 		if(options & GAME_OPTION_AUTO_HIDE_GAMEPAD)
@@ -1349,9 +1371,6 @@ extern "C"
 		if(options & GAME_OPTION_GLES2)
 		{
 			touchcontrols::gl_setGLESVersion(2);
-#ifndef D3ES
-			touchcontrols::gl_useGL4ES(); // GLES2 always uses GL4ES library
-#endif
 		}
 
 		if(options & GAME_OPTION_GLES3)
@@ -1606,4 +1625,41 @@ extern "C"
 		return &controlsContainer;
 	}
 
+
+	bool saveControlSettings(std::string path)
+	{
+		std::string settings = path + "/settings.xml";
+		touchcontrols::touchSettings_save(settings);
+
+		tcGameMain->saveXML(path + "/tcGameMain.xml");
+		tcInventory->saveXML(path + "/tcInventory.xml");
+		tcWeaponWheel->saveXML(path + "/tcWeaponWheel.xml");
+		tcGameWeapons->saveXML(path + "/tcGameWeapons.xml");
+		tcCutomButtons->saveXML(path + "/tcCustomButtons.xml");
+		return false;
+	}
+
+	bool loadControlSettings(std::string path)
+	{
+		std::string settings = path + "/settings.xml";
+	 	touchcontrols::touchSettings_load(settings);
+		touchcontrols::touchSettings_save(); // Save over current settings
+
+		tcGameMain->loadXML(path + "/tcGameMain.xml");
+		tcGameMain->save(); // Save the newly loaded
+
+		tcInventory->loadXML(path + "/tcInventory.xml");
+		tcInventory->save();
+
+		tcWeaponWheel->loadXML(path + "/tcWeaponWheel.xml");
+		tcWeaponWheel->save();
+
+		tcGameWeapons->loadXML(path + "/tcGameWeapons.xml");
+		tcGameWeapons->save();
+
+		tcCutomButtons->loadXML(path + "/tcCustomButtons.xml");
+		tcCutomButtons->save();
+
+	 	return false;
+	}
 }
