@@ -211,7 +211,7 @@ extern "C"
 
 		touchcontrols::gl_startRender();
 
-#if !defined(D3ES) && !defined(GZDOOM_GL3)
+#if !defined(D3ES)
 
 		if(touchcontrols::gl_getGLESVersion() == 1)
 		{
