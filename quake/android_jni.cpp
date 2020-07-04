@@ -44,6 +44,7 @@ extern "C"
 	static const char * argv[128];
 
 	const char *nativeLibsPath;
+	std::string userFilesPath;
 
 	static const char *key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArVTuCs3MUfRpivh5ETTzfgq+pdSHPfvWKKOsqLdyugv37TPWGfjHADzI+Ryst8qdObT9qEfKQXbd5PLC6+Lspl3/N8L+FXJO5tNSzcxDNr/gCXgR/vs+YiRpyuCJMNcuwPHfDIKdBmPaFxQAxSggdzoWfEmTXyaA1S8PZprT1GcOIB1scLUWpXPjzZeOTXwEzD20HWKeR+oG7PzFBAF85clKu5Y2bypoBcmnlpBl3nK2TdNJdESitxjS5CssRp5zBxYQ6BnMfDI1W8n2QCatFb+lAHcnhye/FB8/nA476b2WOw3VBkk5CspXhDNRom6dCMfP1HTxHrH6Q0LFh81SxQIDAQAB";
 	static const char *pkg = "com.opentouchgaming.quadtouch";
@@ -51,7 +52,7 @@ extern "C"
 	char pkgGlobal[64];
 
 	jint EXPORT_ME
-	JAVA_FUNC(init)(JNIEnv* env,	jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs)
+	JAVA_FUNC(init)(JNIEnv* env,	jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles)
 	{
 		env_ = env;
 
@@ -59,6 +60,7 @@ extern "C"
 		static std::string graphics_path = (char *)(env)->GetStringUTFChars(graphics_dir, 0);
 		static std::string log_filename_path = (char *)(env)->GetStringUTFChars(logFilename, 0);
 		static std::string native_libs_path = (char *)(env)->GetStringUTFChars(nativeLibs, 0);
+		userFilesPath = (char *)(env)->GetStringUTFChars(userFiles, 0);
 
 		nativeLibsPath = native_libs_path.c_str();
 
@@ -82,6 +84,7 @@ extern "C"
 		LOGI("game_path = %s", game_path.c_str());
 
 		setenv("HOME", game_path.c_str(), 1);
+		setenv("USER_FILES", userFilesPath.c_str(), 1);
 
 
 // quakespasm spiked AND Hexen2 uses GL4ES. But Hexen uses it in GLES1 mode
@@ -235,4 +238,27 @@ extern "C"
 		AUDIO_OVERRIDE_SAMPLES = samples;
 	}
 
+	int EXPORT_ME
+	JAVA_FUNC(loadTouchSettings)(JNIEnv *env, jobject obj, jstring filename)
+	{
+		const char * filename_c = (const char *)(env)->GetStringUTFChars(filename, 0);
+		LOGI("loadTouchSettings %s", filename_c);
+
+		loadControlSettings(filename_c);
+
+		env->ReleaseStringUTFChars(filename, filename_c);
+		return 0;
+	}
+
+	int EXPORT_ME
+	JAVA_FUNC(saveTouchSettings)(JNIEnv *env, jobject obj, jstring filename)
+	{
+		const char * filename_c = (const char *)(env)->GetStringUTFChars(filename, 0);
+		LOGI("saveTouchSettings %s", filename_c);
+
+		saveControlSettings(filename_c);
+
+		env->ReleaseStringUTFChars(filename, filename_c);
+		return 0;
+	}
 }

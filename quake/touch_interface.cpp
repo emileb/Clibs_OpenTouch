@@ -39,6 +39,7 @@ extern "C"
 #define COMMAND_SHOW_KEYBOARD      0x8003
 #define COMMAND_SHOW_GAMEPAD       0x8004
 #define COMMAND_VIBRATE            0x8005
+#define COMMAND_LOAD_SAVE_CONTROLS 0x8006
 
 
 #define KEY_SHOW_WEAPONS     0x1000
@@ -53,6 +54,7 @@ extern "C"
 #define KEY_BACK_BUTTON  0x100B
 #define KEY_SHOW_GYRO    0x100C
 #define KEY_SHOW_GAMEPAD 0x100D
+#define KEY_LOAD_SAVE_CONTROLS 0x1010
 
 
 	static int gameType;
@@ -143,6 +145,7 @@ extern "C"
 
 
 	extern const char *nativeLibsPath;
+	extern std::string userFilesPath;
 
 // Send message to JAVA SDL activity
 	int Android_JNI_SendMessage(int command, int param);
@@ -560,6 +563,12 @@ extern "C"
 			// Show gyro options
 			if(state)
 				Android_JNI_SendMessage(COMMAND_SHOW_GYRO_OPTIONS, 0);
+		}
+		else  if(code == KEY_LOAD_SAVE_CONTROLS)
+		{
+			// Show load save controls
+			if(state)
+				Android_JNI_SendMessage(COMMAND_LOAD_SAVE_CONTROLS, 0);
 		}
 		else  if(code == KEY_SHOW_GAMEPAD)
 		{
@@ -1021,6 +1030,8 @@ extern "C"
 
 			tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 			tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
+			tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
+
 			tcMenuMain->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 10, 6, 16), "enter", PORT_ACT_MENU_SELECT));
 			touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24, 3, 26, 11), "brightness_slider");
 			brightnessSlide->signal_action.connect(sigc::ptr_fun(& brightnessSlideMouse));
@@ -1032,6 +1043,7 @@ extern "C"
 
 			tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 			tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
+			tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
 
 			// Stop buttons passing though control, otherwise goes wierd with mouse
 			touchcontrols::Button *b;
@@ -1102,20 +1114,21 @@ extern "C"
 				tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch/Swim down"));
 
 			tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (Mouse 2)"));
+			tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
+
+			bool hideQ2 = true;
 
 #if defined(QUAKE2) || defined(YQUAKE2)
-			tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, false, "Show Inventory"));
-			tcGameMain->addControl(new touchcontrols::Button("help_comp", touchcontrols::RectF(2, 0, 4, 2), "gamma", PORT_ACT_HELPCOMP));
+			hideQ2 = false;
 #endif
-
+			// If Hexen 2, also show these
 			if(gameType == Q1HEXEN2)
-			{
-				tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, false, "Show Inventory"));
-				tcGameMain->addControl(new touchcontrols::Button("help_comp", touchcontrols::RectF(2, 0, 4, 2), "gamma", PORT_ACT_HELPCOMP));
-			}
+				hideQ2 = false;
+
+			tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, hideQ2, "Show Inventory"));
+			tcGameMain->addControl(new touchcontrols::Button("help_comp", touchcontrols::RectF(2, 0, 4, 2), "gamma", PORT_ACT_HELPCOMP, false, hideQ2, "PDA"));
 
 			tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 2, 2, 4), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
-
 			tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
 			tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
 
@@ -1602,4 +1615,40 @@ extern "C"
 		return &controlsContainer;
 	}
 
+	bool saveControlSettings(std::string path)
+	{
+		std::string settings = path + "/settings.xml";
+		touchcontrols::touchSettings_save(settings);
+
+		tcGameMain->saveXML(path + "/tcGameMain.xml");
+		tcInventory->saveXML(path + "/tcInventory.xml");
+		tcWeaponWheel->saveXML(path + "/tcWeaponWheel.xml");
+		tcGameWeapons->saveXML(path + "/tcGameWeapons.xml");
+		tcCutomButtons->saveXML(path + "/tcCustomButtons.xml");
+		return false;
+	}
+
+	bool loadControlSettings(std::string path)
+	{
+		std::string settings = path + "/settings.xml";
+	 	touchcontrols::touchSettings_load(settings);
+		touchcontrols::touchSettings_save(); // Save over current settings
+
+		tcGameMain->loadXML(path + "/tcGameMain.xml");
+		tcGameMain->save(); // Save the newly loaded
+
+		tcInventory->loadXML(path + "/tcInventory.xml");
+		tcInventory->save();
+
+		tcWeaponWheel->loadXML(path + "/tcWeaponWheel.xml");
+		tcWeaponWheel->save();
+
+		tcGameWeapons->loadXML(path + "/tcGameWeapons.xml");
+		tcGameWeapons->save();
+
+		tcCutomButtons->loadXML(path + "/tcCustomButtons.xml");
+		tcCutomButtons->save();
+
+	 	return false;
+	}
 }
