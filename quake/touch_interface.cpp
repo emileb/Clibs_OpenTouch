@@ -73,6 +73,8 @@ extern "C"
 	static int left_double_action;
 	static int right_double_action;
 
+	static int volume_up_action;
+	static int volume_down_action;
 
 //To be set by android
 	static float strafe_sens = 1;
@@ -143,6 +145,28 @@ extern "C"
 		return game_path.c_str();
 	}
 
+	static int touchActionToAction(int action)
+	{
+		int ret = 0;
+		switch(action)
+		{
+			case 1:
+    			ret = PORT_ACT_USE;
+    			break;
+    		case 2:
+    			ret = PORT_ACT_JUMP;
+    			break;
+    		case 3:
+    			ret = PORT_ACT_ATTACK;
+    			break;
+			case 4:
+				ret = PORT_ACT_ALT_ATTACK;
+				break;
+    		default:
+    			ret = 0;
+		}
+		return ret;
+	}
 
 	extern const char *nativeLibsPath;
 	extern std::string userFilesPath;
@@ -724,41 +748,11 @@ extern "C"
 		autoHideNumbers = settings.autoHideNumbers;
 		weaponWheelEnabled  = settings.weaponWheelEnabled;
 
-		switch(settings.dblTapLeft)
-		{
-		case 1:
-			left_double_action = PORT_ACT_USE;
-			break;
+		left_double_action = touchActionToAction(settings.dblTapLeft);
+		right_double_action = touchActionToAction(settings.dblTapRight);
 
-		case 2:
-			left_double_action = PORT_ACT_JUMP;
-			break;
-
-		case 3:
-			left_double_action = PORT_ACT_ATTACK;
-			break;
-
-		default:
-			left_double_action = 0;
-		}
-
-		switch(settings.dblTapRight)
-		{
-		case 1:
-			right_double_action = PORT_ACT_USE;
-			break;
-
-		case 2:
-			right_double_action = PORT_ACT_JUMP;
-			break;
-
-		case 3:
-			right_double_action = PORT_ACT_ATTACK;
-			break;
-
-		default:
-			right_double_action = 0;
-		}
+		volume_up_action = touchActionToAction(settings.volumeUp);
+		volume_down_action = touchActionToAction(settings.volumeDown);
 
 		tcGameMain->setAlpha(gameControlsAlpha);
 		tcCutomButtons->setAlpha(gameControlsAlpha);
@@ -775,7 +769,6 @@ extern "C"
 		tcCutomButtons->setColour(settings.defaultColor);
 		tcGamepadUtility->setColour(settings.defaultColor);
 		tcDPadInventory->setColour(settings.defaultColor);
-
 	}
 
 	extern SDL_Scancode SDLCALL SDL_GetScancodeFromKey(SDL_Keycode key);
@@ -1114,7 +1107,7 @@ extern "C"
 				tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch/Swim down"));
 
 			tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (Mouse 2)"));
-			tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
+			//tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
 
 			bool hideQ2 = true;
 
@@ -1601,6 +1594,30 @@ extern "C"
 		}
 		else
 			return 0;
+	}
+
+	int volumeKey(int state, bool volumeUp)
+	{
+		if(currentScreenMode == TS_GAME) // Allow real volume to change when not in game
+		{
+			if(volumeUp)
+			{
+				if(volume_up_action)
+				{
+					PortableAction(state, volume_up_action);
+					return 1;
+				}
+			}
+			else
+			{
+				if(volume_down_action)
+				{
+					PortableAction(state, volume_down_action);
+					return 1;
+				}
+			}
+		}
+		return 0;
 	}
 
 	void weaponWheelSettings(bool useMoveStick, int mode, int autoTimeout)

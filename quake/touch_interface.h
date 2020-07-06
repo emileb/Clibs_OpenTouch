@@ -22,6 +22,7 @@ extern "C"
 	void axisValue(int axis, float value);
 	void weaponWheelSettings(bool useMoveStick, int mode, int autoTimeout);
 	int blockGamepad(void);
+	int volumeKey(int state, bool volumeUp);
 	bool saveControlSettings(std::string filename);
 	bool loadControlSettings(std::string filename);
 }

@@ -198,6 +198,8 @@
 
 #define PORT_ACT_MOUSE_LEFT               0x240 // Left mouse button
 #define PORT_ACT_MOUSE_RIGHT              0x241 // Right mouse button
+#define PORT_ACT_VOLUME_UP                0x242
+#define PORT_ACT_VOLUME_DOWN              0x243
 
 
 #define LOOK_MODE_MOUSE    0

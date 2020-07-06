@@ -120,10 +120,18 @@ extern "C"
 		android_screen_height = height;
 	}
 
-	void EXPORT_ME
+	int EXPORT_ME
 	JAVA_FUNC(doAction)(JNIEnv *env, jobject obj,	jint state, jint action)
 	{
-		gamepadAction(state, action);
+		if((action == PORT_ACT_VOLUME_UP) || (action == PORT_ACT_VOLUME_DOWN))
+		{
+			return volumeKey(state, (action == PORT_ACT_VOLUME_UP));
+		}
+		else
+		{
+			gamepadAction(state, action);
+			return 0;
+		}
 	}
 
 
