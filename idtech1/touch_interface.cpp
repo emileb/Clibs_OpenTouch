@@ -85,6 +85,8 @@ extern "C"
 	static int left_double_action;
 	static int right_double_action;
 
+	static int volume_up_action;
+	static int volume_down_action;
 
 //To be set by android
 	static float strafe_sens = 1;
@@ -161,6 +163,29 @@ extern "C"
 	const char * getGamePath()
 	{
 		return game_path.c_str();
+	}
+
+	static int touchActionToAction(int action)
+	{
+		int ret = 0;
+		switch(action)
+		{
+			case 1:
+    			ret = PORT_ACT_USE;
+    			break;
+    		case 2:
+    			ret = PORT_ACT_JUMP;
+    			break;
+    		case 3:
+    			ret = PORT_ACT_ATTACK;
+    			break;
+			case 4:
+				ret = PORT_ACT_ALT_ATTACK;
+				break;
+    		default:
+    			ret = 0;
+		}
+		return ret;
 	}
 
 // Needed for Doom 3
@@ -570,6 +595,13 @@ extern "C"
 			if(state)
 				Android_JNI_SendMessage(COMMAND_SHOW_GAMEPAD, 0);
 		}
+		else if(code == KEY_USE_MOUSE)
+		{
+			if(state)
+			{
+				useMouse = true;
+			}
+		}
 		else if(code == PORT_ACT_CONSOLE)
 		{
 			PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
@@ -725,67 +757,29 @@ extern "C"
 		autoHideNumbers = settings.autoHideNumbers;
 		weaponWheelEnabled  = settings.weaponWheelEnabled;
 
-		switch(settings.dblTapLeft)
-		{
-		case 1:
-			left_double_action = PORT_ACT_USE;
-			break;
+		left_double_action = touchActionToAction(settings.dblTapLeft);
+		right_double_action = touchActionToAction(settings.dblTapRight);
 
-		case 2:
-			left_double_action = PORT_ACT_JUMP;
-			break;
-
-		case 3:
-			left_double_action = PORT_ACT_ATTACK;
-			break;
-
-		case 4:
-			left_double_action = PORT_ACT_ALT_ATTACK;
-			break;
-
-		default:
-			left_double_action = 0;
-		}
-
-		switch(settings.dblTapRight)
-		{
-		case 1:
-			right_double_action = PORT_ACT_USE;
-			break;
-
-		case 2:
-			right_double_action = PORT_ACT_JUMP;
-			break;
-
-		case 3:
-			right_double_action = PORT_ACT_ATTACK;
-			break;
-
-		case 4:
-			right_double_action = PORT_ACT_ALT_ATTACK;
-			break;
-
-		default:
-			right_double_action = 0;
-		}
-
-		tcGameMain->setAlpha(gameControlsAlpha);
-		tcCutomButtons->setAlpha(gameControlsAlpha);
-		touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
+		volume_up_action = touchActionToAction(settings.volumeUp);
+		volume_down_action = touchActionToAction(settings.volumeDown);
 
 		controlsContainer.setColour(settings.defaultColor);
 		controlsContainer.setAlpha(gameControlsAlpha);
 
-		tcYesNo->setColour(settings.defaultColor);
-		tcGameMain->setColour(settings.defaultColor);
-		tcGameWeapons->setColour(settings.defaultColor);
-		tcWeaponWheel->setColour(settings.defaultColor);
-		tcInventory->setColour(settings.defaultColor);
-		tcAutomap->setColour(settings.defaultColor);
-		tcCutomButtons->setColour(settings.defaultColor);
-		tcGamepadUtility->setColour(settings.defaultColor);
-		tcDPadInventory->setColour(settings.defaultColor);
+		touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
 
+		if(tcGameMain) tcGameMain->setAlpha(gameControlsAlpha);
+		if(tcCutomButtons)  tcCutomButtons->setAlpha(gameControlsAlpha);
+
+		if(tcYesNo) tcYesNo->setColour(settings.defaultColor);
+		if(tcGameMain) tcGameMain->setColour(settings.defaultColor);
+		if(tcGameWeapons) tcGameWeapons->setColour(settings.defaultColor);
+		if(tcWeaponWheel) tcWeaponWheel->setColour(settings.defaultColor);
+		if(tcInventory) tcInventory->setColour(settings.defaultColor);
+		if(tcAutomap) tcAutomap->setColour(settings.defaultColor);
+		if(tcCutomButtons) tcCutomButtons->setColour(settings.defaultColor);
+		if(tcGamepadUtility) tcGamepadUtility->setColour(settings.defaultColor);
+		if(tcDPadInventory) tcDPadInventory->setColour(settings.defaultColor);
 	}
 
 	extern SDL_Scancode SDLCALL SDL_GetScancodeFromKey(SDL_Keycode key);
@@ -854,13 +848,12 @@ extern "C"
 #endif
 
 #if defined(D3ES)
-
 		if(action == TOUCHMOUSE_TAP)
 		{
 			PortableMouseButton(1, 1, 0, 0);
+			usleep(200 * 1000);
 			PortableMouseButton(0, 1, 0, 0);
 		}
-
 #endif
 	}
 
@@ -896,7 +889,6 @@ extern "C"
 
 		if(mode != currentScreenMode)
 		{
-
 			//first disable the last screen and fade out is necessary
 			switch(currentScreenMode)
 			{
@@ -967,6 +959,8 @@ extern "C"
 				break;
 
 			case TS_MENU:
+				useMouse = false;
+
 				if(!hideGameAndMenu)
 				{
 					tcMenuMain->setEnabled(true);
@@ -981,6 +975,8 @@ extern "C"
 				break;
 
 			case TS_GAME:
+				useMouse = false;
+
 				if(!hideGameAndMenu)
 				{
 					tcGameMain->setEnabled(true);
@@ -1041,7 +1037,6 @@ extern "C"
 
 			currentScreenMode = mode;
 		}
-
 	}
 
 	void frameControls()
@@ -1082,7 +1077,7 @@ extern "C"
 			tcDemo->setAlpha(demoControlsAlpha);
 		}
 
-		if((screenMode == TS_GAME) & useMouse)   // Show mouse screen
+		if(((screenMode == TS_GAME) || (screenMode == TS_MENU)) & useMouse)   // Show mouse screen
 		{
 			screenMode = TS_MOUSE;
 		}
@@ -1098,24 +1093,13 @@ extern "C"
 
 
 
-	void initControlsDoom3(int width, int height, const char * graphics_path)
+	void initControlsDoom3(const char * xmlPath)
 	{
-		touchcontrols::GLScaleWidth = (float)width;
-		touchcontrols::GLScaleHeight = (float)height;
-
-		LOGI("initControls %d x %d,x path = %s", width, height, graphics_path);
+		LOGI("initControlsDoom3");
 
 		if(!controlsCreated)
 		{
 			LOGI("creating controls");
-
-			touchcontrols::signal_vibrate.connect(sigc::ptr_fun(&vibrate));
-
-			touchcontrols::gl_setGraphicsBasePath(graphics_path);
-			//setControlsContainer(&controlsContainer);
-
-			controlsContainer.openGL_start.connect(sigc::ptr_fun(&openGLStart));
-			controlsContainer.openGL_end.connect(sigc::ptr_fun(&openGLEnd));
 
 			tcMenuMain = new touchcontrols::TouchControls("menu", false, true, 10, false);
 			tcGameMain = new touchcontrols::TouchControls("game", false, true, 1, true);
@@ -1131,7 +1115,7 @@ extern "C"
 			mouse->setEditable(false);
 			tcMenuMain->addControl(mouse);
 			mouse->signal_action.connect(sigc::ptr_fun(&mouse_move));
-			tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Back"));
+			tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Back"));
 			tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 
 			// Hide mouse button, try to use tap for now..
@@ -1142,7 +1126,7 @@ extern "C"
 			// GAME------------------------------------------------------------------------------
 			//-----------------------------------------------------------------------------------
 			tcGameMain->setAlpha(gameControlsAlpha);
-			tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Show menu"));
+			tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
 			tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(20, 7, 23, 10), "shoot", KEY_SHOOT, false, false, "Attack!"));
 			tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
 			tcGameMain->addControl(new touchcontrols::Button("quick_save", touchcontrols::RectF(24, 0, 26, 2), "save", PORT_ACT_QUICKSAVE, false, false, "Quick save"));
@@ -1198,7 +1182,6 @@ extern "C"
 
 			//Weapon wheel -------------------------------------------
 			//------------------------------------------------------
-
 			int weaponWheelNbr = 10;
 
 			wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", weaponWheelNbr);
@@ -1215,9 +1198,9 @@ extern "C"
 			// We want touch to pass through only where there is no keyboard
 			tcKeyboard->setPassThroughTouch(touchcontrols::TouchControls::PassThrough::NO_CONTROL);
 
-
-			UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, (std::string)graphics_path +  "/touch_settings_doom3.xml");
+			UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, (std::string)xmlPath +  "/touch_settings_doom3.xml");
 			UI_tc->setAlpha(1);
+
 			//---------------------------------------------------------------
 			//---------------------------------------------------------------
 			controlsContainer.addControlGroup(tcKeyboard);
@@ -1226,15 +1209,12 @@ extern "C"
 			controlsContainer.addControlGroup(tcGameWeapons);
 			controlsContainer.addControlGroup(tcWeaponWheel);
 
-
 			controlsCreated = 1;
 
-
-
-			tcMenuMain->setXMLFile((std::string)graphics_path +  "/menu_d3es.xml");
-			tcGameMain->setXMLFile((std::string)graphics_path +  "/game_d3es.xml");
-			tcWeaponWheel->setXMLFile((std::string)graphics_path +  "/weaponwheel_d3es.xml");
-			tcGameWeapons->setXMLFile((std::string)graphics_path +  "/weapons_d3es.xml");
+			tcMenuMain->setXMLFile((std::string)xmlPath +  "/menu_d3es.xml");
+			tcGameMain->setXMLFile((std::string)xmlPath +  "/game_d3es.xml");
+			tcWeaponWheel->setXMLFile((std::string)xmlPath +  "/weaponwheel_d3es.xml");
+			tcGameWeapons->setXMLFile((std::string)xmlPath +  "/weapons_d3es.xml");
 		}
 		else
 			LOGI("NOT creating controls");
@@ -1244,26 +1224,13 @@ extern "C"
 		SDL_SetShowKeyboardCallBack(showHideKeyboard);
 	}
 
-	void initControls(int width, int height, const char * graphics_path)
+	void initControls(const char * xmlPath)
 	{
-		touchcontrols::GLScaleWidth = (float)width;
-		touchcontrols::GLScaleHeight = (float)height;
-
-		LOGI("initControls %d x %d,x path = %s", width, height, graphics_path);
+		LOGI("initControls");
 
 		if(!controlsCreated)
 		{
 			LOGI("creating controls");
-
-			touchcontrols::signal_vibrate.connect(sigc::ptr_fun(&vibrate));
-
-			touchcontrols::gl_setGraphicsBasePath(graphics_path);
-			//setControlsContainer(&controlsContainer);
-
-			controlsContainer.openGL_start.connect(sigc::ptr_fun(&openGLStart));
-			controlsContainer.openGL_end.connect(sigc::ptr_fun(&openGLEnd));
-
-			touchcontrols::getSettingsSignal()->connect(sigc::ptr_fun(&touchSettings));
 
 			tcMenuMain = new touchcontrols::TouchControls("menu", false, true, 10, false);
 			tcYesNo = new touchcontrols::TouchControls("yes_no", false, false);
@@ -1284,13 +1251,15 @@ extern "C"
 
 			//Menu -------------------------------------------
 			//------------------------------------------------------
-			tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON));
+			tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON));
 			tcMenuMain->addControl(new touchcontrols::Button("down_arrow", touchcontrols::RectF(20, 13, 23, 16), "arrow_down", PORT_ACT_MENU_DOWN));
 			tcMenuMain->addControl(new touchcontrols::Button("up_arrow", touchcontrols::RectF(20, 10, 23, 13), "arrow_up", PORT_ACT_MENU_UP));
 			tcMenuMain->addControl(new touchcontrols::Button("left_arrow", touchcontrols::RectF(17, 13, 20, 16), "arrow_left", PORT_ACT_MENU_LEFT));
 			tcMenuMain->addControl(new touchcontrols::Button("right_arrow", touchcontrols::RectF(23, 13, 26, 16), "arrow_right", PORT_ACT_MENU_RIGHT));
 			tcMenuMain->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 10, 6, 16), "enter", PORT_ACT_MENU_SELECT));
 			tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
+			// Mouse pointer does not work with SDL
+			//tcMenuMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(5, 0, 7, 2), "left_mouse", KEY_USE_MOUSE));
 
 #ifndef CHOC_SETUP
 			tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
@@ -1316,7 +1285,7 @@ extern "C"
 			//Game -------------------------------------------
 			//------------------------------------------------------
 			tcGameMain->setAlpha(gameControlsAlpha);
-			tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Show menu"));
+			tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
 			tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(20, 7, 23, 10), "shoot", KEY_SHOOT, false, false, "Attack!"));
 			tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
 
@@ -1379,7 +1348,7 @@ extern "C"
 			tcGameMain->signal_settingsButton.connect(sigc::ptr_fun(&gameSettingsButton));
 
 
-			UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, (std::string)graphics_path +  "/touch_settings.xml");
+			UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, (std::string)xmlPath +  "/touch_settings.xml");
 			UI_tc->setAlpha(1);
 
 			//Weapons -------------------------------------------
@@ -1518,10 +1487,17 @@ extern "C"
 			touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2", touchcontrols::RectF(14, 7, 16, 9), "quad_slide", "slide_arrow", PORT_ACT_CUSTOM_14, PORT_ACT_CUSTOM_15, PORT_ACT_CUSTOM_16, PORT_ACT_CUSTOM_17, false, "Quad Slide 2 (E - H)");
 			tcCutomButtons->addControl(qs2);
 
+			touchcontrols::QuadSlide *qs3 = new touchcontrols::QuadSlide("quad_slide_3", touchcontrols::RectF(10, 11, 12, 13), "quad_slide_2", "slide_arrow", PORT_ACT_CUSTOM_18, PORT_ACT_CUSTOM_19, PORT_ACT_CUSTOM_20, PORT_ACT_CUSTOM_21, true, "Quad Slide 3 (I - L)");
+			tcCutomButtons->addControl(qs3);
+
+			touchcontrols::QuadSlide *qs4 = new touchcontrols::QuadSlide("quad_slide_4", touchcontrols::RectF(14, 11, 16, 13), "quad_slide_2", "slide_arrow", PORT_ACT_CUSTOM_22, PORT_ACT_CUSTOM_23, PORT_ACT_CUSTOM_24, PORT_ACT_CUSTOM_25, true, "Quad Slide 4 (M - P)");
+			tcCutomButtons->addControl(qs4);
 			//tcCutomButtons->setColor(0.7,0.7,1.f);
 
 			qs1->signal.connect(sigc::ptr_fun(&customButton));
 			qs2->signal.connect(sigc::ptr_fun(&customButton));
+			qs3->signal.connect(sigc::ptr_fun(&customButton));
+			qs4->signal.connect(sigc::ptr_fun(&customButton));
 			tcCutomButtons->signal_button.connect(sigc::ptr_fun(&customButton));
 			tcCutomButtons->signal_settingsButton.connect(sigc::ptr_fun(&customSettingsButton));
 			tcCutomButtons->setAlpha(gameControlsAlpha);
@@ -1530,7 +1506,7 @@ extern "C"
 			//------------------------------------------------------
 			touchcontrols::ButtonGrid *gamepadUtils = new touchcontrols::ButtonGrid("gamepad_grid", touchcontrols::RectF(8, 5, 18, 11), "gamepad_utils_bg", 3, 2);
 
-			gamepadUtils->addCell(0, 0, "ui_back_arrow", KEY_BACK_BUTTON);
+			gamepadUtils->addCell(0, 0, "back_button", KEY_BACK_BUTTON);
 			gamepadUtils->addCell(0, 1, "map", PORT_ACT_MAP);
 			gamepadUtils->addCell(1, 0, "keyboard", KEY_SHOW_KBRD);
 			gamepadUtils->addCell(1, 1, "tild", PORT_ACT_CONSOLE);
@@ -1564,7 +1540,7 @@ extern "C"
 			mouse->setEditable(false);
 			tcMouse->addControl(mouse);
 			mouse->signal_action.connect(sigc::ptr_fun(&mouse_move));
-			tcMouse->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Back"));
+			tcMouse->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Back"));
 			tcMouse->addControl(new touchcontrols::Button("left_button", touchcontrols::RectF(0, 6, 3, 10), "left_mouse", KEY_LEFT_MOUSE, false, false, "Back"));
 			tcMouse->signal_button.connect(sigc::ptr_fun(&mouseButton));
 
@@ -1595,13 +1571,13 @@ extern "C"
 			else if(gameType == GAME_TYPE_STRIFE)
 				touchcontrols::setGlobalXmlAppend(".strife");
 
-			tcMenuMain->setXMLFile((std::string)graphics_path +  "/menu.xml");
+			tcMenuMain->setXMLFile((std::string)xmlPath +  "/menu.xml");
 
-			tcGameMain->setXMLFile((std::string)graphics_path +  "/game_" ENGINE_NAME ".xml");
-			tcInventory->setXMLFile((std::string)graphics_path +  "/inventory_" ENGINE_NAME ".xml");
-			tcWeaponWheel->setXMLFile((std::string)graphics_path +  "/weaponwheel_" ENGINE_NAME ".xml");
-			tcGameWeapons->setXMLFile((std::string)graphics_path +  "/weapons_" ENGINE_NAME ".xml");
-			tcCutomButtons->setXMLFile((std::string)graphics_path +  "/custom_buttons_0_" ENGINE_NAME ".xml");
+			tcGameMain->setXMLFile((std::string)xmlPath +  "/game_" ENGINE_NAME ".xml");
+			tcInventory->setXMLFile((std::string)xmlPath +  "/inventory_" ENGINE_NAME ".xml");
+			tcWeaponWheel->setXMLFile((std::string)xmlPath +  "/weaponwheel_" ENGINE_NAME ".xml");
+			tcGameWeapons->setXMLFile((std::string)xmlPath +  "/weapons_" ENGINE_NAME ".xml");
+			tcCutomButtons->setXMLFile((std::string)xmlPath +  "/custom_buttons_0_" ENGINE_NAME ".xml");
 		}
 		else
 			LOGI("NOT creating controls");
@@ -1651,14 +1627,25 @@ extern "C"
 
 		putenv((char*)"TIMIDITY_CFG=./audiopack/snd_timidity/timidity.cfg");
 
+		touchcontrols::GLScaleWidth = (float)mobile_screen_width;
+		touchcontrols::GLScaleHeight = (float)-mobile_screen_height;
+		touchcontrols::signal_vibrate.connect(sigc::ptr_fun(&vibrate));
+		touchcontrols::gl_setGraphicsBasePath(graphicpath.c_str());
+		touchcontrols::getSettingsSignal()->connect(sigc::ptr_fun(&touchSettings));
+
+		controlsContainer.openGL_start.connect(sigc::ptr_fun(&openGLStart));
+		controlsContainer.openGL_end.connect(sigc::ptr_fun(&openGLEnd));
+
 #ifdef D3ES
-		initControlsDoom3(mobile_screen_width, -mobile_screen_height, graphicpath.c_str());
+		initControlsDoom3(graphicpath.c_str());
 #else
-		initControls(mobile_screen_width, -mobile_screen_height, graphicpath.c_str());
+		initControls(graphicpath.c_str());
 #endif
 
 
 #endif
+
+
 #ifdef __IOS__
 		mobile_screen_width = 1152;
 		mobile_screen_height = 640;
@@ -1883,6 +1870,30 @@ extern "C"
 		weaponWheelMoveStick = useMoveStick;
 		weaponWheelGamepadMode = (touchcontrols::WheelSelectMode)mode;
 		weaponWheelAutoTimout = autoTimeout;
+	}
+
+	int volumeKey(int state, bool volumeUp)
+	{
+		if(currentScreenMode == TS_GAME) // Allow real volume to change when not in game
+		{
+			if(volumeUp)
+			{
+				if(volume_up_action)
+				{
+					PortableAction(state, volume_up_action);
+					return 1;
+				}
+			}
+			else
+			{
+				if(volume_down_action)
+				{
+					PortableAction(state, volume_down_action);
+					return 1;
+				}
+			}
+		}
+		return 0;
 	}
 
 	TouchControlsInterface* mobileGetTouchInterface()

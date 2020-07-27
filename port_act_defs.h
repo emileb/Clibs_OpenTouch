@@ -164,14 +164,15 @@
 #define PORT_ACT_CUSTOM_15         165
 #define PORT_ACT_CUSTOM_16         166
 #define PORT_ACT_CUSTOM_17         167
+#define PORT_ACT_CUSTOM_18         168
+#define PORT_ACT_CUSTOM_19         169
+#define PORT_ACT_CUSTOM_20         170
+#define PORT_ACT_CUSTOM_21         171
+#define PORT_ACT_CUSTOM_22         172
+#define PORT_ACT_CUSTOM_23         173
+#define PORT_ACT_CUSTOM_24         174
+#define PORT_ACT_CUSTOM_25         175
 
-//strife VE
-#define PORT_ACT_INVSLOT0         170
-#define PORT_ACT_INVSLOT1         171
-#define PORT_ACT_INVSLOT2         172
-#define PORT_ACT_INVSLOT3         173
-#define PORT_ACT_INVSLOT4         174
-#define PORT_ACT_INVSLOT5         175
 
 
 // Demo playback

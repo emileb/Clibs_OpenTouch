@@ -201,11 +201,11 @@ void PortableAction(int state, int action)
 {
 	LOGI("PortableAction %d   %d", state, action);
 
-	if((action >= PORT_ACT_CUSTOM_0) && (action <= PORT_ACT_CUSTOM_17))
+	if((action >= PORT_ACT_CUSTOM_0) && (action <= PORT_ACT_CUSTOM_25))
 	{
 		if(action <= PORT_ACT_CUSTOM_9)
 			PortableKeyEvent(state, SDL_SCANCODE_KP_1 + action - PORT_ACT_CUSTOM_0, 0);
-		else if(action <= PORT_ACT_CUSTOM_17)
+		else if(action <= PORT_ACT_CUSTOM_25)
 			PortableKeyEvent(state, SDL_SCANCODE_A + action - PORT_ACT_CUSTOM_10, 0);
 	}
 	else if((PortableGetScreenMode() == TS_MENU) || (PortableGetScreenMode() == TS_BLANK))
