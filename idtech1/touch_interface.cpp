@@ -1117,6 +1117,8 @@ extern "C"
 			mouse->signal_action.connect(sigc::ptr_fun(&mouse_move));
 			tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Back"));
 			tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
+			tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
+			tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
 
 			// Hide mouse button, try to use tap for now..
 			//tcMenuMain->addControl(new touchcontrols::Button("left_button",touchcontrols::RectF(0,6,3,10),"left_mouse",KEY_LEFT_MOUSE,false,false,"Back"));
@@ -1301,20 +1303,26 @@ extern "C"
 #endif
 
 			bool hideJump = true;
+			bool hideInventory = true;
+			bool hideFlySlide = true;
 
 			if((gameType == GAME_TYPE_STRIFE) || (gameType == GAME_TYPE_HEXEN))
 				hideJump = false;
 
-			tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, hideJump, "Jump"));
-
-			bool hideInventory = true;
 
 			if((gameType == GAME_TYPE_STRIFE) || (gameType == GAME_TYPE_HEXEN) || (gameType == GAME_TYPE_HERETIC))
 				hideInventory = false;
 
+			if(gameType == GAME_TYPE_HERETIC)
+				hideFlySlide = false;
+
+			// Quad slider for fly controls
+			touchcontrols::QuadSlide *flyQs = new touchcontrols::QuadSlide("quad_slide_fly", touchcontrols::RectF(3, 4, 5, 6), "wings", "slide_arrow", PORT_ACT_FLY_UP, 0, PORT_ACT_FLY_DOWN, 0, hideFlySlide, "Heretic fly slider");
+			flyQs->signal.connect(sigc::ptr_fun(&gameButton));
+			tcGameMain->addControl(flyQs);
+
+			tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, hideJump, "Jump"));
 			tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, hideInventory, "Show Inventory"));
-
-
 			tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, true, "Crouch"));
 			tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, true, "Crouch (toggle)"));
 			tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack"));

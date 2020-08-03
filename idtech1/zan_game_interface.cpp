@@ -211,6 +211,14 @@ void PortableAction(int state, int action)
 			buttonChange(state, &Button_MoveRight);
 			break;
 
+		case PORT_ACT_FLY_UP:
+			buttonChange(state, &Button_MoveUp);
+			break;
+
+		case PORT_ACT_FLY_DOWN:
+			buttonChange(state, &Button_MoveDown);
+			break;
+
 		case PORT_ACT_USE:
 			buttonChange(state, &Button_Use);
 			break;
