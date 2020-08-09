@@ -96,6 +96,7 @@ extern "C"
 		LOGI("game_path = %s", game_path.c_str());
 
 		setenv("HOME", game_path.c_str(), 1);
+		setenv("USER_FILES", userFilesPath.c_str(), 1);
 
 		setenv("LIBGL_ES", "2", 1);
 		setenv("LIBGL_GL", "21", 1);
