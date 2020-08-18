@@ -70,7 +70,7 @@ extern "C"
 #define GAME_TYPE_HERETIC  3
 #define GAME_TYPE_STRIFE   4
 
-	static int gameType;
+	int gameType;
 
 	static float gameControlsAlpha = 0.5;
 	static bool joystickLookMode = false;
@@ -1164,6 +1164,7 @@ extern "C"
 
 			tcGameMain->signal_button.connect(sigc::ptr_fun(&gameButton));
 			tcGameMain->signal_settingsButton.connect(sigc::ptr_fun(&gameSettingsButton));
+
 
 
 			//Weapons -------------------------------------------
