@@ -29,6 +29,7 @@ typedef enum
 	TS_CUSTOM,
 	TS_DEMO,
 	TS_MOUSE,
+	TS_PDA, // Doom 3
 } touchscreemode_t;
 
 

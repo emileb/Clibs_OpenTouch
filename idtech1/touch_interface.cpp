@@ -140,6 +140,9 @@ extern "C"
 	static touchcontrols::TouchControls *tcGamepadUtility = 0;
 	static touchcontrols::TouchControls *tcDPadInventory = 0;
 	static touchcontrols::TouchControls *tcMouse = 0;
+#ifdef D3ES
+	static touchcontrols::TouchControls *tcPda = 0;
+#endif
 
 // So can hide and show these buttons
 	static touchcontrols::TouchJoy *touchJoyLeft;
@@ -360,35 +363,36 @@ extern "C"
 	static void gameButton(int state, int code)
 	{
 #ifndef NO_SEC
-
-		if(licTest < 0)
-			return;
-
-		licTest++;
-
-		if(licTest == 64)
+		if( state )
 		{
-			if(keyCheck() == 0)
-			{
-				// Failed
-				licTest = -1;
-			}
-			else
-			{
-				// Now make it fail
-				keyGlobal[4] = keyGlobal[4] ^ 0xAA;
+			if(licTest < 0)
+				return;
 
-				if(keyCheck() == 1)
+			licTest++;
+
+			if(licTest == 64)
+			{
+				if(keyCheck() == 0)
 				{
-					// Failed, keyCheck always returns valid!!
+					// Failed
 					licTest = -1;
 				}
+				else
+				{
+					// Now make it fail
+					keyGlobal[4] = keyGlobal[4] ^ 0xAA;
 
-				// Put back
-				keyGlobal[4] = keyGlobal[4] ^ 0xAA;
+					if(keyCheck() == 1)
+					{
+						// Failed, keyCheck always returns valid!!
+						licTest = -1;
+					}
+
+					// Put back
+					keyGlobal[4] = keyGlobal[4] ^ 0xAA;
+				}
 			}
 		}
-
 #endif
 
 		if(code == KEY_SHOOT)
@@ -851,7 +855,7 @@ extern "C"
 		if(action == TOUCHMOUSE_TAP)
 		{
 			PortableMouseButton(1, 1, 0, 0);
-			usleep(200 * 1000);
+			usleep(200 * 1000); // Need this for the PDA to work, needs a frame to react..
 			PortableMouseButton(0, 1, 0, 0);
 		}
 #endif
@@ -946,7 +950,12 @@ extern "C"
 				tcMouse->resetOutput();
 				tcMouse->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
 				break;
-
+#ifdef D3ES
+			case TS_PDA:
+				tcPda->resetOutput();
+				tcPda->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
+				break;
+#endif
 			case TS_CONSOLE:
 				break;
 			}
@@ -1030,7 +1039,20 @@ extern "C"
 				tcMouse->setEnabled(true);
 				tcMouse->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 				break;
+#ifdef D3ES
+			case TS_PDA:
+				{
+					// Copy position from the game screen
+					touchcontrols::Button* pdaGame = (touchcontrols::Button*)tcGameMain->getControl("pda");
+					touchcontrols::Button* pda = (touchcontrols::Button*)tcPda->getControl("pda");
+					pda->controlPos = pdaGame->controlPos;
+					pda->updateSize();
 
+					tcPda->setEnabled(true);
+					tcPda->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
+				}
+				break;
+#endif
 			case TS_CONSOLE:
 				break;
 			}
@@ -1041,6 +1063,7 @@ extern "C"
 
 	void frameControls()
 	{
+
 #ifndef NO_SEC
 		unsigned char sha_data[20] = {0x23, 0x53, 0xff, 0x41, 0x16, 0xd4, 0x43, 0x7f, 0x43, 0xaf, 0x12, 0x19, 0x75, 0xaa, 0xd7, 0xb0, 0x5e, 0xee, 0xf5, 0xde};
 #include "./secure/check_include.h"
@@ -1092,7 +1115,7 @@ extern "C"
 	}
 
 
-
+#ifdef D3ES
 	void initControlsDoom3(const char * xmlPath)
 	{
 		LOGI("initControlsDoom3");
@@ -1107,6 +1130,9 @@ extern "C"
 			tcWeaponWheel = new touchcontrols::TouchControls("weapon_wheel", false, true, 1, false);
 			tcBlank = new touchcontrols::TouchControls("blank", true, false);
 			tcKeyboard = new touchcontrols::TouchControls("keyboard", false, false);
+            tcPda = new touchcontrols::TouchControls("pda", false, false);
+			tcGamepadUtility = new touchcontrols::TouchControls("gamepad_utility", false, false);
+
 			// Hide the cog because when using the gamepad and weapon wheel is enabled, the cog will show otherwise
 			tcWeaponWheel->hideEditButton = true;
 
@@ -1166,7 +1192,12 @@ extern "C"
 			tcGameMain->signal_button.connect(sigc::ptr_fun(&gameButton));
 			tcGameMain->signal_settingsButton.connect(sigc::ptr_fun(&gameSettingsButton));
 
-
+			//PDA -------------------------------------------
+			//------------------------------------------------------
+			tcPda->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
+			tcPda->addControl(new touchcontrols::Button("pda", touchcontrols::RectF(16, 0, 18, 2), "gamma", PORT_ACT_HELPCOMP, false, false, "Show PDA"));
+			tcPda->addControl(mouse); // Try to add the same mosue object from the main menu.. should work?...
+			tcPda->signal_button.connect(sigc::ptr_fun(&gameButton));
 
 			//Weapons -------------------------------------------
 			//------------------------------------------------------
@@ -1195,6 +1226,24 @@ extern "C"
 			tcWeaponWheel->addControl(wheelSelect);
 			tcWeaponWheel->setAlpha(0.8);
 
+			//Gamepad utility -------------------------------------------
+			//------------------------------------------------------
+			touchcontrols::ButtonGrid *gamepadUtils = new touchcontrols::ButtonGrid("gamepad_grid", touchcontrols::RectF(8, 5, 18, 11), "gamepad_utils_bg", 3, 2);
+
+			gamepadUtils->addCell(0, 0, "back_button", KEY_BACK_BUTTON);
+			gamepadUtils->addCell(0, 1, "gamma", PORT_ACT_HELPCOMP);
+			gamepadUtils->addCell(1, 0, "keyboard", KEY_SHOW_KBRD);
+			gamepadUtils->addCell(1, 1, "flashlight", PORT_ACT_FLASH_LIGHT);
+			gamepadUtils->addCell(2, 0, "save", PORT_ACT_QUICKSAVE);
+			gamepadUtils->addCell(2, 1, "load", PORT_ACT_QUICKLOAD);
+
+			gamepadUtils->signal_outside.connect(sigc::ptr_fun(&gameUtilitiesOutside));
+
+			tcGamepadUtility->addControl(gamepadUtils);
+			tcGamepadUtility->setAlpha(0.9);
+			tcGamepadUtility->signal_button.connect(sigc::ptr_fun(&gameUtilitiesButton));
+
+
 			//Keyboard -------------------------------------------
 			//------------------------------------------------------
 			uiKeyboard = new touchcontrols::UI_Keyboard("keyboard", touchcontrols::RectF(0, 8, 26, 16), "font_dual", 0, 0, 0);
@@ -1209,10 +1258,12 @@ extern "C"
 			//---------------------------------------------------------------
 			//---------------------------------------------------------------
 			controlsContainer.addControlGroup(tcKeyboard);
+			controlsContainer.addControlGroup(tcGamepadUtility);
 			controlsContainer.addControlGroup(tcMenuMain);
 			controlsContainer.addControlGroup(tcGameMain);
 			controlsContainer.addControlGroup(tcGameWeapons);
 			controlsContainer.addControlGroup(tcWeaponWheel);
+			controlsContainer.addControlGroup(tcPda);
 
 			controlsCreated = 1;
 
@@ -1228,6 +1279,7 @@ extern "C"
 
 		SDL_SetShowKeyboardCallBack(showHideKeyboard);
 	}
+#endif // D3ES
 
 	void initControls(const char * xmlPath)
 	{
@@ -1791,7 +1843,7 @@ extern "C"
 				}
 			}
 		}
-		else if(action == PORT_ACT_SHOW_DPAD_INV  && currentScreenMode == TS_GAME)
+		else if(tcDPadInventory && action == PORT_ACT_SHOW_DPAD_INV  && currentScreenMode == TS_GAME)
 		{
 			if(state)
 			{
@@ -1802,7 +1854,7 @@ extern "C"
 				}
 			}
 		}
-		else if(action == PORT_ACT_SHOW_INV && currentScreenMode == TS_GAME)
+		else if(tcInventory && action == PORT_ACT_SHOW_INV && currentScreenMode == TS_GAME)
 		{
 			if(state)
 			{
@@ -1919,10 +1971,18 @@ extern "C"
 		touchcontrols::touchSettings_save(settings);
 
 		tcGameMain->saveXML(path + "/tcGameMain.xml");
-		tcInventory->saveXML(path + "/tcInventory.xml");
+
+
 		tcWeaponWheel->saveXML(path + "/tcWeaponWheel.xml");
+
 		tcGameWeapons->saveXML(path + "/tcGameWeapons.xml");
-		tcCutomButtons->saveXML(path + "/tcCustomButtons.xml");
+
+		if(tcInventory)
+			tcInventory->saveXML(path + "/tcInventory.xml");
+
+		if(tcCutomButtons)
+			tcCutomButtons->saveXML(path + "/tcCustomButtons.xml");
+
 		return false;
 	}
 
@@ -1935,17 +1995,23 @@ extern "C"
 		tcGameMain->loadXML(path + "/tcGameMain.xml");
 		tcGameMain->save(); // Save the newly loaded
 
-		tcInventory->loadXML(path + "/tcInventory.xml");
-		tcInventory->save();
-
 		tcWeaponWheel->loadXML(path + "/tcWeaponWheel.xml");
 		tcWeaponWheel->save();
 
 		tcGameWeapons->loadXML(path + "/tcGameWeapons.xml");
 		tcGameWeapons->save();
 
-		tcCutomButtons->loadXML(path + "/tcCustomButtons.xml");
-		tcCutomButtons->save();
+		if(tcInventory)
+		{
+			tcInventory->loadXML(path + "/tcInventory.xml");
+			tcInventory->save();
+		}
+
+		if(tcCutomButtons)
+		{
+			tcCutomButtons->loadXML(path + "/tcCustomButtons.xml");
+			tcCutomButtons->save();
+		}
 
 	 	return false;
 	}
