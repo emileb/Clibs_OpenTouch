@@ -185,6 +185,7 @@
 
 //Doom 3
 #define PORT_ACT_FLASH_LIGHT      200
+#define PORT_ACT_SPRINT           201
 
 
 #define PORT_ACT_MENU_UP                  0x200 //512
