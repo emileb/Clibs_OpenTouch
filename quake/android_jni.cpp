@@ -45,6 +45,7 @@ extern "C"
 
 	const char *nativeLibsPath;
 	std::string userFilesPath;
+	std::string tmpFilesPath;
 
 	static const char *key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArVTuCs3MUfRpivh5ETTzfgq+pdSHPfvWKKOsqLdyugv37TPWGfjHADzI+Ryst8qdObT9qEfKQXbd5PLC6+Lspl3/N8L+FXJO5tNSzcxDNr/gCXgR/vs+YiRpyuCJMNcuwPHfDIKdBmPaFxQAxSggdzoWfEmTXyaA1S8PZprT1GcOIB1scLUWpXPjzZeOTXwEzD20HWKeR+oG7PzFBAF85clKu5Y2bypoBcmnlpBl3nK2TdNJdESitxjS5CssRp5zBxYQ6BnMfDI1W8n2QCatFb+lAHcnhye/FB8/nA476b2WOw3VBkk5CspXhDNRom6dCMfP1HTxHrH6Q0LFh81SxQIDAQAB";
 	static const char *pkg = "com.opentouchgaming.quadtouch";
@@ -52,7 +53,7 @@ extern "C"
 	char pkgGlobal[64];
 
 	jint EXPORT_ME
-	JAVA_FUNC(init)(JNIEnv* env,	jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles)
+	JAVA_FUNC(init)(JNIEnv* env,	jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles, jstring tmpFiles)
 	{
 		env_ = env;
 
@@ -61,6 +62,8 @@ extern "C"
 		static std::string log_filename_path = (char *)(env)->GetStringUTFChars(logFilename, 0);
 		static std::string native_libs_path = (char *)(env)->GetStringUTFChars(nativeLibs, 0);
 		userFilesPath = (char *)(env)->GetStringUTFChars(userFiles, 0);
+		tmpFilesPath = (char *)(env)->GetStringUTFChars(tmpFiles, 0);
+		tmpFilesPath += "/tmpfile-XXXXXX";
 
 		nativeLibsPath = native_libs_path.c_str();
 
@@ -92,7 +95,7 @@ extern "C"
 		setenv("LIBGL_ES", "2", 1);
 		setenv("LIBGL_GL", "21", 1);
 		setenv("LIBGL_DEFAULTWRAP", "0", 1);
-		setenv("LIBGL_USEVBO", "0", 1);
+		setenv("LIBGL_USEVBO", "1", 1);
 		setenv("LIBGL_NOINTOVLHACK", "1", 1);
 
 		//setenv("LIBGL_NOCLEAN","1",1);
@@ -269,4 +272,28 @@ extern "C"
 		env->ReleaseStringUTFChars(filename, filename_c);
 		return 0;
 	}
+
+
+	FILE *tmpfile() {
+		FILE * handle = nullptr;
+
+		std::string path;
+
+		path = tmpFilesPath;
+
+		int descriptor = mkstemp(&path[0]);
+		if (-1 != descriptor) {
+			handle = fdopen(descriptor, "w+b");
+			if (nullptr == handle) {
+			  close(descriptor);
+			}
+
+			// File already open,
+			// can be unbound from the file system
+			std::remove(path.c_str());
+		}
+
+		return handle;
+	}
+
 }
