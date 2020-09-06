@@ -516,11 +516,14 @@ extern "C"
 
 	static void blankButton(int state, int code)
 	{
-#if (PRBOOM_DOOM)
+#if defined(PRBOOM_DOOM)
 
 		if(state)
 			PortableBackButton();
 
+#elif defined(D3ES) // Blank is used for cinematic, allow to skip them
+		if(state)
+			mobileBackButton();
 #else
 		PortableAction(state, PORT_ACT_USE);
 		PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
@@ -1200,6 +1203,11 @@ extern "C"
 			tcPda->addControl(mouse); // Try to add the same mosue object from the main menu.. should work?...
 			tcPda->signal_button.connect(sigc::ptr_fun(&gameButton));
 
+			//Blank -------------------------------------------
+			//------------------------------------------------------
+			tcBlank->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 0, 26, 16), "", 0x123));
+			tcBlank->signal_button.connect(sigc::ptr_fun(&blankButton));
+
 			//Weapons -------------------------------------------
 			//------------------------------------------------------
 			tcGameWeapons->addControl(new touchcontrols::Button("weapon1", touchcontrols::RectF(1, 14, 3, 16), "key_1", 1));
@@ -1265,6 +1273,7 @@ extern "C"
 			controlsContainer.addControlGroup(tcGameWeapons);
 			controlsContainer.addControlGroup(tcWeaponWheel);
 			controlsContainer.addControlGroup(tcPda);
+			controlsContainer.addControlGroup(tcBlank);
 
 			controlsCreated = 1;
 
