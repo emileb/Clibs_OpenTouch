@@ -1067,7 +1067,7 @@ extern "C"
 	void frameControls()
 	{
 
-#ifndef NO_SEC
+#if !defined(NO_SEC) && !defined(D3ES)
 		unsigned char sha_data[20] = {0x23, 0x53, 0xff, 0x41, 0x16, 0xd4, 0x43, 0x7f, 0x43, 0xaf, 0x12, 0x19, 0x75, 0xaa, 0xd7, 0xb0, 0x5e, 0xee, 0xf5, 0xde};
 #include "./secure/check_include.h"
 #endif
@@ -1165,8 +1165,8 @@ extern "C"
 			tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show keyboard"));
 
 			tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, false, "Jump"));
-			tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch"));
-			tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, true, "Crouch (toggle)"));
+			tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, true, "Crouch"));
+			tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, false, "Crouch (smart toggle)"));
 			tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
 			tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
 			tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
@@ -1174,8 +1174,8 @@ extern "C"
 			tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
 			tcGameMain->addControl(new touchcontrols::Button("flashlight", touchcontrols::RectF(21, 3, 23, 5), "flashlight", PORT_ACT_FLASH_LIGHT, false, false, "Flashlight"));
 			tcGameMain->addControl(new touchcontrols::Button("pda", touchcontrols::RectF(16, 0, 18, 2), "gamma", PORT_ACT_HELPCOMP, false, false, "Show PDA"));
-			tcGameMain->addControl(new touchcontrols::Button("zoom", touchcontrols::RectF(18, 3, 20, 5), "zoom", PORT_ACT_ZOOM_IN, false, false, "Zoom"));
-			tcGameMain->addControl(new touchcontrols::Button("sprint", touchcontrols::RectF(0, 7, 2, 9), "sprint", PORT_ACT_SPRINT, false, false, "Sprint toggle or press"));
+			tcGameMain->addControl(new touchcontrols::Button("zoom", touchcontrols::RectF(18, 3, 20, 5), "zoom", PORT_ACT_ZOOM_IN, false, false, "Zoom (smart toggle)"));
+			tcGameMain->addControl(new touchcontrols::Button("sprint", touchcontrols::RectF(0, 7, 2, 9), "sprint", PORT_ACT_SPRINT, false, false, "Sprint (smart toggle)"));
 
 
 			touchJoyRight = new touchcontrols::TouchJoy("touch", touchcontrols::RectF(17, 4, 26, 16), "look_arrow", "fixed_stick_circle");
