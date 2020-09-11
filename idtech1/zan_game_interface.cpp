@@ -81,6 +81,7 @@ extern "C"
 {
 	extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
 	void Android_OnMouse(int androidButton, int action, float x, float y);
+	#include "SmartToggle.h"
 }
 
 //Move left/right fwd/back
@@ -239,7 +240,6 @@ void PortableAction(int state, int action)
 				else
 					buttonChange(1, &Button_AltAttack);
 			}
-
 			break;
 
 		case PORT_ACT_JUMP:
@@ -251,14 +251,11 @@ void PortableAction(int state, int action)
 			break;
 
 		case PORT_ACT_TOGGLE_CROUCH:
-			if(state)
 			{
-				if(Button_Crouch.bDown)
-					buttonChange(0, &Button_Crouch);
-				else
-					buttonChange(1, &Button_Crouch);
+				static SmartToggle_t smartToggle;
+				int activate = SmartToggleAction( &smartToggle, state,Button_Crouch.bDown);
+				buttonChange(activate, &Button_Crouch);
 			}
-
 			break;
 
 		case PORT_ACT_NEXT_WEP:

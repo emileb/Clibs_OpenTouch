@@ -1,4 +1,4 @@
-
+#include <time.h>
 
 #define TAP_TIME 500
 
