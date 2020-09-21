@@ -508,10 +508,8 @@ void PortableLookYaw(int mode, float yaw)
 // Start game, does not return!
 void PortableInit(int argc, const char ** argv)
 {
-
 	extern int main_android(int argc, char **argv);
 	main_android(argc, (char **)argv);
-
 }
 
 extern bool		automapactive;

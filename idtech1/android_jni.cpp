@@ -27,6 +27,17 @@ extern "C"
 
 	JNIEnv* env_;
 
+	int Android_JNI_SendMessage(int command, int param);
+	#define COMMAND_EXIT_APP  0x8007
+
+	void exit(int status)
+	{
+		LOGI("EXIT OVERRIDE!!!");
+		Android_JNI_SendMessage(COMMAND_EXIT_APP, 0);
+
+		usleep(1000 * 1000 * 5); // Wait 5 seconds
+		exit(0); // This should never happen because the SDLActivity should have killed the process already
+	}
 
 //#define JAVA_FUNC(x) Java_com_beloko_opengames_gzdoom2_NativeLib_##x
 
@@ -119,6 +130,8 @@ extern "C"
 
 		mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(), options, game);
 		PortableInit(argc, argv); //Never returns!!
+
+		LOGI("PortableInit returned");
 
 		return 0;
 	}

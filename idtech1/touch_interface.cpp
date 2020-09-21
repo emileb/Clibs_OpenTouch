@@ -1374,7 +1374,6 @@ extern "C"
 			if((gameType == GAME_TYPE_STRIFE) || (gameType == GAME_TYPE_HEXEN))
 				hideJump = false;
 
-
 			if((gameType == GAME_TYPE_STRIFE) || (gameType == GAME_TYPE_HEXEN) || (gameType == GAME_TYPE_HERETIC))
 				hideInventory = false;
 
