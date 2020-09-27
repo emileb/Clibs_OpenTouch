@@ -135,7 +135,7 @@ extern "C"
 	static touchcontrols::TouchControls *tcAutomap = 0;
 	static touchcontrols::TouchControls *tcBlank = 0;
 	static touchcontrols::TouchControls *tcKeyboard = 0;
-	static touchcontrols::TouchControls *tcCutomButtons = 0;
+	static touchcontrols::TouchControls *tcCustomButtons = 0;
 	static touchcontrols::TouchControls *tcDemo = 0;
 	static touchcontrols::TouchControls *tcGamepadUtility = 0;
 	static touchcontrols::TouchControls *tcDPadInventory = 0;
@@ -432,15 +432,15 @@ extern "C"
 		{
 			if(state == 1)
 			{
-				if(!tcCutomButtons->enabled)
+				if(!tcCustomButtons->enabled)
 				{
-					tcCutomButtons->setEnabled(true);
-					tcCutomButtons->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
+					tcCustomButtons->setEnabled(true);
+					tcCustomButtons->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 					showCustomOn = true;
 				}
 				else
 				{
-					tcCutomButtons->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
+					tcCustomButtons->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
 					showCustomOn = false;
 				}
 			}
@@ -776,7 +776,7 @@ extern "C"
 		touchJoyLeft->setCenterAnchor(settings.fixedMoveStick);
 
 		if(tcGameMain) tcGameMain->setAlpha(gameControlsAlpha);
-		if(tcCutomButtons)  tcCutomButtons->setAlpha(gameControlsAlpha);
+		if(tcCustomButtons)  tcCustomButtons->setAlpha(gameControlsAlpha);
 
 		if(tcYesNo) tcYesNo->setColour(settings.defaultColor);
 		if(tcGameMain) tcGameMain->setColour(settings.defaultColor);
@@ -784,7 +784,7 @@ extern "C"
 		if(tcWeaponWheel) tcWeaponWheel->setColour(settings.defaultColor);
 		if(tcInventory) tcInventory->setColour(settings.defaultColor);
 		if(tcAutomap) tcAutomap->setColour(settings.defaultColor);
-		if(tcCutomButtons) tcCutomButtons->setColour(settings.defaultColor);
+		if(tcCustomButtons) tcCustomButtons->setColour(settings.defaultColor);
 		if(tcGamepadUtility) tcGamepadUtility->setColour(settings.defaultColor);
 		if(tcDPadInventory) tcDPadInventory->setColour(settings.defaultColor);
 	}
@@ -920,10 +920,10 @@ extern "C"
 				tcGameWeapons->setEnabled(false);
 				tcWeaponWheel->setEnabled(false);
 
-				if(tcCutomButtons)
+				if(tcCustomButtons)
 				{
-					tcCutomButtons->resetOutput();
-					tcCutomButtons->setEnabled(false);
+					tcCustomButtons->resetOutput();
+					tcCustomButtons->setEnabled(false);
 				}
 
 				if(tcInventory)
@@ -940,8 +940,8 @@ extern "C"
 				break;
 
 			case TS_CUSTOM:
-				tcCutomButtons->resetOutput();
-				tcCutomButtons->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
+				tcCustomButtons->resetOutput();
+				tcCustomButtons->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
 				break;
 
 			case TS_DEMO:
@@ -957,6 +957,9 @@ extern "C"
 			case TS_PDA:
 				tcPda->resetOutput();
 				tcPda->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
+				break;
+#else
+			case TS_PDA:
 				break;
 #endif
 			case TS_CONSOLE:
@@ -989,6 +992,10 @@ extern "C"
 			case TS_GAME:
 				useMouse = false;
 
+				// Always set these so they are never wrong
+				if(tcGameMain) tcGameMain->setAlpha(gameControlsAlpha);
+				if(tcCustomButtons) tcCustomButtons->setAlpha(gameControlsAlpha);
+
 				if(!hideGameAndMenu)
 				{
 					tcGameMain->setEnabled(true);
@@ -996,8 +1003,8 @@ extern "C"
 
 					if(showCustomOn || showCustomAlways)   // Also remember if custom buttons were shown
 					{
-						tcCutomButtons->setEnabled(true);
-						tcCutomButtons->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
+						tcCustomButtons->setEnabled(true);
+						tcCustomButtons->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 					}
 
 					// Bring back weapon numbers
@@ -1028,9 +1035,9 @@ extern "C"
 			break;
 
 			case TS_CUSTOM:
-				tcCutomButtons->setEnabled(true);
-				tcCutomButtons->setAlpha(1.0);
-				tcCutomButtons->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
+				tcCustomButtons->setEnabled(true);
+				tcCustomButtons->setAlpha(1.0);
+				tcCustomButtons->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 				break;
 
 			case TS_DEMO:
@@ -1054,6 +1061,9 @@ extern "C"
 					tcPda->setEnabled(true);
 					tcPda->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 				}
+				break;
+#else
+			case TS_PDA:
 				break;
 #endif
 			case TS_CONSOLE:
@@ -1118,6 +1128,43 @@ extern "C"
 	}
 
 
+	static void createCustomControls( touchcontrols::TouchControls* customControls)
+	{
+		customControls->addControl(new touchcontrols::Button("A", touchcontrols::RectF(5, 5, 7, 7), "Custom_1", PORT_ACT_CUSTOM_0, false, false, "Custom 1 (KP1)", touchcontrols::COLOUR_RED2));
+		customControls->addControl(new touchcontrols::Button("B", touchcontrols::RectF(7, 5, 9, 7), "Custom_2", PORT_ACT_CUSTOM_1, false, false, "Custom 2 (KP2)", touchcontrols::COLOUR_RED2));
+		customControls->addControl(new touchcontrols::Button("C", touchcontrols::RectF(5, 7, 7, 9), "Custom_3", PORT_ACT_CUSTOM_2, false, false, "Custom 3 (KP3)", touchcontrols::COLOUR_BLUE1));
+
+		customControls->addControl(new touchcontrols::Button("D", touchcontrols::RectF(7, 7, 9, 9), "Custom_4", PORT_ACT_CUSTOM_3, false, false, "Custom 4 (KP4)", touchcontrols::COLOUR_BLUE1));
+		customControls->addControl(new touchcontrols::Button("E", touchcontrols::RectF(5, 9, 7, 11), "Custom_5", PORT_ACT_CUSTOM_4, false, false, "Custom 5 (KP5)", touchcontrols::COLOUR_GREEN2));
+		customControls->addControl(new touchcontrols::Button("F", touchcontrols::RectF(7, 9, 9, 11), "Custom_6", PORT_ACT_CUSTOM_5, false, false, "Custom 6 (KP6)", touchcontrols::COLOUR_GREEN2));
+
+		customControls->addControl(new touchcontrols::Button("G", touchcontrols::RectF(5, 11, 7, 13), "custom_a", PORT_ACT_CUSTOM_6, false, true, "Custom 7 (KP7)", touchcontrols::COLOUR_NONE));
+		customControls->addControl(new touchcontrols::Button("H", touchcontrols::RectF(7, 11, 9, 13), "custom_b", PORT_ACT_CUSTOM_7, false, true, "Custom 8 (KP8)", touchcontrols::COLOUR_NONE));
+		customControls->addControl(new touchcontrols::Button("I", touchcontrols::RectF(5, 13, 7, 15), "custom_c", PORT_ACT_CUSTOM_8, false, true, "Custom 9 (KP9)", touchcontrols::COLOUR_NONE));
+		customControls->addControl(new touchcontrols::Button("J", touchcontrols::RectF(7, 13, 9, 15), "custom_d", PORT_ACT_CUSTOM_9, false, true, "Custom 10 (KP0)", touchcontrols::COLOUR_NONE));
+
+		touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1", touchcontrols::RectF(10, 7, 12, 9), "quad_slide", "slide_arrow", PORT_ACT_CUSTOM_10, PORT_ACT_CUSTOM_11, PORT_ACT_CUSTOM_12, PORT_ACT_CUSTOM_13, false, "Quad Slide 1 (A - D)");
+		customControls->addControl(qs1);
+
+		touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2", touchcontrols::RectF(14, 7, 16, 9), "quad_slide", "slide_arrow", PORT_ACT_CUSTOM_14, PORT_ACT_CUSTOM_15, PORT_ACT_CUSTOM_16, PORT_ACT_CUSTOM_17, false, "Quad Slide 2 (E - H)");
+		customControls->addControl(qs2);
+
+		touchcontrols::QuadSlide *qs3 = new touchcontrols::QuadSlide("quad_slide_3", touchcontrols::RectF(10, 11, 12, 13), "quad_slide_2", "slide_arrow", PORT_ACT_CUSTOM_18, PORT_ACT_CUSTOM_19, PORT_ACT_CUSTOM_20, PORT_ACT_CUSTOM_21, true, "Quad Slide 3 (I - L)");
+		customControls->addControl(qs3);
+
+		touchcontrols::QuadSlide *qs4 = new touchcontrols::QuadSlide("quad_slide_4", touchcontrols::RectF(14, 11, 16, 13), "quad_slide_2", "slide_arrow", PORT_ACT_CUSTOM_22, PORT_ACT_CUSTOM_23, PORT_ACT_CUSTOM_24, PORT_ACT_CUSTOM_25, true, "Quad Slide 4 (M - P)");
+		customControls->addControl(qs4);
+		//customControls->setColor(0.7,0.7,1.f);
+
+		qs1->signal.connect(sigc::ptr_fun(&customButton));
+		qs2->signal.connect(sigc::ptr_fun(&customButton));
+		qs3->signal.connect(sigc::ptr_fun(&customButton));
+		qs4->signal.connect(sigc::ptr_fun(&customButton));
+		customControls->signal_button.connect(sigc::ptr_fun(&customButton));
+		customControls->signal_settingsButton.connect(sigc::ptr_fun(&customSettingsButton));
+		customControls->setAlpha(gameControlsAlpha);
+	}
+
 #ifdef D3ES
 	void initControlsDoom3(const char * xmlPath)
 	{
@@ -1133,6 +1180,7 @@ extern "C"
 			tcWeaponWheel = new touchcontrols::TouchControls("weapon_wheel", false, true, 1, false);
 			tcBlank = new touchcontrols::TouchControls("blank", true, false);
 			tcKeyboard = new touchcontrols::TouchControls("keyboard", false, false);
+			tcCustomButtons = new touchcontrols::TouchControls("custom_buttons", false, true, 1, true);
             tcPda = new touchcontrols::TouchControls("pda", false, false);
 			tcGamepadUtility = new touchcontrols::TouchControls("gamepad_utility", false, false);
 
@@ -1176,7 +1224,7 @@ extern "C"
 			tcGameMain->addControl(new touchcontrols::Button("pda", touchcontrols::RectF(16, 0, 18, 2), "gamma", PORT_ACT_HELPCOMP, false, false, "Show PDA"));
 			tcGameMain->addControl(new touchcontrols::Button("zoom", touchcontrols::RectF(18, 3, 20, 5), "zoom", PORT_ACT_ZOOM_IN, false, false, "Zoom (smart toggle)"));
 			tcGameMain->addControl(new touchcontrols::Button("sprint", touchcontrols::RectF(0, 7, 2, 9), "sprint", PORT_ACT_SPRINT, false, false, "Sprint (smart toggle)"));
-
+			tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 7, 2, 9), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
 
 			touchJoyRight = new touchcontrols::TouchJoy("touch", touchcontrols::RectF(17, 4, 26, 16), "look_arrow", "fixed_stick_circle");
 			tcGameMain->addControl(touchJoyRight);
@@ -1195,6 +1243,10 @@ extern "C"
 
 			tcGameMain->signal_button.connect(sigc::ptr_fun(&gameButton));
 			tcGameMain->signal_settingsButton.connect(sigc::ptr_fun(&gameSettingsButton));
+
+			//CUSTOM BUTTONS -------------------------------------------
+            //-------------------------------------------
+			createCustomControls(tcCustomButtons);
 
 			//PDA -------------------------------------------
 			//------------------------------------------------------
@@ -1269,6 +1321,7 @@ extern "C"
 			controlsContainer.addControlGroup(tcKeyboard);
 			controlsContainer.addControlGroup(tcGamepadUtility);
 			controlsContainer.addControlGroup(tcMenuMain);
+			controlsContainer.addControlGroup(tcCustomButtons);
 			controlsContainer.addControlGroup(tcGameMain);
 			controlsContainer.addControlGroup(tcGameWeapons);
 			controlsContainer.addControlGroup(tcWeaponWheel);
@@ -1281,6 +1334,7 @@ extern "C"
 			tcGameMain->setXMLFile((std::string)xmlPath +  "/game_d3es.xml");
 			tcWeaponWheel->setXMLFile((std::string)xmlPath +  "/weaponwheel_d3es.xml");
 			tcGameWeapons->setXMLFile((std::string)xmlPath +  "/weapons_d3es.xml");
+			tcCustomButtons->setXMLFile((std::string)xmlPath +  "/custom_buttons_d3es.xml");
 		}
 		else
 			LOGI("NOT creating controls");
@@ -1307,7 +1361,7 @@ extern "C"
 			tcWeaponWheel = new touchcontrols::TouchControls("weapon_wheel", false, true, 1, false);
 			tcAutomap = new touchcontrols::TouchControls("automap", false, false);
 			tcBlank = new touchcontrols::TouchControls("blank", true, false);
-			tcCutomButtons = new touchcontrols::TouchControls("custom_buttons", false, true, 1, true);
+			tcCustomButtons = new touchcontrols::TouchControls("custom_buttons", false, true, 1, true);
 			tcKeyboard = new touchcontrols::TouchControls("keyboard", false, false);
 			tcDemo = new touchcontrols::TouchControls("demo_playback", false, false);
 			tcGamepadUtility = new touchcontrols::TouchControls("gamepad_utility", false, false);
@@ -1542,39 +1596,7 @@ extern "C"
 
 			//Custom Controls -------------------------------------------
 			//------------------------------------------------------
-			tcCutomButtons->addControl(new touchcontrols::Button("A", touchcontrols::RectF(5, 5, 7, 7), "Custom_1", PORT_ACT_CUSTOM_0, false, false, "Custom 1 (KP1)", touchcontrols::COLOUR_RED2));
-			tcCutomButtons->addControl(new touchcontrols::Button("B", touchcontrols::RectF(7, 5, 9, 7), "Custom_2", PORT_ACT_CUSTOM_1, false, false, "Custom 2 (KP2)", touchcontrols::COLOUR_RED2));
-			tcCutomButtons->addControl(new touchcontrols::Button("C", touchcontrols::RectF(5, 7, 7, 9), "Custom_3", PORT_ACT_CUSTOM_2, false, false, "Custom 3 (KP3)", touchcontrols::COLOUR_BLUE1));
-
-			tcCutomButtons->addControl(new touchcontrols::Button("D", touchcontrols::RectF(7, 7, 9, 9), "Custom_4", PORT_ACT_CUSTOM_3, false, false, "Custom 4 (KP4)", touchcontrols::COLOUR_BLUE1));
-			tcCutomButtons->addControl(new touchcontrols::Button("E", touchcontrols::RectF(5, 9, 7, 11), "Custom_5", PORT_ACT_CUSTOM_4, false, false, "Custom 5 (KP5)", touchcontrols::COLOUR_GREEN2));
-			tcCutomButtons->addControl(new touchcontrols::Button("F", touchcontrols::RectF(7, 9, 9, 11), "Custom_6", PORT_ACT_CUSTOM_5, false, false, "Custom 6 (KP6)", touchcontrols::COLOUR_GREEN2));
-
-			tcCutomButtons->addControl(new touchcontrols::Button("G", touchcontrols::RectF(5, 11, 7, 13), "custom_a", PORT_ACT_CUSTOM_6, false, true, "Custom 7 (KP7)", touchcontrols::COLOUR_NONE));
-			tcCutomButtons->addControl(new touchcontrols::Button("H", touchcontrols::RectF(7, 11, 9, 13), "custom_b", PORT_ACT_CUSTOM_7, false, true, "Custom 8 (KP8)", touchcontrols::COLOUR_NONE));
-			tcCutomButtons->addControl(new touchcontrols::Button("I", touchcontrols::RectF(5, 13, 7, 15), "custom_c", PORT_ACT_CUSTOM_8, false, true, "Custom 9 (KP9)", touchcontrols::COLOUR_NONE));
-			tcCutomButtons->addControl(new touchcontrols::Button("J", touchcontrols::RectF(7, 13, 9, 15), "custom_d", PORT_ACT_CUSTOM_9, false, true, "Custom 10 (KP0)", touchcontrols::COLOUR_NONE));
-
-			touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1", touchcontrols::RectF(10, 7, 12, 9), "quad_slide", "slide_arrow", PORT_ACT_CUSTOM_10, PORT_ACT_CUSTOM_11, PORT_ACT_CUSTOM_12, PORT_ACT_CUSTOM_13, false, "Quad Slide 1 (A - D)");
-			tcCutomButtons->addControl(qs1);
-
-			touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2", touchcontrols::RectF(14, 7, 16, 9), "quad_slide", "slide_arrow", PORT_ACT_CUSTOM_14, PORT_ACT_CUSTOM_15, PORT_ACT_CUSTOM_16, PORT_ACT_CUSTOM_17, false, "Quad Slide 2 (E - H)");
-			tcCutomButtons->addControl(qs2);
-
-			touchcontrols::QuadSlide *qs3 = new touchcontrols::QuadSlide("quad_slide_3", touchcontrols::RectF(10, 11, 12, 13), "quad_slide_2", "slide_arrow", PORT_ACT_CUSTOM_18, PORT_ACT_CUSTOM_19, PORT_ACT_CUSTOM_20, PORT_ACT_CUSTOM_21, true, "Quad Slide 3 (I - L)");
-			tcCutomButtons->addControl(qs3);
-
-			touchcontrols::QuadSlide *qs4 = new touchcontrols::QuadSlide("quad_slide_4", touchcontrols::RectF(14, 11, 16, 13), "quad_slide_2", "slide_arrow", PORT_ACT_CUSTOM_22, PORT_ACT_CUSTOM_23, PORT_ACT_CUSTOM_24, PORT_ACT_CUSTOM_25, true, "Quad Slide 4 (M - P)");
-			tcCutomButtons->addControl(qs4);
-			//tcCutomButtons->setColor(0.7,0.7,1.f);
-
-			qs1->signal.connect(sigc::ptr_fun(&customButton));
-			qs2->signal.connect(sigc::ptr_fun(&customButton));
-			qs3->signal.connect(sigc::ptr_fun(&customButton));
-			qs4->signal.connect(sigc::ptr_fun(&customButton));
-			tcCutomButtons->signal_button.connect(sigc::ptr_fun(&customButton));
-			tcCutomButtons->signal_settingsButton.connect(sigc::ptr_fun(&customSettingsButton));
-			tcCutomButtons->setAlpha(gameControlsAlpha);
+			createCustomControls(tcCustomButtons);
 
 			//Gamepad utility -------------------------------------------
 			//------------------------------------------------------
@@ -1624,7 +1646,7 @@ extern "C"
 			controlsContainer.addControlGroup(tcInventory); // before gamemain so touches don't go through
 			controlsContainer.addControlGroup(tcGamepadUtility); // before gamemain so touches don't go through
 			controlsContainer.addControlGroup(tcDPadInventory);
-			controlsContainer.addControlGroup(tcCutomButtons);
+			controlsContainer.addControlGroup(tcCustomButtons);
 			controlsContainer.addControlGroup(tcGameMain);
 			controlsContainer.addControlGroup(tcYesNo);
 			controlsContainer.addControlGroup(tcGameWeapons);
@@ -1651,7 +1673,7 @@ extern "C"
 			tcInventory->setXMLFile((std::string)xmlPath +  "/inventory_" ENGINE_NAME ".xml");
 			tcWeaponWheel->setXMLFile((std::string)xmlPath +  "/weaponwheel_" ENGINE_NAME ".xml");
 			tcGameWeapons->setXMLFile((std::string)xmlPath +  "/weapons_" ENGINE_NAME ".xml");
-			tcCutomButtons->setXMLFile((std::string)xmlPath +  "/custom_buttons_0_" ENGINE_NAME ".xml");
+			tcCustomButtons->setXMLFile((std::string)xmlPath +  "/custom_buttons_0_" ENGINE_NAME ".xml");
 		}
 		else
 			LOGI("NOT creating controls");
@@ -1991,8 +2013,8 @@ extern "C"
 		if(tcInventory)
 			tcInventory->saveXML(path + "/tcInventory.xml");
 
-		if(tcCutomButtons)
-			tcCutomButtons->saveXML(path + "/tcCustomButtons.xml");
+		if(tcCustomButtons)
+			tcCustomButtons->saveXML(path + "/tcCustomButtons.xml");
 
 		return false;
 	}
@@ -2018,10 +2040,10 @@ extern "C"
 			tcInventory->save();
 		}
 
-		if(tcCutomButtons)
+		if(tcCustomButtons)
 		{
-			tcCutomButtons->loadXML(path + "/tcCustomButtons.xml");
-			tcCutomButtons->save();
+			tcCustomButtons->loadXML(path + "/tcCustomButtons.xml");
+			tcCustomButtons->save();
 		}
 
 	 	return false;
