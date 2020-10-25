@@ -25,6 +25,17 @@ extern "C"
 
 	JNIEnv* env_;
 
+	int Android_JNI_SendMessage(int command, int param);
+	#define COMMAND_EXIT_APP  0x8007
+
+	void exit(int status)
+	{
+		LOGI("EXIT OVERRIDE!!!");
+		Android_JNI_SendMessage(COMMAND_EXIT_APP, 0);
+
+		usleep(1000 * 1000 * 5); // Wait 5 seconds
+		exit(0); // This should never happen because the SDLActivity should have killed the process already
+	}
 
 //#define JAVA_FUNC(x) Java_com_beloko_opengames_gzdoom2_NativeLib_##x
 
@@ -44,8 +55,11 @@ extern "C"
 	static const char * argv[128];
 
 	const char *nativeLibsPath;
+	const char *sourceFilePath_c;
+
 	std::string userFilesPath;
 	std::string tmpFilesPath;
+	std::string sourceFilePath;
 
 	static const char *key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArVTuCs3MUfRpivh5ETTzfgq+pdSHPfvWKKOsqLdyugv37TPWGfjHADzI+Ryst8qdObT9qEfKQXbd5PLC6+Lspl3/N8L+FXJO5tNSzcxDNr/gCXgR/vs+YiRpyuCJMNcuwPHfDIKdBmPaFxQAxSggdzoWfEmTXyaA1S8PZprT1GcOIB1scLUWpXPjzZeOTXwEzD20HWKeR+oG7PzFBAF85clKu5Y2bypoBcmnlpBl3nK2TdNJdESitxjS5CssRp5zBxYQ6BnMfDI1W8n2QCatFb+lAHcnhye/FB8/nA476b2WOw3VBkk5CspXhDNRom6dCMfP1HTxHrH6Q0LFh81SxQIDAQAB";
 	static const char *pkg = "com.opentouchgaming.quadtouch";
@@ -53,7 +67,7 @@ extern "C"
 	char pkgGlobal[64];
 
 	jint EXPORT_ME
-	JAVA_FUNC(init)(JNIEnv* env,	jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles, jstring tmpFiles)
+	JAVA_FUNC(init)(JNIEnv* env,	jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles, jstring tmpFiles, jstring sourceFiles)
 	{
 		env_ = env;
 
@@ -64,6 +78,9 @@ extern "C"
 		userFilesPath = (char *)(env)->GetStringUTFChars(userFiles, 0);
 		tmpFilesPath = (char *)(env)->GetStringUTFChars(tmpFiles, 0);
 		tmpFilesPath += "/tmpfile-XXXXXX";
+
+		sourceFilePath = (char *)(env)->GetStringUTFChars(sourceFiles, 0);
+		sourceFilePath_c = sourceFilePath.c_str();
 
 		nativeLibsPath = native_libs_path.c_str();
 
