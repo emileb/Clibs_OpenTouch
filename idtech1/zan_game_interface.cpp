@@ -145,8 +145,20 @@ static void buttonChange(int state, FButtonStatus *button)
 
 void PortableMouse(float dx, float dy)
 {
+	static float mx = 0;
+	static float my = 0;
 	//LOGI("%f %f",dx,dy);
-	Android_OnMouse(0, ACTION_MOVE_REL, -dx * 1000, -dy * 600);
+	mx += -dx * screen->GetWidth();
+	my +=  -dy * screen->GetHeight();
+	if((fabs(mx) > 1) || (fabs(my) > 1) )
+	{
+		Android_OnMouse(0, ACTION_MOVE_REL, mx, my);
+	}
+	if (fabs(mx) > 1)
+		mx = 0;
+
+	if (fabs(my) > 1)
+		my = 0;
 }
 
 void PortableMouseButton(int state, int button, float dx, float dy)

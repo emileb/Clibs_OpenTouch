@@ -100,6 +100,8 @@ extern "C"
 
 	static bool useMouse = false;
 
+	static bool gameShowMouse = false;
+
 // Show buttons in game
 	static bool showCustomAlways = false;
 	static bool showCustomOn = false;
@@ -806,14 +808,14 @@ extern "C"
 			return;
 		}
 
+		char text[2] = {0,0};
+
 		// Only send printable chars
 		if(key >= 32 && key <= 125)
 		{
-			char text[2];
 			text[0] = key;
 			text[1] = 0;
 
-			SDL_SendKeyboardText(text);
 		}
 
 		// Change upper case to lower case to get scan code
@@ -821,19 +823,18 @@ extern "C"
 		{
 			key = key + 32;
 		}
-
 		SDL_Scancode sc = SDL_GetScancodeFromKey(key);
 
+		// Send scancode
 		if(sc != SDL_SCANCODE_UNKNOWN)
 		{
-			LOGI("scan code: %d", sc);
-//SDL_SendKeyboardKey( SDL_PRESSED, SDL_SCANCODE_LSHIFT );
-//SDL_SetModState( KMOD_LSHIFT );
 			SDL_SendKeyboardKey(SDL_PRESSED, sc);
 			SDL_SendKeyboardKey(SDL_RELEASED, sc);
-//SDL_SetModState( KMOD_NONE );
-// SDL_SendKeyboardKey( SDL_RELEASED, SDL_SCANCODE_LSHIFT );
 		}
+
+		// Send text if avaliable
+		if(text[0])
+			SDL_SendKeyboardText(text);
 	}
 
 	static void mouse_move(int action, float x, float y, float mouse_x, float mouse_y)
@@ -844,21 +845,10 @@ extern "C"
 		{
 			PortableMouse(mouse_x, mouse_y);
 		}
-
-		/* // Dont do this because pressing the other buttons will cause a tap
-		else if( action == TOUCHMOUSE_TAP )
-		{
-		    PortableAction(1, PORT_ACT_MENU_SELECT);
-		    PortableAction(0, PORT_ACT_MENU_SELECT);
-		}
-		*/
-#endif
-
-#if defined(D3ES)
-		if(action == TOUCHMOUSE_TAP)
+		else if(action == TOUCHMOUSE_TAP)
 		{
 			PortableMouseButton(1, 1, 0, 0);
-			usleep(200 * 1000); // Need this for the PDA to work, needs a frame to react..
+			usleep(200 * 1000); // Need this for the PDA to work in D3, needs a frame to react..
 			PortableMouseButton(0, 1, 0, 0);
 		}
 #endif
@@ -867,9 +857,8 @@ extern "C"
 	static void mouseButton(int state, int code)
 	{
 #if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES)
-
-		// Auto hide the gamepad utilitie, except if showing consol
-		if((code == KEY_BACK_BUTTON) && state)
+		// Hide the mouse
+		if((code == KEY_USE_MOUSE) && state)
 		{
 			useMouse = false;
 		}
@@ -877,9 +866,24 @@ extern "C"
 		{
 			PortableMouseButton(state, 1, 0, 0);
 		}
-
-		LOGI("usemOuse = %d", useMouse);
+		else if((code == KEY_BACK_BUTTON) && state)
+		{
+			mobileBackButton();
+		}
+		LOGI("useMouse = %d", useMouse);
 #endif
+	}
+
+	static void showSDLMouseCallback(int show)
+	{
+		LOGI("showSDLMouseCallback = %d", show);
+		gameShowMouse = show;
+	}
+
+	static void moveSDLMouseCallback(float x, float y)
+	{
+		LOGI("moveSDLMouseCallback = %f, %f", x, y);
+		controlsContainer.mousePos(x, y);
 	}
 
 
@@ -1118,6 +1122,11 @@ extern "C"
 			screenMode = TS_MOUSE;
 		}
 
+		if(gameShowMouse && useMouse)
+			controlsContainer.showMouse(true);
+		else
+			controlsContainer.showMouse(false);
+
 		updateTouchScreenMode(screenMode);
 
 		setHideSticks(!showSticks);
@@ -1196,6 +1205,7 @@ extern "C"
 			tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 			tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 			tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
+			tcMenuMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(9, 0, 11, 2), "custom_show", KEY_SHOW_CUSTOM));
 
 			// Hide mouse button, try to use tap for now..
 			//tcMenuMain->addControl(new touchcontrols::Button("left_button",touchcontrols::RectF(0,6,3,10),"left_mouse",KEY_LEFT_MOUSE,false,false,"Back"));
@@ -1380,8 +1390,9 @@ extern "C"
 			tcMenuMain->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 10, 6, 16), "enter", PORT_ACT_MENU_SELECT));
 			tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 			// Mouse pointer does not work with SDL
-			//tcMenuMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(5, 0, 7, 2), "left_mouse", KEY_USE_MOUSE));
-
+#if defined(GZDOOM) || defined(ZANDRONUM_30)
+			tcMenuMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE));
+#endif
 #ifndef CHOC_SETUP
 			tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 			tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
@@ -1415,7 +1426,7 @@ extern "C"
 			tcGameMain->addControl(new touchcontrols::Button("quick_load", touchcontrols::RectF(20, 0, 22, 2), "load", PORT_ACT_QUICKLOAD, false, false, "Quick load"));
 			tcGameMain->addControl(new touchcontrols::Button("map", touchcontrols::RectF(2, 0, 4, 2), "map", PORT_ACT_MAP, false, false, "Show map"));
 			tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show keyboard"));
-			tcGameMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "left_mouse", KEY_USE_MOUSE, false, true, "Use mouse"));
+			tcGameMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE, false, true, "Use mouse"));
 
 #if defined(RETRO_DOOM) || defined(CHOCOLATE) || defined (PRBOOM_DOOM)
 			tcGameMain->addControl(new touchcontrols::Button("gamma", touchcontrols::RectF(17, 0, 19, 2), "gamma", PORT_ACT_GAMMA, false, false, "Gamma"));
@@ -1631,13 +1642,16 @@ extern "C"
 			tcDPadInventory->setAlpha(0.9);
 
 			// Mouse for GZDoom
-			touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse", touchcontrols::RectF(0, 0, 26, 16), "");
+			touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse", touchcontrols::RectF(0, 2, 26, 16), "");
 			mouse->setHideGraphics(true);
 			mouse->setEditable(false);
 			tcMouse->addControl(mouse);
 			mouse->signal_action.connect(sigc::ptr_fun(&mouse_move));
 			tcMouse->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Back"));
-			tcMouse->addControl(new touchcontrols::Button("left_button", touchcontrols::RectF(0, 6, 3, 10), "left_mouse", KEY_LEFT_MOUSE, false, false, "Back"));
+			// Hide the mouse button because we can now use a tap
+			//tcMouse->addControl(new touchcontrols::Button("left_button", touchcontrols::RectF(0, 6, 3, 10), "mouse2", KEY_LEFT_MOUSE, false, false, "Back"));
+			tcMouse->addControl(new touchcontrols::Button("hide_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE, false, false, "Hide mouse"));
+			tcMouse->setAlpha(0.9);
 			tcMouse->signal_button.connect(sigc::ptr_fun(&mouseButton));
 
 			//---------------------------------------------------------------
@@ -1731,6 +1745,10 @@ extern "C"
 
 		controlsContainer.openGL_start.connect(sigc::ptr_fun(&openGLStart));
 		controlsContainer.openGL_end.connect(sigc::ptr_fun(&openGLEnd));
+
+
+		SDL_ShowMouseCallBack(showSDLMouseCallback);
+		SDL_MouseMoveCallBack(moveSDLMouseCallback);
 
 #ifdef D3ES
 		initControlsDoom3(graphicpath.c_str());
