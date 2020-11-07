@@ -1,5 +1,7 @@
 #include "port_act_defs.h"
 
+#include <SDL.h>
+
 #ifdef __IOS__
 #define LOGI printf
 #endif
@@ -52,6 +54,20 @@ void PortableAutomapControl(float zoom, float x, float y);
 int PortableShowKeyboard(void);
 touchscreemode_t PortableGetScreenMode();
 
+extern void Android_OnMouse(SDL_Window *window, int button, int action, float x, float y, SDL_bool relative);
+
+#define ACTION_DOWN 0
+#define ACTION_UP 1
+#define BUTTON_PRIMARY 1
+#define BUTTON_SECONDARY 2
+
+inline void MouseButton(int state, int button)
+{
+	if(state)
+ 		Android_OnMouse(NULL, button, ACTION_DOWN, 0, 0, SDL_TRUE);
+	else
+ 		Android_OnMouse(NULL, button, ACTION_UP, 0, 0, SDL_TRUE);
+}
 
 #ifdef __cplusplus
 }
