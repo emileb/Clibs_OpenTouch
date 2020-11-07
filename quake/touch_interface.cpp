@@ -54,6 +54,8 @@ extern "C"
 #define KEY_BACK_BUTTON  0x100B
 #define KEY_SHOW_GYRO    0x100C
 #define KEY_SHOW_GAMEPAD 0x100D
+#define KEY_USE_MOUSE    0x100E
+#define KEY_LEFT_MOUSE   0x100F
 #define KEY_LOAD_SAVE_CONTROLS 0x1010
 
 
@@ -84,6 +86,10 @@ extern "C"
 
 	static bool m_shooting = false;
 	static float precisionSensitivty = 0.5;
+
+	static bool useMouse = false;
+
+	static bool gameShowMouse = false;
 
 // Show buttons in game
 	static bool showCustomAlways = false;
@@ -120,6 +126,7 @@ extern "C"
 //touchcontrols::TouchControls *tcDemo=0;
 	touchcontrols::TouchControls *tcGamepadUtility = 0;
 	touchcontrols::TouchControls *tcDPadInventory = 0;
+	static touchcontrols::TouchControls *tcMouse = 0;
 
 // So can hide and show these buttons
 	touchcontrols::TouchJoy *touchJoyLeft;
@@ -482,6 +489,13 @@ extern "C"
 				mobileBackButton();
 			}
 		}
+		else if(code == KEY_USE_MOUSE)
+		{
+			if(state)
+			{
+				useMouse = true;
+			}
+		}
 		else if(code == PORT_ACT_MAP)
 		{
 			if(state)
@@ -600,6 +614,17 @@ extern "C"
 			if(state)
 				Android_JNI_SendMessage(COMMAND_SHOW_GAMEPAD, 0);
 		}
+		else if(code == KEY_USE_MOUSE)
+		{
+			if(state)
+			{
+				useMouse = true;
+			}
+		}
+		else if(code == PORT_ACT_CONSOLE)
+		{
+			PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
+		}
 		else
 		{
 			PortableAction(state, code);
@@ -707,25 +732,6 @@ extern "C"
 		Android_JNI_SendMessage(COMMAND_SET_BACKLIGHT, y * 255);
 	}
 
-#ifdef QUAKE3
-	static void mouse_move(int action, float x, float y, float mouse_x, float mouse_y)
-	{
-
-		if(action == TOUCHMOUSE_MOVE)
-		{
-			PortableMouse(mouse_x, mouse_y);
-		}
-
-		/* // Dont do this because pressing the other buttons will cause a tap
-		else if( action == TOUCHMOUSE_TAP )
-		{
-		    PortableAction(1, PORT_ACT_MENU_SELECT);
-		    PortableAction(0, PORT_ACT_MENU_SELECT);
-		}
-		*/
-	}
-#endif
-
 	static void touchSettings(touchcontrols::tTouchSettings settings)
 	{
 		gameControlsAlpha = settings.alpha;
@@ -788,14 +794,14 @@ extern "C"
 			return;
 		}
 
+		char text[2] = {0,0};
+
 		// Only send printable chars
 		if(key >= 32 && key <= 125)
 		{
-			char text[2];
 			text[0] = key;
 			text[1] = 0;
 
-			SDL_SendKeyboardText(text);
 		}
 
 		// Change upper case to lower case to get scan code
@@ -803,15 +809,62 @@ extern "C"
 		{
 			key = key + 32;
 		}
-
 		SDL_Scancode sc = SDL_GetScancodeFromKey(key);
 
+		// Send scancode
 		if(sc != SDL_SCANCODE_UNKNOWN)
 		{
-			LOGI("scan code: %d", sc);
 			SDL_SendKeyboardKey(SDL_PRESSED, sc);
 			SDL_SendKeyboardKey(SDL_RELEASED, sc);
 		}
+
+		// Send text if avaliable
+		if(text[0])
+			SDL_SendKeyboardText(text);
+	}
+
+	static void mouse_move(int action, float x, float y, float mouse_x, float mouse_y)
+	{
+		if(action == TOUCHMOUSE_MOVE)
+		{
+			PortableMouse(mouse_x, mouse_y);
+		}
+		else if(action == TOUCHMOUSE_TAP)
+		{
+			//PortableMouseButton(1, 1, 0, 0);
+			//usleep(200 * 1000); // Need this for the PDA to work in D3, needs a frame to react..
+			//PortableMouseButton(0, 1, 0, 0);
+		}
+	}
+
+	static void mouseButton(int state, int code)
+	{
+		// Hide the mouse
+		if((code == KEY_USE_MOUSE) && state)
+		{
+			useMouse = false;
+		}
+		else if(code == KEY_LEFT_MOUSE)
+		{
+			//PortableMouseButton(state, 1, 0, 0);
+		}
+		else if((code == KEY_BACK_BUTTON) && state)
+		{
+			mobileBackButton();
+		}
+		LOGI("useMouse = %d", useMouse);
+	}
+
+	static void showSDLMouseCallback(int show)
+	{
+		LOGI("showSDLMouseCallback = %d", show);
+		gameShowMouse = show;
+	}
+
+	static void moveSDLMouseCallback(float x, float y)
+	{
+		LOGI("moveSDLMouseCallback = %f, %f", x, y);
+		controlsContainer.mousePos(x, y);
 	}
 
 
@@ -863,6 +916,10 @@ extern "C"
 				tcCutomButtons->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
 				break;
 
+			case TS_MOUSE:
+				tcMouse->resetOutput();
+				tcMouse->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
+				break;
 			case TS_CONSOLE:
 			case TS_MAP:
 			case TS_DEMO:
@@ -877,6 +934,8 @@ extern "C"
 				break;
 
 			case TS_MENU:
+				useMouse = false;
+
 				if(!hideGameAndMenu)
 				{
 					tcMenuMain->setEnabled(true);
@@ -891,6 +950,12 @@ extern "C"
 				break;
 
 			case TS_GAME:
+				useMouse = false;
+
+				// Always set these so they are never wrong
+				if(tcGameMain) tcGameMain->setAlpha(gameControlsAlpha);
+				if(tcCutomButtons) tcCutomButtons->setAlpha(gameControlsAlpha);
+
 				if(!hideGameAndMenu)
 				{
 					tcGameMain->setEnabled(true);
@@ -914,6 +979,10 @@ extern "C"
 				tcCutomButtons->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 				break;
 
+			case TS_MOUSE:
+				tcMouse->setEnabled(true);
+				tcMouse->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
+				break;
 			case TS_CONSOLE:
 			case TS_MAP:
 			case TS_DEMO:
@@ -963,6 +1032,15 @@ extern "C"
 			screenMode = TS_CUSTOM;
 		}
 
+		if(((screenMode == TS_GAME) || (screenMode == TS_MENU)) & useMouse)   // Show mouse screen
+		{
+			screenMode = TS_MOUSE;
+		}
+
+		if(gameShowMouse && useMouse)
+			controlsContainer.showMouse(true);
+		else
+			controlsContainer.showMouse(false);
 		updateTouchScreenMode(screenMode);
 
 		setHideSticks(!showSticks);
@@ -1021,6 +1099,7 @@ extern "C"
 			tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 			tcMenuMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE));
 			tcMenuMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(9, 0, 11, 2), "custom_show", KEY_SHOW_CUSTOM));
+			//tcMenuMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE));
 
 			tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 			tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
@@ -1597,6 +1676,13 @@ extern "C"
 			return 0;
 	}
 
+	void weaponWheelSettings(bool useMoveStick, int mode, int autoTimeout)
+	{
+		weaponWheelMoveStick = useMoveStick;
+		weaponWheelGamepadMode = (touchcontrols::WheelSelectMode)mode;
+		weaponWheelAutoTimout = autoTimeout;
+	}
+
 	int volumeKey(int state, bool volumeUp)
 	{
 		if(currentScreenMode == TS_GAME) // Allow real volume to change when not in game
@@ -1619,13 +1705,6 @@ extern "C"
 			}
 		}
 		return 0;
-	}
-
-	void weaponWheelSettings(bool useMoveStick, int mode, int autoTimeout)
-	{
-		weaponWheelMoveStick = useMoveStick;
-		weaponWheelGamepadMode = (touchcontrols::WheelSelectMode)mode;
-		weaponWheelAutoTimout = autoTimeout;
 	}
 
 	TouchControlsInterface* mobileGetTouchInterface()

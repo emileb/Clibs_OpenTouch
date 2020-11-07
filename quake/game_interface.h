@@ -29,7 +29,8 @@ typedef enum
 	TS_CONSOLE,
 	TS_Y_N,
 	TS_CUSTOM,
-	TS_DEMO
+	TS_DEMO,
+	TS_MOUSE
 } touchscreemode_t;
 
 
