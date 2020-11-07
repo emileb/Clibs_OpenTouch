@@ -106,6 +106,8 @@ extern "C"
 		setenv("HOME", game_path.c_str(), 1);
 		setenv("USER_FILES", userFilesPath.c_str(), 1);
 
+		if(options & GAME_OPTION_SDL_OLD_AUDIO)
+			setenv("SDL_AUDIODRIVER", "android", 1);
 
 // quakespasm spiked AND Hexen2 uses GL4ES. But Hexen uses it in GLES1 mode
 #ifdef QUAKESPASM_SPIKED
@@ -118,7 +120,6 @@ extern "C"
 		//setenv("LIBGL_NOCLEAN","1",1);
 		//setenv("LIBGL_NOES2COMPAT","1",1);
 		//setenv("LIBGL_GLXRECYCLE","1",1);
-
 #endif
 
 		chdir(game_path.c_str());
