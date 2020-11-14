@@ -1,6 +1,6 @@
 #include <time.h>
 
-#define TAP_TIME 500
+#define TAP_TIME 300
 
 typedef struct
 {
