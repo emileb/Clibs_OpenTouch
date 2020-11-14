@@ -13,6 +13,7 @@
 
 #include "touch_interface.h"
 
+
 #include "quake_game_dll.h"
 
 #include <GLES/gl.h> // This is OK because YQ2 GLES3 does not call any gl functions yet..
@@ -185,6 +186,36 @@ extern "C"
 	{
 		return gameType;
 	}
+
+
+extern void Android_OnMouse(SDL_Window *window, int button, int action, float x, float y, SDL_bool relative);
+
+
+void MouseButton(int state, int button)
+{
+	if(state)
+ 		SDL_InjectMouse(button, ACTION_DOWN, 0, 0, SDL_TRUE);
+	else
+ 		SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
+}
+
+void MouseMove(float dx, float dy)
+{
+	static float mx = 0;
+	static float my = 0;
+	//LOGI("%f %f",dx,dy);
+	mx += -dx;
+	my +=  -dy;
+	if((fabs(mx) > 1) || (fabs(my) > 1) )
+	{
+		SDL_InjectMouse(0, ACTION_MOVE, mx, my, SDL_TRUE);
+	}
+	if (fabs(mx) > 1)
+		mx = 0;
+
+	if (fabs(my) > 1)
+		my = 0;
+}
 
 #ifdef DARKPLACES
 //These are in gl_backend
@@ -827,13 +858,13 @@ extern "C"
 	{
 		if(action == TOUCHMOUSE_MOVE)
 		{
-			PortableMouse(mouse_x, mouse_y);
+			MouseMove(mouse_x * mobile_screen_width, mouse_y * mobile_screen_height);
 		}
 		else if(action == TOUCHMOUSE_TAP)
 		{
-			//PortableMouseButton(1, 1, 0, 0);
-			//usleep(200 * 1000); // Need this for the PDA to work in D3, needs a frame to react..
-			//PortableMouseButton(0, 1, 0, 0);
+			MouseButton(1, BUTTON_PRIMARY);
+			usleep(200 * 1000);
+			MouseButton(0, BUTTON_PRIMARY);
 		}
 	}
 
@@ -1085,6 +1116,7 @@ extern "C"
 			//tcDemo = new touchcontrols::TouchControls("demo_playback",false,false);
 			tcGamepadUtility = new touchcontrols::TouchControls("gamepad_utility", false, false);
 			tcDPadInventory = new touchcontrols::TouchControls("dpad_inventory", false, false);
+			tcMouse = new touchcontrols::TouchControls("mouse", false, false);
 
 			//Menu -------------------------------------------
 			//------------------------------------------------------
@@ -1145,17 +1177,17 @@ extern "C"
 			b->setAllowPassThrough(false);
 			tcMenuMain->addControl(b);
 
+			touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24, 3, 26, 11), "brightness_slider");
+			brightnessSlide->signal_action.connect(sigc::ptr_fun(& brightnessSlideMouse));
+			brightnessSlide->setAllowPassThrough(false);
+			tcMenuMain->addControl(brightnessSlide);
 
 			// Mouse at end
-			touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse", touchcontrols::RectF(0, 0, 26, 16), "");
+			touchcontrols::Mouse *mouse = new touchcontrols::Mouse("mouse", touchcontrols::RectF(0, 2, 26, 16), "");
 			mouse->setHideGraphics(true);
 			mouse->setEditable(false);
 			tcMenuMain->addControl(mouse);
 			mouse->signal_action.connect(sigc::ptr_fun(&mouse_move));
-
-			touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24, 3, 26, 11), "brightness_slider");
-			brightnessSlide->signal_action.connect(sigc::ptr_fun(& brightnessSlideMouse));
-			tcMenuMain->addControl(brightnessSlide);
 #endif
 
 			tcMenuMain->signal_button.connect(sigc::ptr_fun(&menuButton));
@@ -1371,6 +1403,18 @@ extern "C"
 			tcDPadInventory->addControl(dpadInventory);
 			tcDPadInventory->setAlpha(0.9);
 
+			// Mouse -------------------------------------------
+			//------------------------------------------------------
+			touchcontrols::Mouse *mouseMainMenu = new touchcontrols::Mouse("mouse", touchcontrols::RectF(0, 2, 26, 16), "");
+			mouseMainMenu->setHideGraphics(true);
+			mouseMainMenu->setEditable(false);
+			tcMouse->addControl(mouseMainMenu);
+			mouseMainMenu->signal_action.connect(sigc::ptr_fun(&mouse_move));
+			tcMouse->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Back"));
+			tcMouse->addControl(new touchcontrols::Button("hide_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE, false, false, "Hide mouse"));
+			tcMouse->setAlpha(0.9);
+			tcMouse->signal_button.connect(sigc::ptr_fun(&mouseButton));
+
 
 			//---------------------------------------------------------------
 			//---------------------------------------------------------------
@@ -1385,9 +1429,8 @@ extern "C"
 
 			controlsContainer.addControlGroup(tcMenuMain);
 			controlsContainer.addControlGroup(tcWeaponWheel);
-			//controlsContainer.addControlGroup(tcAutomap);
 			controlsContainer.addControlGroup(tcBlank);
-			//controlsContainer.addControlGroup(tcDemo);
+			controlsContainer.addControlGroup(tcMouse);
 
 			controlsCreated = 1;
 
@@ -1467,6 +1510,9 @@ extern "C"
 		putenv((char*)"TIMIDITY_CFG=./audiopack/snd_timidity/timidity.cfg");
 
 		initControls(mobile_screen_width, -mobile_screen_height, graphicpath.c_str());
+
+		SDL_ShowMouseCallBack(showSDLMouseCallback);
+		SDL_MouseMoveCallBack(moveSDLMouseCallback);
 #endif
 
 	}

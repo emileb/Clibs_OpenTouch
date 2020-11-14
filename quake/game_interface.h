@@ -37,7 +37,7 @@ typedef enum
 void PortableInit(int argc, const char ** argv);
 
 
-void PortableBackButton();
+void PortableBackButton(void);
 
 int PortableKeyEvent(int state, int code, int unitcode);
 void PortableAction(int state, int action);
@@ -55,20 +55,15 @@ void PortableAutomapControl(float zoom, float x, float y);
 int PortableShowKeyboard(void);
 touchscreemode_t PortableGetScreenMode();
 
-extern void Android_OnMouse(SDL_Window *window, int button, int action, float x, float y, SDL_bool relative);
-
 #define ACTION_DOWN 0
 #define ACTION_UP 1
+#define ACTION_MOVE 2
 #define BUTTON_PRIMARY 1
 #define BUTTON_SECONDARY 2
 
-inline void MouseButton(int state, int button)
-{
-	if(state)
- 		Android_OnMouse(NULL, button, ACTION_DOWN, 0, 0, SDL_TRUE);
-	else
- 		Android_OnMouse(NULL, button, ACTION_UP, 0, 0, SDL_TRUE);
-}
+extern void MouseButton(int state, int button);
+
+extern void MouseMove(float dx, float dy);
 
 #ifdef __cplusplus
 }
