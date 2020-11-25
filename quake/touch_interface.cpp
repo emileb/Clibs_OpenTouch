@@ -652,10 +652,6 @@ void MouseMove(float dx, float dy)
 				useMouse = true;
 			}
 		}
-		else if(code == PORT_ACT_CONSOLE)
-		{
-			PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
-		}
 		else
 		{
 			PortableAction(state, code);
