@@ -1352,16 +1352,16 @@ void MouseMove(float dx, float dy)
 			tcCutomButtons->addControl(new touchcontrols::Button("I", touchcontrols::RectF(5, 13, 7, 15), "custom_c", PORT_ACT_CUSTOM_8, false, true, "Custom 9 (P)", touchcontrols::COLOUR_NONE));
 			tcCutomButtons->addControl(new touchcontrols::Button("J", touchcontrols::RectF(7, 13, 9, 15), "custom_d", PORT_ACT_CUSTOM_9, false, true, "Custom 10 (Q)", touchcontrols::COLOUR_NONE));
 
-			//touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_8,PORT_ACT_CUSTOM_9,PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,false,"Quad Slide 1");
-			//tcCutomButtons->addControl(qs1);
+			touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,false,"Quad Slide 1 (R - U)");
+			tcCutomButtons->addControl(qs1);
 
-			//touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,false,"Quad Slide 2");
-			//tcCutomButtons->addControl(qs2);
+			touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,PORT_ACT_CUSTOM_16,PORT_ACT_CUSTOM_17,false,"Quad Slide 2 (V -Y)");
+			tcCutomButtons->addControl(qs2);
 
 			//tcCutomButtons->setColor(0.7,0.7,1.f);
 
-			//qs1->signal.connect(sigc::ptr_fun(&customButton));
-			//qs2->signal.connect(sigc::ptr_fun(&customButton));
+			qs1->signal.connect(sigc::ptr_fun(&customButton));
+			qs2->signal.connect(sigc::ptr_fun(&customButton));
 
 			tcCutomButtons->signal_button.connect(sigc::ptr_fun(&customButton));
 			tcCutomButtons->signal_settingsButton.connect(sigc::ptr_fun(&customSettingsButton));
