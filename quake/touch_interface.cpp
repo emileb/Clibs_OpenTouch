@@ -188,8 +188,6 @@ extern "C"
 	}
 
 
-extern void Android_OnMouse(SDL_Window *window, int button, int action, float x, float y, SDL_bool relative);
-
 
 void MouseButton(int state, int button)
 {
@@ -1355,7 +1353,7 @@ void MouseMove(float dx, float dy)
 			touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,false,"Quad Slide 1 (R - U)");
 			tcCutomButtons->addControl(qs1);
 
-			touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,PORT_ACT_CUSTOM_16,PORT_ACT_CUSTOM_17,false,"Quad Slide 2 (V -Y)");
+			touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,PORT_ACT_CUSTOM_16,PORT_ACT_CUSTOM_17,false,"Quad Slide 2 (V - Y)");
 			tcCutomButtons->addControl(qs2);
 
 			//tcCutomButtons->setColor(0.7,0.7,1.f);

@@ -123,10 +123,12 @@ extern "C"
 		setenv("LIBGL_USEVBO", "0", 1);
 		setenv("LIBGL_NOINTOVLHACK", "1", 1);
 
+		if(options & GAME_OPTION_SDL_OLD_AUDIO)
+			setenv("SDL_AUDIODRIVER", "android", 1);
+
 		chdir(game_path.c_str());
 		strcpy(keyGlobal, key);
 		strcpy(pkgGlobal, pkg);
-
 
 		mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(), options, game);
 		PortableInit(argc, argv); //Never returns!!

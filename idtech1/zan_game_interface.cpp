@@ -75,12 +75,11 @@
 #include "p_local.h"
 #include "autosegs.h"
 
-
+#include "SDL_beloko_extra.h"
 
 extern "C"
 {
 	extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
-	void Android_OnMouse(int androidButton, int action, float x, float y);
 	#include "SmartToggle.h"
 }
 
@@ -152,7 +151,7 @@ void PortableMouse(float dx, float dy)
 	my +=  -dy * screen->GetHeight();
 	if((fabs(mx) > 1) || (fabs(my) > 1) )
 	{
-		Android_OnMouse(0, ACTION_MOVE_REL, mx, my);
+		SDL_InjectMouse(0, ACTION_MOVE, mx, my, SDL_TRUE);
 	}
 	if (fabs(mx) > 1)
 		mx = 0;
@@ -163,10 +162,10 @@ void PortableMouse(float dx, float dy)
 
 void PortableMouseButton(int state, int button, float dx, float dy)
 {
-	if(state)
-		Android_OnMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0);
-	else
-		Android_OnMouse(BUTTON_PRIMARY, ACTION_UP, 0, 0);
+    if( state )
+       	SDL_InjectMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0, SDL_TRUE);
+    else
+        SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
 }
 
 void PortableAction(int state, int action)
