@@ -1465,7 +1465,13 @@ extern "C"
 			tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 			tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
 
+			touchcontrols::ButtonGrid *dpad = new touchcontrols::ButtonGrid("dpad_move", touchcontrols::RectF(6, 3, 12, 7), "", 3, 2, true, "Movement btns (WASD)");
 
+			dpad->addCell(0, 1, "direction_left", PORT_ACT_MOVE_LEFT);
+			dpad->addCell(2, 1, "direction_right", PORT_ACT_MOVE_RIGHT);
+			dpad->addCell(1, 0, "direction_up", PORT_ACT_FWD);
+			dpad->addCell(1, 1, "direction_down", PORT_ACT_BACK);
+			tcGameMain->addControl(dpad);
 
 			touchJoyRight = new touchcontrols::TouchJoy("touch", touchcontrols::RectF(17, 4, 26, 16), "look_arrow", "fixed_stick_circle");
 			tcGameMain->addControl(touchJoyRight);
