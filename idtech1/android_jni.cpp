@@ -12,6 +12,7 @@
 
 #include <unistd.h>
 
+#include "Framebuffer.h"
 
 #ifndef NO_SEC
 #include "./secure/license/license.h"
@@ -141,8 +142,24 @@ extern "C"
 	void EXPORT_ME
 	JAVA_FUNC(setScreenSize)(JNIEnv* env,	jobject thiz, jint width, jint height)
 	{
+		LOGI("setScreenSize %d x %d", width, height);
+
 		android_screen_width = width;
 		android_screen_height = height;
+	}
+
+	void EXPORT_ME
+	JAVA_FUNC(setFramebufferSize)(JNIEnv* env,	jobject thiz, jint width, jint height)
+	{
+		LOGI("setFramebufferSize %d x %d", width, height);
+
+		touchcontrols::fbConfig config;
+		config.vidWidth = width;
+		config.vidHeight = height;
+		config.vidWidthReal = android_screen_width;
+		config.vidHeightReal = android_screen_height;
+
+		touchcontrols::R_FrameBufferConfig(config);
 	}
 
 	int EXPORT_ME

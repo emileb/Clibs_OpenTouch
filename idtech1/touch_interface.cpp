@@ -238,7 +238,6 @@ extern "C"
 	static void openGLStart()
 	{
 #if 1
-
 		touchcontrols::gl_startRender();
 
 #if !defined(D3ES)
@@ -275,7 +274,6 @@ extern "C"
 	static void openGLEnd()
 	{
 #if 1
-
 		touchcontrols::gl_endRender();
 
 #if defined(PRBOOM_DOOM)
@@ -332,7 +330,6 @@ extern "C"
 #endif
 
 #endif
-
 	}
 
 	static void vibrate(int duration)
