@@ -1703,7 +1703,7 @@ extern "C"
 
 
 
-	void mobile_init(int width, int height, const char *pngPath, int options, int game)
+	void mobile_init(int width, int height, const char *pngPath, int options, int wheelNbr, int game)
 	{
 		if(options & GAME_OPTION_AUTO_HIDE_GAMEPAD)
 			gamepadHideTouch = true;

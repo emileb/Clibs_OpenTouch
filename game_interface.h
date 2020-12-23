@@ -36,7 +36,7 @@ typedef enum
 void PortableInit(int argc, const char ** argv);
 
 
-void PortableBackButton();
+void PortableBackButton(void);
 
 int PortableKeyEvent(int state, int code, int unitcode);
 void PortableAction(int state, int action);
@@ -55,6 +55,15 @@ void PortableAutomapControl(float zoom, float x, float y);
 int PortableShowKeyboard(void);
 touchscreemode_t PortableGetScreenMode();
 
+#define ACTION_DOWN 0
+#define ACTION_UP 1
+#define ACTION_MOVE 2
+#define BUTTON_PRIMARY 1
+#define BUTTON_SECONDARY 2
+
+extern void MouseButton(int state, int button);
+
+extern void MouseMove(float dx, float dy);
 
 #ifdef __cplusplus
 }
