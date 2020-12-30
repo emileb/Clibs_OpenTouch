@@ -35,7 +35,6 @@ typedef enum
 
 void PortableInit(int argc, const char ** argv);
 
-
 void PortableBackButton(void);
 
 int PortableKeyEvent(int state, int code, int unitcode);
