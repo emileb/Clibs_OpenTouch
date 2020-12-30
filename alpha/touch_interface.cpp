@@ -1061,7 +1061,7 @@ extern "C"
 			//Game -------------------------------------------
 			//------------------------------------------------------
 			tcGameMain->setAlpha(gameControlsAlpha);
-			tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", PORT_ACT_MENU_BACK, false, false, "Show menu"));
+			tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Show menu"));
 			tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(20, 7, 23, 10), "shoot", KEY_SHOOT, false, false, "Attack!"));
 			tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
 
@@ -1357,7 +1357,7 @@ extern "C"
 
 
 
-	void mobile_init(int width, int height, const char *pngPath, int options, int game)
+	void mobile_init(int width, int height, const char *pngPath, int options, int wheelNbr, int game)
 	{
 		if(options & GAME_OPTION_AUTO_HIDE_GAMEPAD)
 			gamepadHideTouch = true;
@@ -1383,7 +1383,6 @@ extern "C"
 
 		LOGI("Game type = %d", gameType);
 
-#ifdef __ANDROID__
 		mobile_screen_width = width;
 		mobile_screen_height = height;
 		graphicpath = pngPath;
@@ -1392,20 +1391,6 @@ extern "C"
 		putenv((char*)"TIMIDITY_CFG=./audiopack/snd_timidity/timidity.cfg");
 
 		initControls(mobile_screen_width, -mobile_screen_height, graphicpath.c_str());
-
-#endif
-#ifdef __IOS__
-		mobile_screen_width = 1152;
-		mobile_screen_height = 640;
-
-		static std::string pngPath = getPngDirectory();
-		//pngPath += "/../png/";
-		LOGI("PNG Path = %s\n", pngPath.c_str());
-
-		initControls(mobile_screen_width, -mobile_screen_height, pngPath.c_str());
-
-		SDL_SetTouchControlsInterface(&controlsContainer);
-#endif
 	}
 
 	void mobileBackButton(void)
@@ -1618,6 +1603,32 @@ extern "C"
 		weaponWheelMoveStick = useMoveStick;
 		weaponWheelGamepadMode = (touchcontrols::WheelSelectMode)mode;
 		weaponWheelAutoTimout = autoTimeout;
+	}
+
+	int volumeKey(int state, bool volumeUp)
+	{
+	/*
+		if(currentScreenMode == TS_GAME) // Allow real volume to change when not in game
+		{
+			if(volumeUp)
+			{
+				if(volume_up_action)
+				{
+					PortableAction(state, volume_up_action);
+					return 1;
+				}
+			}
+			else
+			{
+				if(volume_down_action)
+				{
+					PortableAction(state, volume_down_action);
+					return 1;
+				}
+			}
+		}
+		*/
+		return 0;
 	}
 
 	TouchControlsInterface* mobileGetTouchInterface()
