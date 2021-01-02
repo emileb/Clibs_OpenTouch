@@ -28,7 +28,7 @@ inline uint64_t getMS()
 	return (s * 1000ull) + ms;
 }
 
-int SmartToggleAction( SmartToggle_t *data, int buttonState, int isActive )
+int SmartToggleAction(SmartToggle_t *data, int buttonState, int isActive)
 {
 	uint64_t timeNow = getMS();
 
@@ -44,7 +44,7 @@ int SmartToggleAction( SmartToggle_t *data, int buttonState, int isActive )
 	{
 		if((timeNow - data->timeDown) < TAP_TIME) // Was a tap
 		{
-			newState = data->wasActive ? 0: 1; // toggle action
+			newState = data->wasActive ? 0 : 1; // toggle action
 		}
 		else // Long press, action off
 		{

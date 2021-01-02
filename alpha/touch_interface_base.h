@@ -66,7 +66,8 @@ extern "C"
 
 
 
-class TouchInterfaceBase {
+class TouchInterfaceBase
+{
 
 public:
 
@@ -86,7 +87,7 @@ public:
 	int rightDoubleAction = 0;
 	int volumeUpAction = 0;
 	int volumeDownAction = 0;
-	
+
 	touchscreemode_t currentScreenMode = TS_BLANK;
 	touchcontrols::tTouchSettings touchSettings;
 	bool useMouse = false;
@@ -164,7 +165,7 @@ public:
 
 
 		touchcontrols::GLScaleWidth = (float)nativeWidth;
-		touchcontrols::GLScaleHeight = (float)-nativeHeight;
+		touchcontrols::GLScaleHeight = (float) - nativeHeight;
 		touchcontrols::signal_vibrate.connect(sigc::mem_fun(this, &TouchInterfaceBase::vibrate));
 		touchcontrols::gl_setGraphicsBasePath(pngPath);
 		touchcontrols::getSettingsSignal()->connect(sigc::mem_fun(this, &TouchInterfaceBase::touchSettingsCallback));
@@ -189,23 +190,29 @@ public:
 	int touchActionToAction(int action)
 	{
 		int ret = 0;
+
 		switch(action)
 		{
-			case 1:
-    			ret = PORT_ACT_USE;
-    			break;
-    		case 2:
-    			ret = PORT_ACT_JUMP;
-    			break;
-    		case 3:
-    			ret = PORT_ACT_ATTACK;
-    			break;
-			case 4:
-				ret = PORT_ACT_ALT_ATTACK;
-				break;
-    		default:
-    			ret = 0;
+		case 1:
+			ret = PORT_ACT_USE;
+			break;
+
+		case 2:
+			ret = PORT_ACT_JUMP;
+			break;
+
+		case 3:
+			ret = PORT_ACT_ATTACK;
+			break;
+
+		case 4:
+			ret = PORT_ACT_ALT_ATTACK;
+			break;
+
+		default:
+			ret = 0;
 		}
+
 		return ret;
 	}
 
@@ -225,23 +232,33 @@ public:
 		touchJoyLeft->setCenterAnchor(touchSettings.fixedMoveStick);
 
 		if(tcGameMain) tcGameMain->setAlpha(touchSettings.alpha);
+
 		if(tcCustomButtons)  tcCustomButtons->setAlpha(touchSettings.alpha);
 
 		if(tcYesNo) tcYesNo->setColour(touchSettings.defaultColor);
+
 		if(tcGameMain) tcGameMain->setColour(touchSettings.defaultColor);
+
 		if(tcGameWeapons) tcGameWeapons->setColour(touchSettings.defaultColor);
+
 		if(tcWeaponWheel) tcWeaponWheel->setColour(touchSettings.defaultColor);
+
 		if(tcInventory) tcInventory->setColour(touchSettings.defaultColor);
+
 		if(tcAutomap) tcAutomap->setColour(touchSettings.defaultColor);
+
 		if(tcCustomButtons) tcCustomButtons->setColour(touchSettings.defaultColor);
+
 		if(tcGamepadUtility) tcGamepadUtility->setColour(touchSettings.defaultColor);
+
 		if(tcDPadInventory) tcDPadInventory->setColour(touchSettings.defaultColor);
 	}
 
 	void gameButton(int state, int code)
 	{
 #ifndef NO_SEC
-		if( state )
+
+		if(state)
 		{
 			if(licTest < 0)
 				return;
@@ -271,6 +288,7 @@ public:
 				}
 			}
 		}
+
 #endif
 
 		if(code == KEY_SHOOT)
@@ -489,7 +507,7 @@ public:
 		}
 	}
 
-	 void customButton(int state, int code)
+	void customButton(int state, int code)
 	{
 		LOGI("Cust %d, %d", state, code);
 		PortableAction(state, code);
@@ -545,12 +563,14 @@ public:
 			usleep(200 * 1000); // Need this for the PDA to work in D3, needs a frame to react..
 			PortableMouseButton(0, 1, 0, 0);
 		}
+
 #endif
 	}
 
 	void mouseButton(int state, int code)
 	{
 #if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES)
+
 		// Hide the mouse
 		if((code == KEY_USE_MOUSE) && state)
 		{
@@ -564,6 +584,7 @@ public:
 		{
 			mobileBackButton();
 		}
+
 		LOGI("useMouse = %d", useMouse);
 #endif
 	}
@@ -735,14 +756,17 @@ public:
 				tcMouse->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
 				break;
 #ifdef D3ES
+
 			case TS_PDA:
 				tcPda->resetOutput();
 				tcPda->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
 				break;
 #else
+
 			case TS_PDA:
 				break;
 #endif
+
 			case TS_CONSOLE:
 				break;
 			}
@@ -781,6 +805,7 @@ public:
 
 				// Always set these so they are never wrong
 				if(tcGameMain) tcGameMain->setAlpha(touchSettings.alpha);
+
 				if(tcCustomButtons) tcCustomButtons->setAlpha(touchSettings.alpha);
 
 				if(!hideGameAndMenu)
@@ -837,22 +862,25 @@ public:
 				tcMouse->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 				break;
 #ifdef D3ES
-			case TS_PDA:
-				{
-					// Copy position from the game screen
-					touchcontrols::Button* pdaGame = (touchcontrols::Button*)tcGameMain->getControl("pda");
-					touchcontrols::Button* pda = (touchcontrols::Button*)tcPda->getControl("pda");
-					pda->controlPos = pdaGame->controlPos;
-					pda->updateSize();
 
-					tcPda->setEnabled(true);
-					tcPda->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
-				}
-				break;
+			case TS_PDA:
+			{
+				// Copy position from the game screen
+				touchcontrols::Button* pdaGame = (touchcontrols::Button*)tcGameMain->getControl("pda");
+				touchcontrols::Button* pda = (touchcontrols::Button*)tcPda->getControl("pda");
+				pda->controlPos = pdaGame->controlPos;
+				pda->updateSize();
+
+				tcPda->setEnabled(true);
+				tcPda->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
+			}
+			break;
 #else
+
 			case TS_PDA:
 				break;
 #endif
+
 			case TS_CONSOLE:
 				break;
 			}
@@ -861,7 +889,7 @@ public:
 
 
 
-    void createCustomControls( touchcontrols::TouchControls* customControls)
+	void createCustomControls(touchcontrols::TouchControls* customControls)
 	{
 		customControls->addControl(new touchcontrols::Button("A", touchcontrols::RectF(5, 5, 7, 7), "Custom_1", PORT_ACT_CUSTOM_0, false, false, "Custom 1 (KP1)", touchcontrols::COLOUR_RED2));
 		customControls->addControl(new touchcontrols::Button("B", touchcontrols::RectF(7, 5, 9, 7), "Custom_2", PORT_ACT_CUSTOM_1, false, false, "Custom 2 (KP2)", touchcontrols::COLOUR_RED2));
@@ -909,7 +937,7 @@ public:
 			return;
 		}
 
-		char text[2] = {0,0};
+		char text[2] = {0, 0};
 
 		// Only send printable chars
 		if(key >= 32 && key <= 125)
@@ -924,6 +952,7 @@ public:
 		{
 			key = key + 32;
 		}
+
 		SDL_Scancode sc = SDL_GetScancodeFromKey(key);
 
 		// Send scancode
@@ -946,7 +975,7 @@ public:
 	}
 
 	// SDL callbacks
-	public:
+public:
 
 	void processPointer(int action, int pid, float x, float y)
 	{
@@ -1133,6 +1162,7 @@ public:
 				}
 			}
 		}
+
 		return 0;
 	}
 
@@ -1160,7 +1190,7 @@ public:
 	bool loadControlSettings(std::string path)
 	{
 		std::string settings = path + "/settings.xml";
-	 	touchcontrols::touchSettings_load(settings);
+		touchcontrols::touchSettings_load(settings);
 		touchcontrols::touchSettings_save(); // Save over current settings
 
 		tcGameMain->loadXML(path + "/tcGameMain.xml");
@@ -1184,7 +1214,7 @@ public:
 			tcCustomButtons->save();
 		}
 
-	 	return false;
+		return false;
 	}
 
 	void frameControls()
@@ -1204,22 +1234,22 @@ public:
 			screenMode = TS_CUSTOM;
 		}
 
-/*
-		if((screenMode == TS_MAP) && (mapState == 1)) TODO fix for delta
-		{
-			screenMode =  TS_GAME;
-		}
+		/*
+				if((screenMode == TS_MAP) && (mapState == 1)) TODO fix for delta
+				{
+					screenMode =  TS_GAME;
+				}
 
-		if(screenMode == TS_DEMO)   // Fade out demo buttons if not touched for a while
-		{
-			if(demoControlsAlpha > 0)
-			{
-				demoControlsAlpha -= DEMO_ALPFA_DEC;
-			}
+				if(screenMode == TS_DEMO)   // Fade out demo buttons if not touched for a while
+				{
+					if(demoControlsAlpha > 0)
+					{
+						demoControlsAlpha -= DEMO_ALPFA_DEC;
+					}
 
-			tcDemo->setAlpha(demoControlsAlpha);
-		}
-*/
+					tcDemo->setAlpha(demoControlsAlpha);
+				}
+		*/
 		if(((screenMode == TS_GAME) || (screenMode == TS_MENU)) & useMouse)   // Show mouse screen
 		{
 			screenMode = TS_MOUSE;
@@ -1231,6 +1261,7 @@ public:
 			controlsContainer.showMouse(false);
 
 		if(touchJoyLeft) touchJoyLeft->setHideGraphics(touchSettings.showJoysticks);
+
 		if(touchJoyRight) touchJoyRight->setHideGraphics(touchSettings.showJoysticks);
 
 		updateTouchScreenModeOut(screenMode);

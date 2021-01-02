@@ -32,7 +32,8 @@
  */
 #ifndef	_FTS_H_
 #define	_FTS_H_
-typedef struct {
+typedef struct
+{
 	struct _ftsent *fts_cur;	/* current node */
 	struct _ftsent *fts_child;	/* linked list of children */
 	struct _ftsent **fts_array;	/* sort array */
@@ -54,7 +55,8 @@ typedef struct {
 #define	FTS_STOP	0x2000		/* (private) unrecoverable error */
 	int fts_options;		/* fts_open options, global flags */
 } FTS;
-typedef struct _ftsent {
+typedef struct _ftsent
+{
 	struct _ftsent *fts_cycle;	/* cycle node */
 	struct _ftsent *fts_parent;	/* parent directory */
 	struct _ftsent *fts_link;	/* next file in directory */
@@ -103,7 +105,7 @@ __BEGIN_DECLS
 FTSENT	*fts_children(FTS *, int);
 int	 fts_close(FTS *);
 FTS	*fts_open(char * const *, int,
-	    int (*)(const FTSENT **, const FTSENT **));
+              int (*)(const FTSENT **, const FTSENT **));
 FTSENT	*fts_read(FTS *);
 int	 fts_set(FTS *, FTSENT *, int);
 __END_DECLS
