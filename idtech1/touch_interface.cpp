@@ -99,7 +99,6 @@ extern "C"
 	static bool m_shooting = false;
 
 	static bool useMouse = false;
-
 	static bool gameShowMouse = false;
 
 // Show buttons in game

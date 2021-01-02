@@ -1,3 +1,6 @@
+#ifndef game_interface_h
+#define game_interface_h
+
 #include "port_act_defs.h"
 
 #ifdef __IOS__
@@ -66,4 +69,7 @@ extern void MouseMove(float dx, float dy);
 
 #ifdef __cplusplus
 }
+#endif
+
+
 #endif

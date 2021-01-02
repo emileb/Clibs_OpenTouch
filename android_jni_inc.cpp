@@ -20,11 +20,14 @@
 
 #include <time.h>
 
+#include "touch_interface_base.h"
 
 extern "C"
 {
-	static int android_screen_width;
-	static int android_screen_height;
+	int mobile_screen_width;
+	int mobile_screen_height;
+
+	static TouchInterface touchInterface;
 
 	JNIEnv* env_;
 
@@ -69,7 +72,7 @@ extern "C"
 	char pkgGlobal[64];
 
 	jint EXPORT_ME
-	JAVA_FUNC(init)(JNIEnv* env,	jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles, jstring tempFiles, jstring sourceFiles)
+	JAVA_FUNC(init)(JNIEnv* env, jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles, jstring tempFiles, jstring sourceFiles)
 	{
 		env_ = env;
 
@@ -121,7 +124,12 @@ extern "C"
 		strcpy(keyGlobal, key);
 		strcpy(pkgGlobal, pkg);
 
-		mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(), options, wheelNbr, game);
+		//mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(), options, wheelNbr, game);
+
+		//touchInterface = new TouchInterface();
+		setupStatic(&touchInterface);
+		touchInterface.init(mobile_screen_width, mobile_screen_height, graphics_path.c_str(), options, wheelNbr, game);
+
 		PortableInit(argc, argv); //Never returns!!
 
 		LOGI("PortableInit returned");
@@ -133,9 +141,8 @@ extern "C"
 	JAVA_FUNC(setScreenSize)(JNIEnv* env,	jobject thiz, jint width, jint height)
 	{
 		LOGI("setScreenSize %d x %d", width, height);
-
-		android_screen_width = width;
-		android_screen_height = height;
+		mobile_screen_width = width;
+		mobile_screen_height = height;
 	}
 
 	void EXPORT_ME
@@ -146,8 +153,8 @@ extern "C"
 		touchcontrols::fbConfig config;
 		config.vidWidth = width;
 		config.vidHeight = height;
-		config.vidWidthReal = android_screen_width;
-		config.vidHeightReal = android_screen_height;
+		config.vidWidthReal = mobile_screen_width;
+		config.vidHeightReal = mobile_screen_height;
 
 		touchcontrols::R_FrameBufferConfig(config);
 	}
@@ -157,11 +164,11 @@ extern "C"
 	{
 		if((action == PORT_ACT_VOLUME_UP) || (action == PORT_ACT_VOLUME_DOWN))
 		{
-			return volumeKey(state, (action == PORT_ACT_VOLUME_UP));
+			return touchInterface.volumeKey(state, (action == PORT_ACT_VOLUME_UP));
 		}
 		else
 		{
-			gamepadAction(state, action);
+			touchInterface.gamepadAction(state, action);
 			return 0;
 		}
 	}
@@ -182,7 +189,6 @@ extern "C"
 	JAVA_FUNC(touchEvent)(JNIEnv *env, jobject obj, jint action, jint pid, jfloat x, jfloat y)
 	{
 #ifndef NO_SEC
-
 		//LOGI("TOUCHED");
 		if(apkRandomDelay == -1)
 		{
@@ -203,7 +209,6 @@ extern "C"
 			if(check != 1)
 				return;
 		}
-
 #else
 		/*
 		    // Beta test time
@@ -219,26 +224,26 @@ extern "C"
 		*/
 #endif
 
-		mobileGetTouchInterface()->processPointer(action, pid, x, y);
+		touchInterface.processPointer(action, pid, x, y);
 	}
 
 	void EXPORT_ME
 	JAVA_FUNC(backButton)(JNIEnv *env, jobject obj)
 	{
-		mobileBackButton();
+		touchInterface.mobileBackButton();
 	}
 
 	void EXPORT_ME
 	JAVA_FUNC(analogFwd)(JNIEnv *env, jobject obj,	jfloat v, jfloat raw)
 	{
-		axisValue(ANALOGUE_AXIS_FWD, raw);
+		touchInterface.axisValue(ANALOGUE_AXIS_FWD, raw);
 		PortableMoveFwd(v);
 	}
 
 	void EXPORT_ME
 	JAVA_FUNC(analogSide)(JNIEnv *env, jobject obj, jfloat v, jfloat raw)
 	{
-		axisValue(ANALOGUE_AXIS_SIDE, raw);
+		touchInterface.axisValue(ANALOGUE_AXIS_SIDE, raw);
 		PortableMoveSide(v);
 	}
 
@@ -246,7 +251,7 @@ extern "C"
 	JAVA_FUNC(analogPitch)(JNIEnv *env, jobject obj, jint mode, jfloat v, jfloat raw)
 	{
 		if(mode == LOOK_MODE_JOYSTICK)
-			axisValue(ANALOGUE_AXIS_PITCH, raw);
+			touchInterface.axisValue(ANALOGUE_AXIS_PITCH, raw);
 
 		PortableLookPitch(mode, v);
 	}
@@ -255,7 +260,7 @@ extern "C"
 	JAVA_FUNC(analogYaw)(JNIEnv *env, jobject obj,	jint mode, jfloat v, jfloat raw)
 	{
 		if(mode == LOOK_MODE_JOYSTICK)
-			axisValue(ANALOGUE_AXIS_YAW, raw);
+			touchInterface.axisValue(ANALOGUE_AXIS_YAW, raw);
 
 		PortableLookYaw(mode, v);
 	}
@@ -265,7 +270,7 @@ extern "C"
 	JAVA_FUNC(weaponWheelSettings)(JNIEnv *env, jobject obj, jint useMoveStick, jint mode, jint autoTimeout)
 	{
 		LOGI("GAMEPAD WEAPON WHEEL: userMoveStick = %d, mode = %d, timeout = %d", useMoveStick, mode, autoTimeout);
-		weaponWheelSettings(useMoveStick, mode, autoTimeout);
+		touchInterface.weaponWheelSettings(useMoveStick, mode, autoTimeout);
 	}
 
 	int AUDIO_OVERRIDE_FREQ = 0;
@@ -286,7 +291,7 @@ extern "C"
 		const char * filename_c = (const char *)(env)->GetStringUTFChars(filename, 0);
 		LOGI("loadTouchSettings %s", filename_c);
 
-		loadControlSettings(filename_c);
+		touchInterface.loadControlSettings(filename_c);
 
 		env->ReleaseStringUTFChars(filename, filename_c);
 		return 0;
@@ -298,7 +303,7 @@ extern "C"
 		const char * filename_c = (const char *)(env)->GetStringUTFChars(filename, 0);
 		LOGI("saveTouchSettings %s", filename_c);
 
-		saveControlSettings(filename_c);
+		touchInterface.saveControlSettings(filename_c);
 
 		env->ReleaseStringUTFChars(filename, filename_c);
 		return 0;

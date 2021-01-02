@@ -9,8 +9,8 @@
 #ifndef touch_interface_h
 #define touch_interface_h
 
-//#define NO_SEC
-
+#define NO_SEC
+/*
 extern "C"
 {
 	void mobile_init(int width, int height, const char *pngPath, int options, int wheelNbr, int game);
@@ -26,5 +26,5 @@ extern "C"
 	bool saveControlSettings(std::string filename);
 	bool loadControlSettings(std::string filename);
 }
-
+*/
 #endif /* touch_interface_h */
