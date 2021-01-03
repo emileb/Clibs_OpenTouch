@@ -2,4 +2,4 @@ static const char *key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Ty9fat4Ma
 static const char *pkg = "com.opentouchgaming.deltatouch";
 
 
-#include "../android_jni_inc.cpp"	
+#include "../android_jni_inc.cpp"

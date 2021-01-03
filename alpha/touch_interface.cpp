@@ -2,7 +2,7 @@
 // Created by emile on 01/01/2021.
 //
 
-#include "touch_interface_base.h"
+#include "touch_interface.h"
 
 
 void TouchInterface::openGLStart()
@@ -69,7 +69,9 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("quick_save", touchcontrols::RectF(24, 0, 26, 2), "save", PORT_ACT_QUICKSAVE, false, false, "Quick save"));
 	tcGameMain->addControl(new touchcontrols::Button("quick_load", touchcontrols::RectF(20, 0, 22, 2), "load", PORT_ACT_QUICKLOAD, false, false, "Quick load"));
 	tcGameMain->addControl(new touchcontrols::Button("map", touchcontrols::RectF(2, 0, 4, 2), "map", PORT_ACT_MAP, false, false, "Show map"));
+#ifndef BSTONE
 	tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show keyboard"));
+#endif
 	tcGameMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "left_mouse", KEY_USE_MOUSE, false, true, "Use mouse"));
 
 	bool hideJump = true;
@@ -77,7 +79,6 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, hideJump, "Jump"));
 
 	bool hideInventory = true;
-
 
 	tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, hideInventory, "Show Inventory"));
 
@@ -218,7 +219,7 @@ void TouchInterface::createControls(std::string filesPath)
 	mouse->setHideGraphics(true);
 	mouse->setEditable(false);
 	tcMouse->addControl(mouse);
-	mouse->signal_action.connect(sigc::mem_fun(this, &TouchInterface::mouse_move));
+	mouse->signal_action.connect(sigc::mem_fun(this, &TouchInterface::mouseMove));
 	tcMouse->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Back"));
 	tcMouse->addControl(new touchcontrols::Button("left_button", touchcontrols::RectF(0, 6, 3, 10), "left_mouse", KEY_LEFT_MOUSE, false, false, "Back"));
 	tcMouse->signal_button.connect(sigc::mem_fun(this, &TouchInterface::mouseButton));

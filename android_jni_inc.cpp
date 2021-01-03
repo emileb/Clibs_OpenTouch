@@ -20,10 +20,10 @@
 
 #include <time.h>
 
-#include "touch_interface_base.h"
 
 extern "C"
 {
+	int gameType;
 	int mobile_screen_width;
 	int mobile_screen_height;
 
@@ -75,6 +75,7 @@ extern "C"
 	JAVA_FUNC(init)(JNIEnv* env, jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles, jstring tempFiles, jstring sourceFiles)
 	{
 		env_ = env;
+		gameType = game;
 
 		static std::string game_path = (char *)(env)->GetStringUTFChars(game_path_, 0);
 		static std::string graphics_path = (char *)(env)->GetStringUTFChars(graphics_dir, 0);
@@ -104,6 +105,8 @@ extern "C"
 		LogWritter_Write("\n");
 
 		LOGI("game_path = %s", game_path.c_str());
+
+		setenv("TIMIDITY_CFG","./audiopack/snd_timidity/timidity.cfg",1);
 
 		setenv("HOME", game_path.c_str(), 1);
 		setenv("USER_FILES", userFilesPath.c_str(), 1);
@@ -333,4 +336,8 @@ extern "C"
 		return handle;
 	}
 
+	int blockGamepad(void)
+	{
+		return touchInterface.blockGamepad();
+	}
 }

@@ -28,6 +28,10 @@
 #define DEFAULT_FADE_FRAMES 10
 #endif
 
+
+#define DEMO_ALPHA_RESET      30
+#define DEMO_ALPFA_DEC        0.1f
+
 #define COMMAND_SET_BACKLIGHT      0x8001
 #define COMMAND_SHOW_GYRO_OPTIONS  0x8002
 #define COMMAND_SHOW_KEYBOARD      0x8003
@@ -97,6 +101,9 @@ public:
 	bool showCustomOn = false;
 	bool showCustomMenu = false;
 
+	int mapState = 0;
+	float demoControlsAlpha = 0; // Used to fade out demo controls
+
 	touchcontrols::TouchControlsContainer controlsContainer;
 
 
@@ -116,10 +123,8 @@ public:
 	touchcontrols::TouchControls *tcGamepadUtility = 0;
 	touchcontrols::TouchControls *tcDPadInventory = 0;
 	touchcontrols::TouchControls *tcMouse = 0;
+	touchcontrols::TouchControls *tcPda = 0;
 
-#ifdef D3ES
-	static touchcontrols::TouchControls *tcPda = 0;
-#endif
 
 	// So can hide and show these buttons
 	touchcontrols::TouchJoy *touchJoyLeft;
@@ -434,14 +439,16 @@ public:
 		}
 		else if(code == KEY_LEFT_MOUSE)
 		{
+#if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES)
 			PortableMouseButton(state, 1, 0, 0);
+#endif
 		}
 		else
 		{
 			PortableAction(state, code);
 		}
 
-		//demoControlsAlpha = DEMO_ALPHA_RESET; TODO
+		demoControlsAlpha = DEMO_ALPHA_RESET;
 	}
 
 	void leftStick(float joy_x, float joy_y, float mouse_x, float mouse_y)
@@ -549,7 +556,7 @@ public:
 		}
 	}
 
-	void mouse_move(int action, float x, float y, float mouse_x, float mouse_y)
+	void mouseMove(int action, float x, float y, float mouse_x, float mouse_y)
 	{
 #if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) // todo
 
@@ -588,6 +595,8 @@ public:
 		LOGI("useMouse = %d", useMouse);
 #endif
 	}
+
+
 	void automap_multitouch_mouse_move(int action, float x, float y, float dx, float dy)
 	{
 		if(action == MULTITOUCHMOUSE_MOVE)
@@ -755,17 +764,11 @@ public:
 				tcMouse->resetOutput();
 				tcMouse->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
 				break;
-#ifdef D3ES
 
 			case TS_PDA:
 				tcPda->resetOutput();
 				tcPda->fade(touchcontrols::FADE_OUT, DEFAULT_FADE_FRAMES);
 				break;
-#else
-
-			case TS_PDA:
-				break;
-#endif
 
 			case TS_CONSOLE:
 				break;
@@ -829,7 +832,6 @@ public:
 				// Always enable wheel
 				if(touchSettings.weaponWheelEnabled)
 					tcWeaponWheel->setEnabled(true);
-
 				break;
 
 			case TS_MAP:
@@ -840,11 +842,11 @@ public:
 				touchcontrols::Button* map = (touchcontrols::Button*)tcAutomap->getControl("map");
 				map->controlPos = mapGame->controlPos;
 				map->updateSize();
-			}
 
-			tcAutomap->setEnabled(true);
-			tcAutomap->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
-			break;
+				tcAutomap->setEnabled(true);
+				tcAutomap->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
+				}
+				break;
 
 			case TS_CUSTOM:
 				tcCustomButtons->setEnabled(true);
@@ -861,7 +863,6 @@ public:
 				tcMouse->setEnabled(true);
 				tcMouse->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 				break;
-#ifdef D3ES
 
 			case TS_PDA:
 			{
@@ -875,11 +876,6 @@ public:
 				tcPda->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);
 			}
 			break;
-#else
-
-			case TS_PDA:
-				break;
-#endif
 
 			case TS_CONSOLE:
 				break;
@@ -1226,48 +1222,10 @@ public:
 			controlsContainer.initGL();
 		}
 
-		touchscreemode_t screenMode = PortableGetScreenMode();
-
-		// Hack to show custom buttons while in the menu to bind keys
-		if(screenMode == TS_MENU && showCustomMenu == true)
-		{
-			screenMode = TS_CUSTOM;
-		}
-
-		/*
-				if((screenMode == TS_MAP) && (mapState == 1)) TODO fix for delta
-				{
-					screenMode =  TS_GAME;
-				}
-
-				if(screenMode == TS_DEMO)   // Fade out demo buttons if not touched for a while
-				{
-					if(demoControlsAlpha > 0)
-					{
-						demoControlsAlpha -= DEMO_ALPFA_DEC;
-					}
-
-					tcDemo->setAlpha(demoControlsAlpha);
-				}
-		*/
-		if(((screenMode == TS_GAME) || (screenMode == TS_MENU)) & useMouse)   // Show mouse screen
-		{
-			screenMode = TS_MOUSE;
-		}
-
-		if(gameShowMouse && useMouse)
-			controlsContainer.showMouse(true);
-		else
-			controlsContainer.showMouse(false);
-
 		if(touchJoyLeft) touchJoyLeft->setHideGraphics(touchSettings.showJoysticks);
-
 		if(touchJoyRight) touchJoyRight->setHideGraphics(touchSettings.showJoysticks);
 
-		updateTouchScreenModeOut(screenMode);
-		updateTouchScreenModeIn(screenMode);
-
-		currentScreenMode = screenMode;
+		newFrame();
 
 		controlsContainer.draw();
 	}
@@ -1328,20 +1286,6 @@ static void moveMouseSDLCallback(float x, float y)
 	staticTouchInterface->moveMouseCallback(x, y);
 }
 
-class TouchInterface : public TouchInterfaceBase
-{
-public:
-	void createControls(std::string filesPath);
 
-	void openGLEnd();
-
-	void openGLStart();
-
-	void blankButton(int state, int code);
-
-	void newFrame();
-
-	void automapButton(int state, int code);
-};
 
 #endif //OPENTOUCH_TOUCH_INTERFACE_BASE_H

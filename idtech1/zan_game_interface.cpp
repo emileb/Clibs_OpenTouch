@@ -80,7 +80,7 @@
 extern "C"
 {
 	extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
-	#include "SmartToggle.h"
+#include "SmartToggle.h"
 }
 
 //Move left/right fwd/back
@@ -149,23 +149,25 @@ void PortableMouse(float dx, float dy)
 	//LOGI("%f %f",dx,dy);
 	mx += -dx * screen->GetWidth();
 	my +=  -dy * screen->GetHeight();
-	if((fabs(mx) > 1) || (fabs(my) > 1) )
+
+	if((fabs(mx) > 1) || (fabs(my) > 1))
 	{
 		SDL_InjectMouse(0, ACTION_MOVE, mx, my, SDL_TRUE);
 	}
-	if (fabs(mx) > 1)
+
+	if(fabs(mx) > 1)
 		mx = 0;
 
-	if (fabs(my) > 1)
+	if(fabs(my) > 1)
 		my = 0;
 }
 
 void PortableMouseButton(int state, int button, float dx, float dy)
 {
-    if( state )
-       	SDL_InjectMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0, SDL_TRUE);
-    else
-        SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
+	if(state)
+		SDL_InjectMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0, SDL_TRUE);
+	else
+		SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
 }
 
 void PortableAction(int state, int action)
@@ -251,6 +253,7 @@ void PortableAction(int state, int action)
 				else
 					buttonChange(1, &Button_AltAttack);
 			}
+
 			break;
 
 		case PORT_ACT_JUMP:
@@ -262,12 +265,12 @@ void PortableAction(int state, int action)
 			break;
 
 		case PORT_ACT_TOGGLE_CROUCH:
-			{
-				static SmartToggle_t smartToggle;
-				int activate = SmartToggleAction( &smartToggle, state,Button_Crouch.bDown);
-				buttonChange(activate, &Button_Crouch);
-			}
-			break;
+		{
+			static SmartToggle_t smartToggle;
+			int activate = SmartToggleAction(&smartToggle, state, Button_Crouch.bDown);
+			buttonChange(activate, &Button_Crouch);
+		}
+		break;
 
 		case PORT_ACT_NEXT_WEP:
 			if(state)
