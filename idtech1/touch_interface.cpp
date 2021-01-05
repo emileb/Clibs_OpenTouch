@@ -9,8 +9,10 @@
 #define GAME_TYPE_HEXEN    2
 #define GAME_TYPE_HERETIC  3
 #define GAME_TYPE_STRIFE   4
-
-
+extern "C"
+{
+void AM_ToggleFollowMode(void);
+void jwzgles_restore(void);
 
 #if defined(PRBOOM_DOOM)
 typedef enum
@@ -40,10 +42,8 @@ static int currentrenderer = 1;
 extern int currentrenderer;
 #endif
 
-static GLint     matrixMode;
-static GLfloat   projection[16];
-static GLfloat   model[16];
 #endif
+}
 
 
 void TouchInterface::openGLStart()
@@ -54,6 +54,53 @@ void TouchInterface::openGLStart()
 void TouchInterface::openGLEnd()
 {
 	touchcontrols::gl_endRender();
+
+#if defined(PRBOOM_DOOM)
+		bool sdlSWMode = (V_GetMode() != VID_MODEGL);
+#else
+		bool sdlSWMode = false;
+#endif
+
+
+#if ( defined(GZDOOM) || defined(ZANDRONUM_30) ) && !defined(GZDOOM_GL3)
+
+		if(touchcontrols::gl_getGLESVersion() == 1)
+		{
+			if(currentrenderer == 1) //GL mode
+			{
+				jwzgles_restore();
+			}
+			else
+			{
+				sdlSWMode = true;
+			}
+		}
+		else if(touchcontrols::gl_getGLESVersion() == 2)
+		{
+			touchcontrols::gl_resetGL4ES();
+		}
+
+#endif
+
+#if !defined(GZDOOM_GL3) && !defined(D3ES)
+
+// Setup for SDL Software rendering again
+		if(SW_SDL_RENDER || sdlSWMode)
+		{
+			touchcontrols::gl_setupForSDLSW();
+		}
+
+#endif
+
+#if defined(PRBOOM_DOOM)
+
+		if(V_GetMode() == VID_MODEGL)
+		{
+			void jwzgles_restore(void);
+			jwzgles_restore();
+		}
+
+#endif
 };
 
 
@@ -587,7 +634,14 @@ void TouchInterface::blankButton(int state, int code)
 
 void TouchInterface::automapButton(int state, int code)
 {
+	if(state && code == PORT_ACT_MAP && mapState == 0)
+	{
+#ifdef RETRO_DOOM // Turn on follow mode to allow movment in map mode
 
+		AM_ToggleFollowMode();
+#endif
+		mapState = 1;
+	}
 }
 
 void TouchInterface::newFrame()
@@ -626,10 +680,6 @@ void TouchInterface::newFrame()
 		controlsContainer.showMouse(true);
 	else
 		controlsContainer.showMouse(false);
-
-	if(touchJoyLeft) touchJoyLeft->setHideGraphics(touchSettings.showJoysticks);
-
-	if(touchJoyRight) touchJoyRight->setHideGraphics(touchSettings.showJoysticks);
 
 	updateTouchScreenModeOut(screenMode);
 	updateTouchScreenModeIn(screenMode);

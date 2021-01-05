@@ -222,3 +222,4 @@
 #define GAME_OPTION_GLES2               0x8
 #define GAME_OPTION_GLES3               0x10
 #define GAME_OPTION_SDL_OLD_AUDIO       0x20
+#define GAME_OPTION_GL4ES               0x40

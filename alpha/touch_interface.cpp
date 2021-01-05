@@ -260,5 +260,21 @@ void TouchInterface::automapButton(int state, int code)
 
 void TouchInterface::newFrame()
 {
+	touchscreemode_t screenMode = PortableGetScreenMode();
 
+	// Hack to show custom buttons while in the menu to bind keys
+	if(screenMode == TS_MENU && showCustomMenu == true)
+	{
+		screenMode = TS_CUSTOM;
+	}
+
+	if((screenMode == TS_MAP) && (mapState == 1))
+	{
+		screenMode =  TS_GAME;
+	}
+
+	updateTouchScreenModeOut(screenMode);
+	updateTouchScreenModeIn(screenMode);
+
+	currentScreenMode = screenMode;
 }

@@ -285,7 +285,6 @@ extern "C"
 #endif
 
 
-
 #if ( defined(GZDOOM) || defined(ZANDRONUM_30) ) && !defined(GZDOOM_GL3)
 
 		if(touchcontrols::gl_getGLESVersion() == 1)

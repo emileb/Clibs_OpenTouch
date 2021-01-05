@@ -29,8 +29,8 @@
 #endif
 
 
-#define DEMO_ALPHA_RESET      30
-#define DEMO_ALPFA_DEC        0.1f
+#define DEMO_ALPHA_RESET      1
+#define DEMO_ALPFA_DEC        0.001f
 
 #define COMMAND_SET_BACKLIGHT      0x8001
 #define COMMAND_SHOW_GYRO_OPTIONS  0x8002
@@ -101,6 +101,7 @@ public:
 	bool showCustomOn = false;
 	bool showCustomMenu = false;
 
+	// For Doom
 	int mapState = 0;
 	float demoControlsAlpha = 0; // Used to fade out demo controls
 
@@ -164,6 +165,8 @@ public:
 		if(options & GAME_OPTION_GLES2)
 			touchcontrols::gl_setGLESVersion(2);
 
+		if(options & GAME_OPTION_GL4ES)
+			touchcontrols::gl_useGL4ES();
 
 		if(options & GAME_OPTION_GLES3)
 			touchcontrols::gl_setGLESVersion(3);
@@ -371,7 +374,7 @@ public:
 		{
 			if(state)
 			{
-				//mapState = 0; TODO FIX FOR DELTA
+				mapState = 0; //TODO FIX FOR DELTA
 			}
 
 			PortableAction(state, code);
@@ -570,7 +573,6 @@ public:
 			usleep(200 * 1000); // Need this for the PDA to work in D3, needs a frame to react..
 			PortableMouseButton(0, 1, 0, 0);
 		}
-
 #endif
 	}
 
@@ -1222,8 +1224,8 @@ public:
 			controlsContainer.initGL();
 		}
 
-		if(touchJoyLeft) touchJoyLeft->setHideGraphics(touchSettings.showJoysticks);
-		if(touchJoyRight) touchJoyRight->setHideGraphics(touchSettings.showJoysticks);
+		if(touchJoyLeft) touchJoyLeft->setHideGraphics(!touchSettings.showJoysticks);
+		if(touchJoyRight) touchJoyRight->setHideGraphics(!touchSettings.showJoysticks);
 
 		newFrame();
 
