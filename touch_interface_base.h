@@ -61,21 +61,29 @@ extern "C"
 	int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
 	int SDL_SendKeyboardText(const char *text);
 
-	static void setupStatic(void);
-	static void frameControlsSDLCallback(void);
-	static void showKeyboardCallbackSDLCallback(int show);
-	static void showMouseSDLCallback(int show);
-	static void moveMouseSDLCallback(float x, float y);
+	extern void setupStatic(void);
+	extern void frameControlsSDLCallback(void);
+	extern void showKeyboardCallbackSDLCallback(int show);
+	extern void showMouseSDLCallback(int show);
+	extern void moveMouseSDLCallback(float x, float y);
+
+	extern char keyGlobal[512];
+	extern int keyCheck();
+
+	extern const char * getFilesPath();
+	extern const char *nativeLibsPath;
 }
 
 
 
 class TouchInterfaceBase
 {
-
+	int licTest = 0;
 public:
 
 	int gameType = 0;
+	int wheelNbr = 10;
+
 	int nativeWidth = 0;
 	int nativeHeight = 0;
 
@@ -146,12 +154,13 @@ public:
 
 	virtual void newFrame() = 0;
 
-	void init(int width, int height, const char *pngPath, int options, int wheelNbr, int game)
+	void init(int width, int height, const char *pngPath, int options, int wheelNbr_, int game)
 	{
 		nativeWidth = width;
 		nativeHeight = height;
 
 		gameType = game;
+		wheelNbr = wheelNbr_;
 
 		if(options & GAME_OPTION_AUTO_HIDE_GAMEPAD)
 			gamepadHideTouch = true;
@@ -265,7 +274,6 @@ public:
 	void gameButton(int state, int code)
 	{
 #ifndef NO_SEC
-
 		if(state)
 		{
 			if(licTest < 0)
@@ -296,7 +304,6 @@ public:
 				}
 			}
 		}
-
 #endif
 
 		if(code == KEY_SHOOT)
@@ -1217,6 +1224,9 @@ public:
 
 	void frameControls()
 	{
+#if !defined(NO_SEC)
+#include "./secure/check_include.h"
+#endif
 		if(SDL_NewEGLCreated())
 		{
 			LOGI("NEW EGL CONTEXT");
@@ -1260,33 +1270,6 @@ public:
 		controlsContainer.mousePos(x, y);
 	}
 };
-
-static TouchInterfaceBase *staticTouchInterface;
-
-static void setupStatic(TouchInterfaceBase * ti)
-{
-	staticTouchInterface = ti;
-}
-
-static void frameControlsSDLCallback(void)
-{
-	staticTouchInterface->frameControls();
-}
-
-static void showKeyboardCallbackSDLCallback(int show)
-{
-	staticTouchInterface->showKeyboardCallback(show);
-}
-
-static void showMouseSDLCallback(int show)
-{
-	staticTouchInterface->showMouseCallback(show);
-}
-
-static void moveMouseSDLCallback(float x, float y)
-{
-	staticTouchInterface->moveMouseCallback(x, y);
-}
 
 
 

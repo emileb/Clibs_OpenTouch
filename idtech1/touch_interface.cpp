@@ -617,15 +617,11 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 void TouchInterface::blankButton(int state, int code)
 {
 #if defined(PRBOOM_DOOM)
-
 	if(state)
 		PortableBackButton();
-
 #elif defined(D3ES) // Blank is used for cinematic, allow to skip them
-
 	if(state)
 		mobileBackButton();
-
 #else
 	PortableAction(state, PORT_ACT_USE);
 	PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);

@@ -40,7 +40,8 @@ extern "C"
 		Android_JNI_SendMessage(COMMAND_EXIT_APP, 0);
 
 		usleep(1000 * 1000 * 5); // Wait 5 seconds
-		exit(0); // This should never happen because the SDLActivity should have killed the process already
+		if(1 == 1)
+			exit(0); // This should never happen because the SDLActivity should have killed the process already
 	}
 
 //#define JAVA_FUNC(x) Java_com_beloko_opengames_gzdoom2_NativeLib_##x
@@ -64,6 +65,7 @@ extern "C"
 
 	const char *nativeLibsPath;
 	const char *sourceFilePath_c;
+	std::string filesPath;
 	std::string userFilesPath;
 	std::string tempFilesPath;
 	std::string sourceFilePath;
@@ -78,9 +80,10 @@ extern "C"
 		gameType = game;
 
 		static std::string game_path = (char *)(env)->GetStringUTFChars(game_path_, 0);
-		static std::string graphics_path = (char *)(env)->GetStringUTFChars(graphics_dir, 0);
+
 		static std::string log_filename_path = (char *)(env)->GetStringUTFChars(logFilename, 0);
 		static std::string native_libs_path = (char *)(env)->GetStringUTFChars(nativeLibs, 0);
+		filesPath = (char *)(env)->GetStringUTFChars(graphics_dir, 0);
 		userFilesPath = (char *)(env)->GetStringUTFChars(userFiles, 0);
 		tempFilesPath = (char *)(env)->GetStringUTFChars(tempFiles, 0);
 		sourceFilePath = (char *)(env)->GetStringUTFChars(sourceFiles, 0);
@@ -130,8 +133,7 @@ extern "C"
 		//mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(), options, wheelNbr, game);
 
 		//touchInterface = new TouchInterface();
-		setupStatic(&touchInterface);
-		touchInterface.init(mobile_screen_width, mobile_screen_height, graphics_path.c_str(), options, wheelNbr, game);
+		touchInterface.init(mobile_screen_width, mobile_screen_height, filesPath.c_str(), options, wheelNbr, game);
 
 		PortableInit(argc, argv); //Never returns!!
 
@@ -336,8 +338,66 @@ extern "C"
 		return handle;
 	}
 
+	const char * getFilesPath()
+	{
+		return filesPath.c_str();
+	}
+
 	int blockGamepad(void)
 	{
 		return touchInterface.blockGamepad();
 	}
+
+	void MouseButton(int state, int button)
+    {
+    	if(state)
+     		SDL_InjectMouse(button, ACTION_DOWN, 0, 0, SDL_TRUE);
+    	else
+     		SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
+    }
+
+    void MouseMove(float dx, float dy)
+    {
+    	static float mx = 0;
+    	static float my = 0;
+    	//LOGI("%f %f",dx,dy);
+    	mx += -dx;
+    	my +=  -dy;
+    	if((fabs(mx) > 1) || (fabs(my) > 1) )
+    	{
+    		SDL_InjectMouse(0, ACTION_MOVE, mx, my, SDL_TRUE);
+    	}
+    	if (fabs(mx) > 1)
+    		mx = 0;
+
+    	if (fabs(my) > 1)
+    		my = 0;
+    }
+
+	int getGameType()
+	{
+		return gameType;
+	}
+
+
+	void frameControlsSDLCallback(void)
+	{
+		touchInterface.frameControls();
+	}
+
+	void showKeyboardCallbackSDLCallback(int show)
+	{
+		touchInterface.showKeyboardCallback(show);
+	}
+
+	void showMouseSDLCallback(int show)
+	{
+		touchInterface.showMouseCallback(show);
+	}
+
+	void moveMouseSDLCallback(float x, float y)
+	{
+		touchInterface.moveMouseCallback(x, y);
+	}
+
 }
