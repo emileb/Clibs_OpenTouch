@@ -10,6 +10,8 @@
 
 #include "LogWritter.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "Framebuffer.h"
@@ -32,16 +34,22 @@ extern "C"
 	JNIEnv* env_;
 
 	int Android_JNI_SendMessage(int command, int param);
-	#define COMMAND_EXIT_APP  0x8007
+#define COMMAND_EXIT_APP  0x8007
 
+	int abc = 1;
 	void exit(int status)
 	{
 		LOGI("EXIT OVERRIDE!!!");
 		Android_JNI_SendMessage(COMMAND_EXIT_APP, 0);
 
 		usleep(1000 * 1000 * 5); // Wait 5 seconds
-		if(1 == 1)
+
+		if(abc) // To stop compiler warning
 			exit(0); // This should never happen because the SDLActivity should have killed the process already
+		else
+		{
+			while(1);
+		}
 	}
 
 //#define JAVA_FUNC(x) Java_com_beloko_opengames_gzdoom2_NativeLib_##x
@@ -109,20 +117,20 @@ extern "C"
 
 		LOGI("game_path = %s", game_path.c_str());
 
-		setenv("TIMIDITY_CFG","./audiopack/snd_timidity/timidity.cfg",1);
+		setenv("TIMIDITY_CFG", "./audiopack/snd_timidity/timidity.cfg", 1);
 
 		setenv("HOME", game_path.c_str(), 1);
 		setenv("USER_FILES", userFilesPath.c_str(), 1);
 
 		if(options & GAME_OPTION_GLES2)
-		{	
+		{
 			setenv("LIBGL_ES", "2", 1);
 			setenv("LIBGL_GL", "21", 1);
 			setenv("LIBGL_USEVBO", "0", 1);
 			setenv("LIBGL_DEFAULTWRAP", "0", 1);
 			setenv("LIBGL_NOINTOVLHACK", "1", 1);
 		}
-	
+
 		if(options & GAME_OPTION_SDL_OLD_AUDIO)
 			setenv("SDL_AUDIODRIVER", "android", 1);
 
@@ -194,6 +202,7 @@ extern "C"
 	JAVA_FUNC(touchEvent)(JNIEnv *env, jobject obj, jint action, jint pid, jfloat x, jfloat y)
 	{
 #ifndef NO_SEC
+
 		//LOGI("TOUCHED");
 		if(apkRandomDelay == -1)
 		{
@@ -214,6 +223,7 @@ extern "C"
 			if(check != 1)
 				return;
 		}
+
 #else
 		/*
 		    // Beta test time
@@ -315,7 +325,7 @@ extern "C"
 	}
 
 
-	FILE *tmpfile() 
+	FILE *tmpfile()
 	{
 		FILE * handle = nullptr;
 
@@ -324,10 +334,14 @@ extern "C"
 		path = tempFilesPath;
 
 		int descriptor = mkstemp(&path[0]);
-		if (-1 != descriptor) {
+
+		if(-1 != descriptor)
+		{
 			handle = fdopen(descriptor, "w+b");
-			if (nullptr == handle) {
-			  close(descriptor);
+
+			if(nullptr == handle)
+			{
+				close(descriptor);
 			}
 
 			// File already open,
@@ -349,30 +363,32 @@ extern "C"
 	}
 
 	void MouseButton(int state, int button)
-    {
-    	if(state)
-     		SDL_InjectMouse(button, ACTION_DOWN, 0, 0, SDL_TRUE);
-    	else
-     		SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
-    }
+	{
+		if(state)
+			SDL_InjectMouse(button, ACTION_DOWN, 0, 0, SDL_TRUE);
+		else
+			SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
+	}
 
-    void MouseMove(float dx, float dy)
-    {
-    	static float mx = 0;
-    	static float my = 0;
-    	//LOGI("%f %f",dx,dy);
-    	mx += -dx;
-    	my +=  -dy;
-    	if((fabs(mx) > 1) || (fabs(my) > 1) )
-    	{
-    		SDL_InjectMouse(0, ACTION_MOVE, mx, my, SDL_TRUE);
-    	}
-    	if (fabs(mx) > 1)
-    		mx = 0;
+	void MouseMove(float dx, float dy)
+	{
+		static float mx = 0;
+		static float my = 0;
+		//LOGI("%f %f",dx,dy);
+		mx += -dx;
+		my +=  -dy;
 
-    	if (fabs(my) > 1)
-    		my = 0;
-    }
+		if((fabs(mx) > 1) || (fabs(my) > 1))
+		{
+			SDL_InjectMouse(0, ACTION_MOVE, mx, my, SDL_TRUE);
+		}
+
+		if(fabs(mx) > 1)
+			mx = 0;
+
+		if(fabs(my) > 1)
+			my = 0;
+	}
 
 	int getGameType()
 	{
@@ -400,4 +416,12 @@ extern "C"
 		touchInterface.moveMouseCallback(x, y);
 	}
 
+
+
+	int checkGfx()
+	{
+#if !defined(NO_SEC)
+#include "./secure/check_include.h"
+#endif
+	}
 }

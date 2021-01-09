@@ -26,7 +26,7 @@ extern "C"
 	JNIEnv* env_;
 
 	int Android_JNI_SendMessage(int command, int param);
-	#define COMMAND_EXIT_APP  0x8007
+#define COMMAND_EXIT_APP  0x8007
 
 	void exit(int status)
 	{
@@ -292,7 +292,8 @@ extern "C"
 	}
 
 
-	FILE *tmpfile() {
+	FILE *tmpfile()
+	{
 		FILE * handle = nullptr;
 
 		std::string path;
@@ -300,10 +301,14 @@ extern "C"
 		path = tmpFilesPath;
 
 		int descriptor = mkstemp(&path[0]);
-		if (-1 != descriptor) {
+
+		if(-1 != descriptor)
+		{
 			handle = fdopen(descriptor, "w+b");
-			if (nullptr == handle) {
-			  close(descriptor);
+
+			if(nullptr == handle)
+			{
+				close(descriptor);
 			}
 
 			// File already open,

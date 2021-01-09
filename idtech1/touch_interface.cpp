@@ -3,6 +3,7 @@
 //
 
 #include "touch_interface.h"
+#include "SDL_keycode.h"
 
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
@@ -11,20 +12,20 @@
 #define GAME_TYPE_STRIFE   4
 extern "C"
 {
-void AM_ToggleFollowMode(void);
-void jwzgles_restore(void);
+	void AM_ToggleFollowMode(void);
+	void jwzgles_restore(void);
 
 #if defined(PRBOOM_DOOM)
-typedef enum
-{
-	VID_MODE8,
-	VID_MODE15,
-	VID_MODE16,
-	VID_MODE32,
-	VID_MODEGL,
-	VID_MODEMAX
-} video_mode_t;
-video_mode_t V_GetMode(void);
+	typedef enum
+	{
+		VID_MODE8,
+		VID_MODE15,
+		VID_MODE16,
+		VID_MODE32,
+		VID_MODEGL,
+		VID_MODEMAX
+	} video_mode_t;
+	video_mode_t V_GetMode(void);
 #endif
 
 
@@ -37,9 +38,9 @@ video_mode_t V_GetMode(void);
 #if defined(GZDOOM) || defined(ZANDRONUM_30)
 
 #ifdef  GZDOOM_DEV // For the dev versions it is always OpenGL, even software mode uses ogl
-static int currentrenderer = 1;
+	static int currentrenderer = 1;
 #else
-extern int currentrenderer;
+	extern int currentrenderer;
 #endif
 
 #endif
@@ -56,49 +57,49 @@ void TouchInterface::openGLEnd()
 	touchcontrols::gl_endRender();
 
 #if defined(PRBOOM_DOOM)
-		bool sdlSWMode = (V_GetMode() != VID_MODEGL);
+	bool sdlSWMode = (V_GetMode() != VID_MODEGL);
 #else
-		bool sdlSWMode = false;
+	bool sdlSWMode = false;
 #endif
 
 
 #if ( defined(GZDOOM) || defined(ZANDRONUM_30) ) && !defined(GZDOOM_GL3)
 
-		if(touchcontrols::gl_getGLESVersion() == 1)
+	if(touchcontrols::gl_getGLESVersion() == 1)
+	{
+		if(currentrenderer == 1) //GL mode
 		{
-			if(currentrenderer == 1) //GL mode
-			{
-				jwzgles_restore();
-			}
-			else
-			{
-				sdlSWMode = true;
-			}
+			jwzgles_restore();
 		}
-		else if(touchcontrols::gl_getGLESVersion() == 2)
+		else
 		{
-			touchcontrols::gl_resetGL4ES();
+			sdlSWMode = true;
 		}
+	}
+	else if(touchcontrols::gl_getGLESVersion() == 2)
+	{
+		touchcontrols::gl_resetGL4ES();
+	}
 
 #endif
 
 #if !defined(GZDOOM_GL3) && !defined(D3ES)
 
 // Setup for SDL Software rendering again
-		if(SW_SDL_RENDER || sdlSWMode)
-		{
-			touchcontrols::gl_setupForSDLSW();
-		}
+	if(SW_SDL_RENDER || sdlSWMode)
+	{
+		touchcontrols::gl_setupForSDLSW();
+	}
 
 #endif
 
 #if defined(PRBOOM_DOOM)
 
-		if(V_GetMode() == VID_MODEGL)
-		{
-			void jwzgles_restore(void);
-			jwzgles_restore();
-		}
+	if(V_GetMode() == VID_MODEGL)
+	{
+		void jwzgles_restore(void);
+		jwzgles_restore();
+	}
 
 #endif
 };
@@ -617,11 +618,15 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 void TouchInterface::blankButton(int state, int code)
 {
 #if defined(PRBOOM_DOOM)
+
 	if(state)
 		PortableBackButton();
+
 #elif defined(D3ES) // Blank is used for cinematic, allow to skip them
+
 	if(state)
 		mobileBackButton();
+
 #else
 	PortableAction(state, PORT_ACT_USE);
 	PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
@@ -660,6 +665,7 @@ void TouchInterface::newFrame()
 		if(demoControlsAlpha > 0)
 		{
 			demoControlsAlpha -= DEMO_ALPFA_DEC;
+
 			if(demoControlsAlpha < 0)
 				demoControlsAlpha = 0;
 		}
