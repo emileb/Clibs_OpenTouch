@@ -366,6 +366,23 @@ void TouchInterfaceBase::menuButton(int state, int code)
 
 void TouchInterfaceBase::leftStick(float joy_x, float joy_y, float mouse_x, float mouse_y)
 {
+	float deadZoneX = touchSettings.deadzoneSensitivity * 0.05;
+	float deadZoneY = deadZoneX * 1.6; // Y is about 1.6 bigger due to screen ratio
+
+	if(abs(joy_x) < deadZoneX)
+		joy_x = 0;
+	else if(joy_x >= deadZoneX)
+		joy_x = joy_x - deadZoneX;
+	else
+		joy_x = joy_x + deadZoneX;
+
+	if(abs(joy_y) < deadZoneY)
+		joy_y = 0;
+	else if(joy_y >= deadZoneY)
+		joy_y = joy_y - deadZoneY;
+	else
+		joy_y = joy_y + deadZoneY;
+
 	float fwdback = joy_y * 15 * touchSettings.fwdSensitivity;
 	float strafe  = -joy_x * 10 * touchSettings.strafeSensitivity;
 
@@ -510,7 +527,7 @@ void TouchInterfaceBase::mouseButton(int state, int code)
 }
 
 
-void TouchInterfaceBase::automap_multitouch_mouse_move(int action, float x, float y, float dx, float dy)
+void TouchInterfaceBase::AutomapMultitouchMouseMove(int action, float x, float y, float dx, float dy)
 {
 	if(action == MULTITOUCHMOUSE_MOVE)
 	{

@@ -3,9 +3,6 @@
 
 #include "port_act_defs.h"
 
-#ifdef __IOS__
-#define LOGI printf
-#endif
 
 #ifndef LOGI
 #ifdef __ANDROID__

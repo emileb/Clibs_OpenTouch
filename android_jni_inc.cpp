@@ -423,5 +423,6 @@ extern "C"
 #if !defined(NO_SEC)
 #include "./secure/check_include.h"
 #endif
+		return 0;
 	}
 }

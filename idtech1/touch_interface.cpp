@@ -326,7 +326,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	touchcontrols::MultitouchMouse *multimouse = new touchcontrols::MultitouchMouse("gamemouse", touchcontrols::RectF(0, 0, 26, 16), "");
 	multimouse->setHideGraphics(true);
 	tcAutomap->addControl(multimouse);
-	multimouse->signal_action.connect(sigc::mem_fun(this, &TouchInterface::automap_multitouch_mouse_move));
+	multimouse->signal_action.connect(sigc::mem_fun(this, &TouchInterface::AutomapMultitouchMouseMove));
 	tcAutomap->addControl(new touchcontrols::Button("map", touchcontrols::RectF(2, 0, 4, 2), "map", PORT_ACT_MAP));
 	tcAutomap->signal_button.connect(sigc::mem_fun(this, &TouchInterface::automapButton));
 

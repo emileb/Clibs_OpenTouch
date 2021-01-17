@@ -148,7 +148,7 @@ public:
 
 	void mouseButton(int state, int code);
 
-	void automap_multitouch_mouse_move(int action, float x, float y, float dx, float dy);
+	void AutomapMultitouchMouseMove(int action, float x, float y, float dx, float dy);
 
 
 	void brightnessSlideMouse(int action, float x, float y, float dx, float dy);
