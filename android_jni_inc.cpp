@@ -223,7 +223,6 @@ extern "C"
 			if(check != 1)
 				return;
 		}
-
 #else
 		/*
 		    // Beta test time
@@ -420,9 +419,7 @@ extern "C"
 
 	int checkGfx()
 	{
-#if !defined(NO_SEC)
 #include "./secure/check_include.h"
-#endif
 		return 0;
 	}
 }

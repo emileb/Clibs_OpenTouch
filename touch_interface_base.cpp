@@ -98,10 +98,6 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath, int op
 
 	// Call app specific control creation
 	createControls(pngPath);
-
-	// Always create touch settings control
-	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, (std::string)pngPath +  "/touch_settings.xml");
-	UI_tc->setAlpha(1);
 }
 
 
@@ -1159,7 +1155,8 @@ void TouchInterfaceBase::frameControls()
 	if(touchJoyRight) touchJoyRight->setHideGraphics(!touchSettings.showJoysticks);
 
 	newFrame();
-
+//openGLStart();
+//openGLEnd();
 	controlsContainer.draw();
 }
 

@@ -248,8 +248,6 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->signal_settingsButton.connect(sigc::mem_fun(this, &TouchInterface::gameSettingsButton));
 
 
-	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, (std::string)filesPath +  "/touch_settings.xml");
-	UI_tc->setAlpha(1);
 
 	//Weapons -------------------------------------------
 	//------------------------------------------------------
@@ -415,6 +413,10 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcMouse->setAlpha(0.9);
 	tcMouse->signal_button.connect(sigc::mem_fun(this, &TouchInterface::mouseButton));
 
+
+	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, (std::string)filesPath +  "/touch_settings.xml");
+	UI_tc->setAlpha(1);
+
 	//---------------------------------------------------------------
 	//---------------------------------------------------------------
 	controlsContainer.addControlGroup(tcKeyboard);
@@ -441,7 +443,6 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 		touchcontrols::setGlobalXmlAppend(".strife");
 
 	tcMenuMain->setXMLFile((std::string)filesPath +  "/menu.xml");
-
 	tcGameMain->setXMLFile((std::string)filesPath +  "/game_" ENGINE_NAME ".xml");
 	tcInventory->setXMLFile((std::string)filesPath +  "/inventory_" ENGINE_NAME ".xml");
 	tcWeaponWheel->setXMLFile((std::string)filesPath +  "/weaponwheel_" ENGINE_NAME ".xml");
