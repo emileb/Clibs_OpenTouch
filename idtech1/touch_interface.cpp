@@ -97,8 +97,7 @@ void TouchInterface::openGLEnd()
 
 	if(V_GetMode() == VID_MODEGL)
 	{
-		void jwzgles_restore(void);
-		jwzgles_restore();
+		touchcontrols::gl_resetGL4ES();
 	}
 
 #endif

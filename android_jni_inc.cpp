@@ -419,7 +419,11 @@ extern "C"
 
 	int checkGfx()
 	{
-#include "./secure/check_include.h"
-		return 0;
+#ifndef NO_SEC
+	#include "./secure/check_include.h"
+	return 0;
+#else
+	return 0;
+#endif
 	}
 }

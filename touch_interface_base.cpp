@@ -382,7 +382,46 @@ void TouchInterfaceBase::leftStick(float joy_x, float joy_y, float mouse_x, floa
 	float fwdback = joy_y * 15 * touchSettings.fwdSensitivity;
 	float strafe  = -joy_x * 10 * touchSettings.strafeSensitivity;
 
-	PortableMove(fwdback, strafe);
+	//LOGI("fwd = %f, side = %f", fwdback, strafe);
+
+	if(touchSettings.digitalMove)
+	{
+		if(fwdback > 0.5)
+		{
+			PortableAction(1, PORT_ACT_FWD);
+			PortableAction(0, PORT_ACT_BACK);
+		}
+		else if(fwdback < -0.5)
+		{
+			PortableAction(0, PORT_ACT_FWD);
+			PortableAction(1, PORT_ACT_BACK);
+		}
+		else
+		{
+			PortableAction(0, PORT_ACT_FWD);
+			PortableAction(0, PORT_ACT_BACK);
+		}
+
+		if(strafe > 0.5)
+		{
+			PortableAction(1, PORT_ACT_MOVE_RIGHT);
+			PortableAction(0, PORT_ACT_MOVE_LEFT);
+		}
+		else if(strafe < -0.5)
+		{
+			PortableAction(0, PORT_ACT_MOVE_RIGHT);
+			PortableAction(1, PORT_ACT_MOVE_LEFT);
+		}
+		else
+		{
+			PortableAction(0, PORT_ACT_MOVE_RIGHT);
+			PortableAction(0, PORT_ACT_MOVE_LEFT);
+		}
+	}
+	else
+	{
+		PortableMove(fwdback, strafe);
+	}
 }
 
 void TouchInterfaceBase::rightStick(float joy_x, float joy_y, float mouse_x, float mouse_y)
