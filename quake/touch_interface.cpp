@@ -4,6 +4,7 @@
 
 #include "touch_interface.h"
 #include "quake_game_dll.h"
+#include "SDL_keycode.h"
 
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization

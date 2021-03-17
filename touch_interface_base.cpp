@@ -52,6 +52,8 @@ extern "C"
 
 	extern const char * getFilesPath();
 	extern const char *nativeLibsPath;
+
+	int checkGfx();
 }
 
 
