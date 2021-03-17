@@ -13,5 +13,10 @@ void LogWritter_Init( const char *filename )
 void LogWritter_Write( const char *msg )
 {
     fprintf(file, "%s\n", msg);
-    fsync(file);
+    fflush(file);
+}
+
+void LogWritter_Close()
+{
+	fclose(file);
 }

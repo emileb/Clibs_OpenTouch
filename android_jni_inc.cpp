@@ -39,6 +39,9 @@ extern "C"
 	int abc = 1;
 	void exit(int status)
 	{
+		LogWritter_Close();
+		usleep(100); // Wait 100ms
+
 		LOGI("EXIT OVERRIDE!!!");
 		Android_JNI_SendMessage(COMMAND_EXIT_APP, 0);
 
