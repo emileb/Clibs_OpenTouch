@@ -331,11 +331,13 @@ extern "C"
 	{
 		FILE * handle = nullptr;
 
-		std::string path;
+		char path[256];
 
-		path = tempFilesPath;
+		snprintf(path, 256, "%s/fileXXXXXX", tempFilesPath.c_str());
 
-		int descriptor = mkstemp(&path[0]);
+		LOGI("Temp file = %s", path );
+
+		int descriptor = mkstemp(path);
 
 		if(-1 != descriptor)
 		{
@@ -348,7 +350,11 @@ extern "C"
 
 			// File already open,
 			// can be unbound from the file system
-			std::remove(path.c_str());
+			//std::remove(path);
+		}
+		else
+		{
+			LOGI("ERROR CREATING TEMP FILE NAME");
 		}
 
 		return handle;
