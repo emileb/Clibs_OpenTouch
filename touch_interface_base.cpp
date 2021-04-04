@@ -52,7 +52,8 @@ extern "C"
 
 	extern const char * getFilesPath();
 	extern const char *nativeLibsPath;
-
+	extern int mobile_screen_width;
+	extern int mobile_screen_height;
 	int checkGfx();
 }
 
@@ -526,7 +527,6 @@ void TouchInterfaceBase::selectWeaponButton(int state, int code)
 void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, float mouse_y)
 {
 #if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) // todo
-
 	if(action == TOUCHMOUSE_MOVE)
 	{
 		PortableMouse(mouse_x, mouse_y);
@@ -537,7 +537,19 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 		usleep(200 * 1000); // Need this for the PDA to work in D3, needs a frame to react..
 		PortableMouseButton(0, 1, 0, 0);
 	}
+#endif
 
+#ifdef QUAKE3
+		if(action == TOUCHMOUSE_MOVE)
+		{
+			MouseMove(mouse_x * mobile_screen_width, mouse_y * mobile_screen_height);
+		}
+		else if(action == TOUCHMOUSE_TAP)
+		{
+			MouseButton(1, BUTTON_PRIMARY);
+			usleep(200 * 1000);
+			MouseButton(0, BUTTON_PRIMARY);
+		}
 #endif
 }
 
@@ -1134,10 +1146,7 @@ bool TouchInterfaceBase::saveControlSettings(std::string path)
 	touchcontrols::touchSettings_save(settings);
 
 	tcGameMain->saveXML(path + "/tcGameMain.xml");
-
-
 	tcWeaponWheel->saveXML(path + "/tcWeaponWheel.xml");
-
 	tcGameWeapons->saveXML(path + "/tcGameWeapons.xml");
 
 	if(tcInventory)
