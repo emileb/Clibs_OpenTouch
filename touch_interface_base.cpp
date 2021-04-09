@@ -33,6 +33,7 @@
 #define COMMAND_SHOW_GAMEPAD       0x8004
 #define COMMAND_VIBRATE            0x8005
 #define COMMAND_LOAD_SAVE_CONTROLS 0x8006
+#define COMMAND_SHOW_QUICK_COMMANDS 0x8008
 
 
 extern "C"
@@ -287,6 +288,11 @@ void TouchInterfaceBase::gameButton(int state, int code)
 		}
 
 		PortableAction(state, code);
+	}
+	else if(code == KEY_QUICK_COMMANDS)
+	{
+		if(state)
+			Android_JNI_SendMessage(COMMAND_SHOW_QUICK_COMMANDS, 0);
 	}
 	else
 	{
@@ -1225,6 +1231,12 @@ void TouchInterfaceBase::showKeyboardCallback(int show)
 		tcKeyboard->setEnabled(show);
 	}
 }
+
+void TouchInterfaceBase::executeCommand(const char *cmd)
+{
+	PortableCommand(cmd);
+}
+
 
 void TouchInterfaceBase::showMouseCallback(int show)
 {

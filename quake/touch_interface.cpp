@@ -21,10 +21,6 @@ extern "C"
 	extern int android_reset_tex;
 #endif
 
-	static GLint     matrixMode;
-	static GLfloat   projection[16];
-	static GLfloat   model[16];
-
 	void jwzgles_restore(void);
 
 #ifdef YQUAKE2
@@ -35,6 +31,11 @@ extern "C"
 	void nanoPopState();
 	void BE_FixPointers();
 	void GL_FixState();
+
+	void PortableAutomapControl(float zoom, float x, float y)
+	{
+		// Blank
+	}
 }
 
 
@@ -222,6 +223,7 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show Keyboard"));
 	tcGameMain->addControl(new touchcontrols::Button("showscores", touchcontrols::RectF(17, 0, 19, 2), "scores", PORT_ACT_MP_SCORES, false, true, "Show Scores"));
 	tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, false, "Jump/Swim up"));
+	tcGameMain->addControl(new touchcontrols::Button("quick_command", touchcontrols::RectF(21, 3, 23, 5), "star", KEY_QUICK_COMMANDS, false, true, "Quick Commands"));
 
 	if(gameType == Q1HEXEN2)
 		tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_CROUCH, false, false, "Crouch/Swim down"));
@@ -460,6 +462,12 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameWeapons->setXMLFile((std::string)filesPath +  "/weapons_" ENGINE_NAME ".xml");
 	tcCustomButtons->setXMLFile((std::string)filesPath +  "/custom_buttons_0_" ENGINE_NAME ".xml");
 
+#if defined(YQUAKE2) // When using GLES1 on YQ2, does not use glGenTextures
+	if(yquake2Renderer == 1)
+	{
+		touchcontrols::setTextureNumberStart(10000);
+	}
+#endif
 }
 
 

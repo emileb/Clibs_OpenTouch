@@ -22,6 +22,7 @@
 
 #include <time.h>
 
+#define COMMAND_EXIT_APP  0x8007
 
 extern "C"
 {
@@ -34,7 +35,6 @@ extern "C"
 	JNIEnv* env_;
 
 	int Android_JNI_SendMessage(int command, int param);
-#define COMMAND_EXIT_APP  0x8007
 
 	int abc = 1;
 	void exit(int status)
@@ -55,14 +55,9 @@ extern "C"
 		}
 	}
 
-//#define JAVA_FUNC(x) Java_com_beloko_opengames_gzdoom2_NativeLib_##x
-
-
 #define JAVA_FUNC(x) Java_org_libsdl_app_NativeLib_##x
 
 #define EXPORT_ME __attribute__ ((visibility("default")))
-
-
 
 	__attribute__((visibility("default"))) jint JNI_OnLoad(JavaVM* vm, void* reserved)
 	{
@@ -326,6 +321,17 @@ extern "C"
 		return 0;
 	}
 
+	int EXPORT_ME
+	JAVA_FUNC(executeCommand)(JNIEnv *env, jobject obj, jstring command)
+	{
+		const char * command_c = (const char *)(env)->GetStringUTFChars(command, 0);
+		LOGI("executeCommand %s", command_c);
+
+		touchInterface.executeCommand(command_c);
+
+		env->ReleaseStringUTFChars(command, command_c);
+		return 0;
+	}
 
 	FILE *tmpfile()
 	{

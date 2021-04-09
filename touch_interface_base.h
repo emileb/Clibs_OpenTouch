@@ -29,6 +29,7 @@
 #define KEY_USE_MOUSE    0x100E
 #define KEY_LEFT_MOUSE   0x100F
 #define KEY_LOAD_SAVE_CONTROLS 0x1010
+#define KEY_QUICK_COMMANDS     0x1011
 
 
 #define DEMO_ALPHA_RESET      1
@@ -198,8 +199,9 @@ public:
 
 	bool loadControlSettings(std::string path);
 
-	void frameControls();
+	void executeCommand(const char *cmd);
 
+	void frameControls();
 
 	void showKeyboardCallback(int show);
 	void showMouseCallback(int show);
