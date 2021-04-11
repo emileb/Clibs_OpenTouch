@@ -688,3 +688,8 @@ void TouchInterface::newFrame()
 
 	currentScreenMode = screenMode;
 }
+
+void TouchInterface::newGLContext()
+{
+
+}

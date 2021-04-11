@@ -481,13 +481,6 @@ void TouchInterface::createControls(std::string filesPath)
 	tcWeaponWheel->setXMLFile((std::string)filesPath +  "/weaponwheel_" ENGINE_NAME ".xml");
 	tcGameWeapons->setXMLFile((std::string)filesPath +  "/weapons_" ENGINE_NAME ".xml");
 	tcCustomButtons->setXMLFile((std::string)filesPath +  "/custom_buttons_0_" ENGINE_NAME ".xml");
-
-#if defined(YQUAKE2) // When using GLES1 on YQ2, does not use glGenTextures
-	if(yquake2Renderer == 1)
-	{
-		touchcontrols::setTextureNumberStart(10000);
-	}
-#endif
 }
 
 
@@ -531,4 +524,18 @@ void TouchInterface::newFrame()
 	updateTouchScreenModeIn(screenMode);
 
 	currentScreenMode = screenMode;
+}
+
+void TouchInterface::newGLContext()
+{
+#if defined(YQUAKE2) // When using GLES1 on YQ2, does not use glGenTextures
+	if(yquake2Renderer == 1)
+	{
+		touchcontrols::setTextureNumberStart(10000);
+	}
+#endif
+
+#if defined(QUAKE2)
+	touchcontrols::setTextureNumberStart(5000);
+#endif
 }

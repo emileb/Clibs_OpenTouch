@@ -22,5 +22,7 @@ public:
 	void newFrame();
 
 	void automapButton(int state, int code);
+
+	void newGLContext();
 };
 #endif /* touch_interface_h */

@@ -112,6 +112,8 @@ public:
 
 	virtual void newFrame() = 0;
 
+	virtual void newGLContext() = 0;
+
 	void init(int width, int height, const char *pngPath, int options, int wheelNbr_, int game);
 
 

@@ -1199,6 +1199,7 @@ void TouchInterfaceBase::frameControls()
 	if(SDL_NewEGLCreated())
 	{
 		LOGI("NEW EGL CONTEXT");
+		newGLContext();
 		touchcontrols::clearGlTexCache();
 		controlsContainer.initGL();
 	}
