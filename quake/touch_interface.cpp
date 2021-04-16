@@ -136,7 +136,7 @@ void TouchInterface::createControls(std::string filesPath)
 
 	//Menu -------------------------------------------
 	//------------------------------------------------------
-	tcMenuMain->setFixAspect(true);   // Dont want menu to fix the aspect
+	tcMenuMain->setFixAspect(true);
 	tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON));
 #ifndef QUAKE3
 	tcMenuMain->addControl(new touchcontrols::Button("down_arrow", touchcontrols::RectF(20, 13, 23, 16), "arrow_down", PORT_ACT_MENU_DOWN));
