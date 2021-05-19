@@ -133,9 +133,10 @@ extern "C"
 			setenv("SDL_AUDIODRIVER", "android", 1);
 
 		chdir(game_path.c_str());
+#ifndef NO_SEC
 		strcpy(keyGlobal, key);
 		strcpy(pkgGlobal, pkg);
-
+#endif
 		//mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(), options, wheelNbr, game);
 
 		//touchInterface = new TouchInterface();
