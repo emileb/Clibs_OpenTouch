@@ -351,10 +351,12 @@ void TouchInterfaceBase::menuButton(int state, int code)
 			useMouse = true;
 		}
 	}
+#if !defined(QUAKESPASM) &&  !defined(QUAKESPASM_SPIKED)  && !defined(FTEQW) && !defined(DARKPLACES) && !defined(QUAKE2) && !defined(YQUAKE2)  && !defined(QUAKE3) && !defined(UHEXEN2)
 	else if(code == PORT_ACT_CONSOLE)
 	{
 		PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
 	}
+#endif
 	else if(code == KEY_LEFT_MOUSE)
 	{
 #if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES)
