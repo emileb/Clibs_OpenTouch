@@ -60,16 +60,16 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 	// Mouse pointer does not work with SDL
 #if defined(GZDOOM) || defined(ZANDRONUM_30)
-	tcMenuMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE));
+	//tcMenuMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE));
 #endif
-#ifndef CHOC_SETUP
+
 	tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 	tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
 	tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
-#endif
-	//tcMenuMain->addControl(new touchcontrols::Button("brightness",touchcontrols::RectF(21,0,23,2),"brightness",KEY_BRIGHTNESS));
 
-
+	touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24, 3, 26, 11), "brightness_slider");
+	brightnessSlide->signal_action.connect(sigc::mem_fun(this, &TouchInterface:: brightnessSlideMouse));
+	tcMenuMain->addControl(brightnessSlide);
 
 	tcMenuMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::menuButton));
 	tcMenuMain->setAlpha(0.8);

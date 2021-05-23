@@ -158,7 +158,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
 	tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
 #endif
-	//tcMenuMain->addControl(new touchcontrols::Button("brightness",touchcontrols::RectF(21,0,23,2),"brightness",KEY_BRIGHTNESS));
+
 #ifdef CHOC_SETUP
 	tcMenuMain->addControl(new touchcontrols::Button("f10", touchcontrols::RectF(24, 0, 26, 2), "key_f10", SDL_SCANCODE_F10));
 #endif
