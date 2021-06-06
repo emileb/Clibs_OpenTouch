@@ -172,7 +172,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 
 	tcMenuMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::menuButton));
 	tcMenuMain->setAlpha(0.8);
-	tcMenuMain->setFixAspect(false);
+	tcMenuMain->setFixAspect(true);
 
 	//Game -------------------------------------------
 	//------------------------------------------------------

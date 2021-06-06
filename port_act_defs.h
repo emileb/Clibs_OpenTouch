@@ -48,6 +48,8 @@
 // Hexen 2
 #define PORT_ACT_CROUCH    40
 
+//Multiplayer
+#define PORT_ACT_MP_SAY    41
 
 //RTCW
 #define PORT_ACT_ZOOM_IN    50 //Also used for Quake 3 zoom
