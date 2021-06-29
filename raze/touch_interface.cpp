@@ -88,6 +88,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("map", touchcontrols::RectF(2, 0, 4, 2), "map", PORT_ACT_MAP, false, false, "Show map"));
 	tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show keyboard"));
 	tcGameMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE, false, true, "Use mouse"));
+	tcGameMain->addControl(new touchcontrols::Button("quick_command", touchcontrols::RectF(21, 3, 23, 5), "star", KEY_QUICK_COMMANDS, false, true, "Quick Commands"));
 
 
 	tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, false, "Jump"));
