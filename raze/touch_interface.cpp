@@ -6,11 +6,12 @@
 #include "SDL_keycode.h"
 
 
-extern "C"
-{
-
-}
-
+#define RAZE_GAME_DUKE   100
+#define RAZE_GAME_BLOOD  101
+#define RAZE_GAME_SW     102
+#define RAZE_GAME_RR     103
+#define RAZE_GAME_NAM    104
+#define RAZE_GAME_PS     105
 
 void TouchInterface::openGLStart()
 {
@@ -77,6 +78,14 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 
 	//Game -------------------------------------------
 	//------------------------------------------------------
+
+	bool hideAltAttack = true;
+
+	if(gameType == RAZE_GAME_BLOOD)
+	{
+		hideAltAttack = false;
+	}
+
 	tcGameMain->setAlpha(touchSettings.alpha);
 	tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
 	tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(20, 7, 23, 10), "shoot", KEY_SHOOT, false, false, "Attack!"));
@@ -96,9 +105,9 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("activate_inventory", touchcontrols::RectF(22, 3, 24, 5), "inventory_use_fade", PORT_ACT_INVUSE, false, true, "Use Inventory"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, true, "Crouch (toggle)"));
-	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack"));
+	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, hideAltAttack, "Alt attack"));
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt2", touchcontrols::RectF(4, 3, 6, 5), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (duplicate)"));
-	tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
+	//tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
 	tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 7, 2, 9), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
 	tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
 	tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
@@ -268,8 +277,9 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcMouse->setAlpha(0.9);
 	tcMouse->signal_button.connect(sigc::mem_fun(this, &TouchInterface::mouseButton));
 
+	std::string gameTypeString =  std::to_string(gameType);
 
-	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, (std::string)filesPath +  "/touch_settings.xml");
+	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, (std::string)filesPath +  "/touch_settings" + gameTypeString + ".xml");
 	UI_tc->setAlpha(1);
 
 	//---------------------------------------------------------------
@@ -290,11 +300,11 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	controlsContainer.addControlGroup(tcMouse);
 
 	tcMenuMain->setXMLFile((std::string)filesPath +  "/menu.xml");
-	tcGameMain->setXMLFile((std::string)filesPath +  "/game_" ENGINE_NAME ".xml");
-	tcInventory->setXMLFile((std::string)filesPath +  "/inventory_" ENGINE_NAME ".xml");
-	tcWeaponWheel->setXMLFile((std::string)filesPath +  "/weaponwheel_" ENGINE_NAME ".xml");
-	tcGameWeapons->setXMLFile((std::string)filesPath +  "/weapons_" ENGINE_NAME ".xml");
-	tcCustomButtons->setXMLFile((std::string)filesPath +  "/custom_buttons_0_" ENGINE_NAME ".xml");
+	tcGameMain->setXMLFile((std::string)filesPath +  "/game_" ENGINE_NAME + gameTypeString + ".xml");
+	tcInventory->setXMLFile((std::string)filesPath +  "/inventory_" ENGINE_NAME  + gameTypeString + ".xml");
+	tcWeaponWheel->setXMLFile((std::string)filesPath +  "/weaponwheel_" ENGINE_NAME  + gameTypeString + ".xml");
+	tcGameWeapons->setXMLFile((std::string)filesPath +  "/weapons_" ENGINE_NAME  + gameTypeString + ".xml");
+	tcCustomButtons->setXMLFile((std::string)filesPath +  "/custom_buttons_0_" ENGINE_NAME  + gameTypeString + ".xml");
 }
 
 
