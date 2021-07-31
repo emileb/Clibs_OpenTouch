@@ -130,6 +130,7 @@
 #define PORT_ACT_WEAP12             112
 #define PORT_ACT_WEAP13             113
 
+#define PORT_ACT_WEAP_ALT           114
 
 //Descent
 #define PORT_ACT_CYCLE_PRIM        120

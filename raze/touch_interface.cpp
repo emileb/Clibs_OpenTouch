@@ -86,6 +86,8 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 		hideAltAttack = false;
 	}
 
+	bool hideAltWeapon = false; // Always visible, I think every game uses it
+
 	tcGameMain->setAlpha(touchSettings.alpha);
 	tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
 	tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(20, 7, 23, 10), "shoot", KEY_SHOOT, false, false, "Attack!"));
@@ -113,6 +115,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
+	tcGameMain->addControl(new touchcontrols::Button("swap_weapon", touchcontrols::RectF(3, 3, 5, 5), "swap", PORT_ACT_WEAP_ALT, false, hideAltWeapon, "Weapon alternative"));
 
 	touchcontrols::ButtonGrid *dpad = new touchcontrols::ButtonGrid("dpad_move", touchcontrols::RectF(6, 3, 12, 7), "", 3, 2, true, "Movement btns (WASD)");
 
