@@ -450,8 +450,11 @@ void PortableAction(int state, int action)
 		case PORT_ACT_SHOW_KEYS:
 			if(state)
 				PortableCommand("showpop 2");
-
 			break;
+
+		case PORT_ACT_MP_SAY:
+			if(state)
+				PortableCommand("messagemode");
 			break;
 		}
 	}
