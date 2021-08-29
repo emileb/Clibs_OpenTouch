@@ -132,6 +132,9 @@ extern "C"
 		if(options & GAME_OPTION_SDL_OLD_AUDIO)
 			setenv("SDL_AUDIODRIVER", "android", 1);
 
+		if(options & GAME_OPTION_SDL_AAUDIO_AUDIO)
+			setenv("SDL_AUDIODRIVER", "AAudio", 1);
+
 		chdir(game_path.c_str());
 #ifndef NO_SEC
 		strcpy(keyGlobal, key);
