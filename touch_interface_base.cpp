@@ -547,7 +547,7 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 	}
 #endif
 
-#if defined(QUAKE3)  || defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM)
+#if defined(QUAKE3)  || defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES)
 		if(action == TOUCHMOUSE_MOVE)
 		{
 			MouseMove(mouse_x * mobile_screen_width, mouse_y * mobile_screen_height);
@@ -563,7 +563,7 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 
 void TouchInterfaceBase::mouseButton(int state, int code)
 {
-#if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) || defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM)
+#if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) || defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES)
 
 	// Hide the mouse
 	if((code == KEY_USE_MOUSE) && state)
@@ -572,7 +572,7 @@ void TouchInterfaceBase::mouseButton(int state, int code)
 	}
 	else if(code == KEY_LEFT_MOUSE)
 	{
-#if defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM)
+#if defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES)
 		MouseButton(state, BUTTON_PRIMARY);
 #else
 		PortableMouseButton(state, 1, 0, 0);
@@ -1218,9 +1218,11 @@ void TouchInterfaceBase::frameControls()
 	if(touchJoyRight) touchJoyRight->setHideGraphics(!touchSettings.showJoysticks);
 
 	newFrame();
-//openGLStart();
-//openGLEnd();
+#if 1
+	//openGLStart();
+	//openGLEnd();
 	controlsContainer.draw();
+#endif
 }
 
 
