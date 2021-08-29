@@ -221,6 +221,7 @@ void TouchInterfaceBase::gameButton(int state, int code)
 			if(!tcGameWeapons->enabled)
 			{
 				showWeaponNumbersOn = true;
+				tcGameWeapons->setAlpha(touchSettings.alpha);
 				tcGameWeapons->animateIn(5);
 			}
 			else
