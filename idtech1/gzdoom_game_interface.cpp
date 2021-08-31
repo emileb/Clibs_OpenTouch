@@ -99,6 +99,8 @@ static float look_yaw_mouse = 0;
 static float look_yaw_joy = 0;
 
 
+bool            g_bindingbutton = false;
+
 int PortableKeyEvent(int state, int code, int unicode)
 {
 	LOGI("PortableKeyEvent %d %d %d\n", state, code, unicode);
@@ -217,6 +219,10 @@ void PortableAction(int state, int action)
 {
 	LOGI("PortableAction %d   %d", state, action);
 
+	// Force this to false on every button down, in case a mod overrides the menu zsript
+	if(state)
+		g_bindingbutton = false;
+
 	if((action >= PORT_ACT_CUSTOM_0) && (action <= PORT_ACT_CUSTOM_25))
 	{
 		if(action <= PORT_ACT_CUSTOM_9)
@@ -318,134 +324,112 @@ void PortableAction(int state, int action)
 		case PORT_ACT_NEXT_WEP:
 			if(state)
 				PortableCommand("weapnext");
-
 			break;
 
 		case PORT_ACT_PREV_WEP:
 			if(state)
 				PortableCommand("weapprev");
-
 			break;
 
 		case PORT_ACT_MAP:
 			if(state)
 				PortableCommand("togglemap");
-
 			break;
 
 		case PORT_ACT_QUICKLOAD:
 			if(state)
 				PortableCommand("quickload");
-
 			break;
 
 		case PORT_ACT_QUICKSAVE:
 			if(state)
 				PortableCommand("quicksave");
-
 			break;
 
 		case PORT_ACT_WEAP0:
 			if(state)
 				PortableCommand("slot 0");
-
 			break;
 
 		case PORT_ACT_WEAP1:
 			if(state)
 				PortableCommand("slot 1");
-
 			break;
 
 		case PORT_ACT_WEAP2:
 			if(state)
 				PortableCommand("slot 2");
-
 			break;
 
 		case PORT_ACT_WEAP3:
 			if(state)
 				PortableCommand("slot 3");
-
 			break;
 
 		case PORT_ACT_WEAP4:
 			if(state)
 				PortableCommand("slot 4");
-
 			break;
 
 		case PORT_ACT_WEAP5:
 			if(state)
 				PortableCommand("slot 5");
-
 			break;
 
 		case PORT_ACT_WEAP6:
 			if(state)
 				PortableCommand("slot 6");
-
 			break;
 
 		case PORT_ACT_WEAP7:
 			if(state)
 				PortableCommand("slot 7");
-
 			break;
 
 		case PORT_ACT_WEAP8:
 			if(state)
 				PortableCommand("slot 8");
-
 			break;
 
 		case PORT_ACT_WEAP9:
 			if(state)
 				PortableCommand("slot 9");
-
 			break;
 
 		case PORT_ACT_CONSOLE:
 			if(state)
 				PortableCommand("toggleconsole");
-
 			break;
 
 		case PORT_ACT_INVUSE:
 			if(state)
 				PortableCommand("invuse");
-
 			break;
 
 		case PORT_ACT_INVDROP:
 			if(state)
 				PortableCommand("invdrop");
-
 			break;
 
 		case PORT_ACT_INVPREV:
 			if(state)
 				PortableCommand("invprev");
-
 			break;
 
 		case PORT_ACT_INVNEXT:
 			if(state)
 				PortableCommand("invnext");
-
 			break;
 
 		case PORT_ACT_HELPCOMP:
 			if(state)
 				PortableCommand("showpop 1");
-
 			break;
 
 		case PORT_ACT_SHOW_WEAPONS:
 			if(state)
 				PortableCommand("showpop 3");
-
-			break;;
+			break;
 
 		case PORT_ACT_SHOW_KEYS:
 			if(state)
@@ -531,7 +515,6 @@ void PortableInit(int argc, const char ** argv)
 }
 
 extern bool		automapactive;
-bool            g_bindingbutton = false;
 
 touchscreemode_t PortableGetScreenMode()
 {

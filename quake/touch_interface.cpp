@@ -7,10 +7,7 @@
 #include "SDL_keycode.h"
 #include <fstream>
 
-#define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
-#define GAME_TYPE_HEXEN    2
-#define GAME_TYPE_HERETIC  3
-#define GAME_TYPE_STRIFE   4
+
 extern "C"
 {
 
