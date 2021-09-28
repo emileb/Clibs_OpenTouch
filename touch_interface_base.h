@@ -67,7 +67,7 @@ public:
 	bool showWeaponNumbersOn = false;
 	bool showCustomOn = false;
 	bool showCustomMenu = false;
-
+	bool gotMouseMove = false; // Set to true if we ever got a mouse mouse from SDL, so we can choose if to show the mouse icon
 	// For Doom
 	int mapState = 0;
 	float demoControlsAlpha = 0; // Used to fade out demo controls

@@ -204,7 +204,6 @@ extern "C"
 	JAVA_FUNC(touchEvent)(JNIEnv *env, jobject obj, jint action, jint pid, jfloat x, jfloat y)
 	{
 #ifndef NO_SEC
-
 		//LOGI("TOUCHED");
 		if(apkRandomDelay == -1)
 		{
@@ -226,18 +225,16 @@ extern "C"
 				return;
 		}
 #else
-		/*
 		    // Beta test time
 		    time_t t = time(NULL);
 		    struct tm tm = *localtime(&t);
 		    int yr =  tm.tm_year + 1900;
 		    int mo = tm.tm_mon + 1;
 		    //LOGI("%d   %d",yr,mo);
-		    if(yr > 2021 || (yr > 2020 && mo > 6))
+		    if(yr > 2023 || (yr > 2022 && mo > 4))
 		    {
 		        return;
 		    }
-		*/
 #endif
 
 		touchInterface.processPointer(action, pid, x, y);

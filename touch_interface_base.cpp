@@ -1256,7 +1256,8 @@ void TouchInterfaceBase::showMouseCallback(int show)
 
 void TouchInterfaceBase::moveMouseCallback(float x, float y)
 {
-	LOGI("moveMouseCallback = %f, %f", x, y);
+	//LOGI("moveMouseCallback = %f, %f", x, y);
+	gotMouseMove = x || y; // Got mouse if it's not zero
 	controlsContainer.mousePos(x, y);
 }
 
