@@ -780,7 +780,6 @@ void TouchInterfaceBase::updateTouchScreenModeIn(touchscreemode_t mode)
 			break;
 
 		case TS_MENU:
-			useMouse = false;
 
 			if(!hideGameAndMenu)
 			{
@@ -796,7 +795,6 @@ void TouchInterfaceBase::updateTouchScreenModeIn(touchscreemode_t mode)
 			break;
 
 		case TS_GAME:
-			useMouse = false;
 
 			// Always set these so they are never wrong
 			if(tcGameMain) tcGameMain->setAlpha(touchSettings.alpha);
