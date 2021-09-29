@@ -502,11 +502,12 @@ void TouchInterface::newFrame()
 		controlsContainer.showMouse(false);
 */
 
-	if((screenMode == TS_MENU) && useMouse)
+	if((screenMode == TS_MENU) && (useMouse || gotMouseMove))
 		controlsContainer.showMouse(true);
 	else
 	{
 		useMouse = false;
+		gotMouseMove = false;
 		controlsContainer.showMouse(false);
 	}
 
