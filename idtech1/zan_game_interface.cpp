@@ -528,8 +528,8 @@ void Mobile_AM_controls(double *zoom, double *pan_x, double *pan_y)
 		am_zoom = 0;
 	}
 
-	*pan_x += (fixed_t)am_pan_x;
-	*pan_y += -(fixed_t)am_pan_y;
+	*pan_x += am_pan_x;
+	*pan_y += -am_pan_y;
 	am_pan_x = am_pan_y = 0;
 	//LOGI("zoom = %f",*zoom);
 }
