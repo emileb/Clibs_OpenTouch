@@ -226,3 +226,4 @@
 #define GAME_OPTION_GLES3               0x10
 #define GAME_OPTION_SDL_OLD_AUDIO       0x20
 #define GAME_OPTION_GL4ES               0x40
+#define GAME_OPTION_SDL_AAUDIO_AUDIO    0x80

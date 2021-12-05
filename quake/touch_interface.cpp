@@ -7,10 +7,7 @@
 #include "SDL_keycode.h"
 #include <fstream>
 
-#define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
-#define GAME_TYPE_HEXEN    2
-#define GAME_TYPE_HERETIC  3
-#define GAME_TYPE_STRIFE   4
+
 extern "C"
 {
 
@@ -43,7 +40,7 @@ void TouchInterface::openGLStart()
 {
 	touchcontrols::gl_startRender();
 #ifdef QUAKE2
-		nanoPushState();
+	nanoPushState();
 #endif
 };
 
@@ -51,36 +48,11 @@ void TouchInterface::openGLEnd()
 {
 	touchcontrols::gl_endRender();
 
-#ifdef YQUAKE2
-
-		if(yquake2Renderer != 3)
-		{
-		/*
-			glDisable(GL_BLEND);
-			glColor4f(1, 1, 1, 1);
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-			glLoadIdentity();
-		*/
-		}
-
-#endif
-
 #ifdef FTEQW
-
 		if(touchcontrols::gl_getGLESVersion() == 1)
 		{
-		/*
-			glMatrixMode(GL_MODELVIEW);
-			glLoadMatrixf(model);
-			glMatrixMode(GL_PROJECTION);
-			glLoadMatrixf(projection);
-			glMatrixMode(matrixMode);
-
-			glColor4f(1, 1, 1, 1);
-*/
 			BE_FixPointers();
 		}
-
 #endif
 
 #ifdef DARKPLACES
@@ -91,7 +63,6 @@ void TouchInterface::openGLEnd()
 
 #ifdef QUAKE3
 		GL_FixState();
-//		glEnable(GL_DEPTH_TEST);
 #endif
 
 
@@ -147,7 +118,10 @@ void TouchInterface::createControls(std::string filesPath)
 	tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 	tcMenuMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE));
 	tcMenuMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(9, 0, 11, 2), "custom_show", KEY_SHOW_CUSTOM));
+
+#if  defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES)
 	//tcMenuMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE));
+#endif
 
 	tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 	tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
@@ -157,6 +131,12 @@ void TouchInterface::createControls(std::string filesPath)
 	touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24, 3, 26, 11), "brightness_slider");
 	brightnessSlide->signal_action.connect(sigc::mem_fun(this, &TouchInterface::brightnessSlideMouse));
 	tcMenuMain->addControl(brightnessSlide);
+
+	touchcontrols::Mouse *mouseMainMenu = new touchcontrols::Mouse("mouse", touchcontrols::RectF(0, 2, 26, 16), "");
+	mouseMainMenu->setHideGraphics(true);
+	mouseMainMenu->setEditable(false);
+	tcMenuMain->addControl(mouseMainMenu);
+	mouseMainMenu->signal_action.connect(sigc::mem_fun(this, &TouchInterface::mouseMove));
 #else // QUAKE 3 menu is different
 
 	tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
@@ -420,11 +400,12 @@ void TouchInterface::createControls(std::string filesPath)
 
 	// Mouse -------------------------------------------
 	//------------------------------------------------------
-	touchcontrols::Mouse *mouseMainMenu = new touchcontrols::Mouse("mouse", touchcontrols::RectF(0, 2, 26, 16), "");
-	mouseMainMenu->setHideGraphics(true);
-	mouseMainMenu->setEditable(false);
-	tcMouse->addControl(mouseMainMenu);
-	mouseMainMenu->signal_action.connect(sigc::mem_fun(this, &TouchInterface::mouseMove));
+	touchcontrols::Mouse *mouseMouseMenu = new touchcontrols::Mouse("mouse", touchcontrols::RectF(0, 2, 26, 16), "");
+	mouseMouseMenu->setHideGraphics(true);
+	mouseMouseMenu->setEditable(false);
+	tcMouse->addControl(mouseMouseMenu);
+	mouseMouseMenu->signal_action.connect(sigc::mem_fun(this, &TouchInterface::mouseMove));
+
 	tcMouse->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Back"));
 	tcMouse->addControl(new touchcontrols::Button("hide_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE, false, false, "Hide mouse"));
 	tcMouse->setAlpha(0.9);
@@ -509,7 +490,7 @@ void TouchInterface::newFrame()
 		screenMode = TS_CUSTOM;
 	}
 
-
+/*
 	if(((screenMode == TS_GAME) || (screenMode == TS_MENU)) & useMouse)   // Show mouse screen
 	{
 		screenMode = TS_MOUSE;
@@ -519,6 +500,16 @@ void TouchInterface::newFrame()
 		controlsContainer.showMouse(true);
 	else
 		controlsContainer.showMouse(false);
+*/
+
+	if((screenMode == TS_MENU) && (useMouse || gotMouseMove))
+		controlsContainer.showMouse(true);
+	else
+	{
+		useMouse = false;
+		gotMouseMove = false;
+		controlsContainer.showMouse(false);
+	}
 
 	updateTouchScreenModeOut(screenMode);
 	updateTouchScreenModeIn(screenMode);

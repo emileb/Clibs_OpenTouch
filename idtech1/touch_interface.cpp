@@ -188,6 +188,9 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show keyboard"));
 	tcGameMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE, false, true, "Use mouse"));
 
+	tcGameMain->addControl(new touchcontrols::Button("mp_chat", touchcontrols::RectF(18, 0, 20, 2), "chat", PORT_ACT_MP_SAY, false, true, "Multiplayer chat"));
+
+
 #if defined(RETRO_DOOM) || defined(CHOCOLATE) || defined (PRBOOM_DOOM)
 	tcGameMain->addControl(new touchcontrols::Button("gamma", touchcontrols::RectF(17, 0, 19, 2), "gamma", PORT_ACT_GAMMA, false, false, "Gamma"));
 #endif
@@ -701,6 +704,11 @@ void TouchInterface::newFrame()
 		controlsContainer.showMouse(true);
 	else
 		controlsContainer.showMouse(false);
+
+	if(screenMode != currentScreenMode && (screenMode == TS_GAME || screenMode == TS_MENU))
+	{
+		useMouse = false;
+	}
 
 	updateTouchScreenModeOut(screenMode);
 	updateTouchScreenModeIn(screenMode);
