@@ -12,6 +12,7 @@
 #define RAZE_GAME_RR     103
 #define RAZE_GAME_NAM    104
 #define RAZE_GAME_PS     105
+#define RAZE_GAME_IONFURY  106
 
 void TouchInterface::openGLStart()
 {
@@ -21,6 +22,9 @@ void TouchInterface::openGLStart()
 void TouchInterface::openGLEnd()
 {
 	touchcontrols::gl_endRender();
+#ifdef EDUKE32
+	touchcontrols::gl_resetGL4ES();
+#endif
 };
 
 
@@ -74,7 +78,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 
 	tcMenuMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::menuButton));
 	tcMenuMain->setAlpha(0.8);
-	tcMenuMain->setFixAspect(false);
+	tcMenuMain->setFixAspect(true);
 
 	//Game -------------------------------------------
 	//------------------------------------------------------

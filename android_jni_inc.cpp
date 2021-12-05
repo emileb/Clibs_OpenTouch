@@ -129,6 +129,10 @@ extern "C"
 			setenv("LIBGL_NOINTOVLHACK", "1", 1);
 		}
 
+#ifdef EDUKE32 // Eduke needs this enabled
+		setenv("LIBGL_USEVBO", "1", 1);
+#endif
+
 		if(options & GAME_OPTION_SDL_OLD_AUDIO)
 			setenv("SDL_AUDIODRIVER", "android", 1);
 
