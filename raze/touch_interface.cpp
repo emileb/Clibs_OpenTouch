@@ -367,6 +367,11 @@ void TouchInterface::newFrame()
 	else
 		controlsContainer.showMouse(false);
 
+	if(screenMode != currentScreenMode && (screenMode == TS_GAME || screenMode == TS_MENU))
+	{
+		useMouse = false;
+	}
+
 	updateTouchScreenModeOut(screenMode);
 	updateTouchScreenModeIn(screenMode);
 
