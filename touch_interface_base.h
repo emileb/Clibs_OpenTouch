@@ -72,6 +72,8 @@ public:
 	int mapState = 0;
 	float demoControlsAlpha = 0; // Used to fade out demo controls
 
+	int framecount = 0;
+
 	touchcontrols::TouchControlsContainer controlsContainer;
 
 	touchcontrols::UI_Controls *UI_tc = 0;
@@ -209,6 +211,8 @@ public:
 	void showMouseCallback(int show);
 
 	void moveMouseCallback(float x, float y);
+
+	void waitFrames(int nbrFrames);
 };
 
 

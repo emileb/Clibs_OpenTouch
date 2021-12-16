@@ -535,7 +535,7 @@ void TouchInterfaceBase::selectWeaponButton(int state, int code)
 
 void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, float mouse_y)
 {
-#if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) // todo
+#if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) || defined(EDUKE32)// todo
 	if(action == TOUCHMOUSE_MOVE)
 	{
 		PortableMouse(mouse_x, mouse_y);
@@ -564,7 +564,7 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 
 void TouchInterfaceBase::mouseButton(int state, int code)
 {
-#if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) || defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES) || defined(FTEQW)
+#if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) || defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES) || defined(FTEQW) || defined(EDUKE32)
 
 	// Hide the mouse
 	if((code == KEY_USE_MOUSE) && state)
@@ -946,6 +946,7 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
 	if(sc != SDL_SCANCODE_UNKNOWN)
 	{
 		SDL_SendKeyboardKey(SDL_PRESSED, sc);
+		waitFrames(1); // Some games (EDuke) need a frame to register
 		SDL_SendKeyboardKey(SDL_RELEASED, sc);
 	}
 
@@ -1201,6 +1202,8 @@ bool TouchInterfaceBase::loadControlSettings(std::string path)
 
 void TouchInterfaceBase::frameControls()
 {
+	framecount++;
+
 	if(SDL_NewEGLCreated())
 	{
 		LOGI("NEW EGL CONTEXT");
@@ -1259,3 +1262,12 @@ void TouchInterfaceBase::moveMouseCallback(float x, float y)
 	controlsContainer.mousePos(x, y);
 }
 
+//Wait for N number of frame to pass. This MUST NOT be called from the game thread
+void TouchInterfaceBase::waitFrames(int nbrFrames)
+{
+	int frameNow = framecount;
+	while(frameNow + nbrFrames + 1 > framecount)
+	{
+		usleep(1000); // wait 1ms
+	}
+}
