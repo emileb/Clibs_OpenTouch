@@ -78,13 +78,19 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	//------------------------------------------------------
 
 	bool hideAltAttack = true;
+	bool hideAltWeapon = false;
+	bool hideInventory = false;
 
-	if(gameType == RAZE_GAME_BLOOD)
+	if(gameType == RAZE_GAME_BLOOD || gameType == RAZE_GAME_IONFURY)
 	{
 		hideAltAttack = false;
 	}
 
-	bool hideAltWeapon = false; // Always visible, I think every game uses it
+	if(gameType == RAZE_GAME_IONFURY) // Does not use traditional inventory, nor alt weapon
+	{
+		hideInventory = true;
+		hideAltWeapon = true;
+	}
 
 	tcGameMain->setAlpha(touchSettings.alpha);
 	tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
@@ -101,7 +107,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 
 
 	tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, false, "Jump"));
-	tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, false, "Show Inventory"));
+	tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, hideInventory, "Show Inventory"));
 	tcGameMain->addControl(new touchcontrols::Button("activate_inventory", touchcontrols::RectF(22, 3, 24, 5), "inventory_use_fade", PORT_ACT_INVUSE, false, true, "Use Inventory"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, true, "Crouch (toggle)"));
@@ -114,6 +120,14 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
 	tcGameMain->addControl(new touchcontrols::Button("swap_weapon", touchcontrols::RectF(3, 3, 5, 5), "swap", PORT_ACT_WEAP_ALT, false, hideAltWeapon, "Weapon alternative"));
+
+	// Add ion fury specific buttons
+	if(gameType == RAZE_GAME_IONFURY)
+	{
+		tcGameMain->addControl(new touchcontrols::Button("reload", touchcontrols::RectF(3, 4, 5, 6), "reload", PORT_ACT_RELOAD, false, false, "Reload"));
+		tcGameMain->addControl(new touchcontrols::Button("medikit", touchcontrols::RectF(15, 0, 17, 2), "medikit", PORT_ACT_MEDKIT, false, false, "Medkit"));
+		tcGameMain->addControl(new touchcontrols::Button("radar", touchcontrols::RectF(17, 0, 19, 2), "radar", PORT_ACT_RADAR, false, false, "Radar"));
+	}
 
 	touchcontrols::ButtonGrid *dpad = new touchcontrols::ButtonGrid("dpad_move", touchcontrols::RectF(6, 3, 12, 7), "", 3, 2, true, "Movement btns (WASD)");
 
