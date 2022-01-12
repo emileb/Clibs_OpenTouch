@@ -132,6 +132,10 @@
 
 #define PORT_ACT_WEAP_ALT           114
 
+// IONFURY
+#define PORT_ACT_MEDKIT            115
+#define PORT_ACT_RADAR             116
+
 //Descent
 #define PORT_ACT_CYCLE_PRIM        120
 #define PORT_ACT_CYCLE_SEC         121
