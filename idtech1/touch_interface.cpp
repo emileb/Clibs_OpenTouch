@@ -413,9 +413,9 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcMouse->setAlpha(0.9);
 	tcMouse->signal_button.connect(sigc::mem_fun(this, &TouchInterface::mouseButton));
 
-	std::string newSettings =  (std::string)filesPath +  "/touch_settings_" ENGINE_NAME ".xml";
+	std::string newSettings = (std::string)filesPath +  "/touch_settings_" ENGINE_NAME ".xml";
 
-	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings );
+	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings);
 	UI_tc->setAlpha(1);
 
 	//---------------------------------------------------------------
