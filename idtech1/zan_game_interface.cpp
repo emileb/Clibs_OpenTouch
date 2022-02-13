@@ -523,7 +523,10 @@ int PortableShowKeyboard(void)
 const char *cmd_to_run = NULL;
 void PortableCommand(const char * cmd)
 {
-	cmd_to_run = cmd;
+	LOGI("Zandronum cmd: %s", cmd);
+	static char cmdBuffer[256];
+	snprintf(cmdBuffer, 256, "%s\n", cmd);
+	cmd_to_run = cmdBuffer;
 }
 
 static float am_zoom = 0;
