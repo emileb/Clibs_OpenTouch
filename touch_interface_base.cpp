@@ -506,6 +506,12 @@ void TouchInterfaceBase::weaponWheelSelected(int enabled)
 {
 	if(enabled)
 		tcWeaponWheel->fade(touchcontrols::FADE_IN, 5); //fade in
+/*
+	if(enabled)
+		PortableCommand("i_timescale 0.1"); //doom3 timescale
+	else
+		PortableCommand("i_timescale 1");
+*/
 }
 
 void TouchInterfaceBase::weaponWheel(int segment)
