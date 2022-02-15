@@ -270,18 +270,8 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	//Weapon wheel -------------------------------------------
 	//------------------------------------------------------
 
-	int weaponWheelNbr = 10;
 
-	if(gameType == GAME_TYPE_HERETIC)
-	{
-		weaponWheelNbr = 8;
-	}
-	else if(gameType == GAME_TYPE_HEXEN)
-	{
-		weaponWheelNbr = 4;
-	}
-
-	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", weaponWheelNbr);
+	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", wheelNbr);
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
@@ -563,9 +553,7 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 
 	//Weapon wheel -------------------------------------------
 	//------------------------------------------------------
-	int weaponWheelNbr = 10;
-
-	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", weaponWheelNbr);
+	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", wheelNbr);
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
@@ -641,7 +629,7 @@ void TouchInterface::automapButton(int state, int code)
 {
 	if(state && code == PORT_ACT_MAP && mapState == 0)
 	{
-#ifdef RETRO_DOOM // Turn on follow mode to allow movment in map mode
+#ifdef RETRO_DOOM // Turn on follow mode to allow movement in map mode
 
 		AM_ToggleFollowMode();
 #endif
