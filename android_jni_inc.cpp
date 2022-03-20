@@ -67,7 +67,7 @@ extern "C"
 	}
 
 	static int argc = 1;
-	static const char * argv[128];
+	static const char * argv[500];
 
 	const char *nativeLibsPath;
 	const char *sourceFilePath_c;
