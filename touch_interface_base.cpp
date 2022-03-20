@@ -562,7 +562,7 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 		else if(action == TOUCHMOUSE_TAP)
 		{
 			MouseButton(1, BUTTON_PRIMARY);
-			usleep(200 * 1000);
+			waitFrames(3);
 			MouseButton(0, BUTTON_PRIMARY);
 		}
 #endif
@@ -658,8 +658,6 @@ void TouchInterfaceBase::customSettingsButton(int state)
 		//showEditButtons();
 	}
 }
-
-
 
 void TouchInterfaceBase::mobileBackButton(void)
 {
@@ -880,8 +878,6 @@ void TouchInterfaceBase::updateTouchScreenModeIn(touchscreemode_t mode)
 	}
 }
 
-
-
 void TouchInterfaceBase::createCustomControls(touchcontrols::TouchControls* customControls)
 {
 	customControls->addControl(new touchcontrols::Button("A", touchcontrols::RectF(5, 5, 7, 7), "Custom_1", PORT_ACT_CUSTOM_0, false, false, "Custom 1 (KP1)", touchcontrols::COLOUR_RED2));
@@ -937,7 +933,6 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
 	{
 		text[0] = key;
 		text[1] = 0;
-
 	}
 
 	// Change upper case to lower case to get scan code
@@ -1271,8 +1266,11 @@ void TouchInterfaceBase::moveMouseCallback(float x, float y)
 //Wait for N number of frame to pass. This MUST NOT be called from the game thread
 void TouchInterfaceBase::waitFrames(int nbrFrames)
 {
+	uint64_t startTime = touchcontrols::getMS();
+
 	int frameNow = framecount;
-	while(frameNow + nbrFrames + 1 > framecount)
+	// Wait for n Frames, OR 500ms has passed for safety
+	while((frameNow + nbrFrames + 1 > framecount) && ((touchcontrols::getMS() - startTime) < 500))
 	{
 		usleep(1000); // wait 1ms
 	}
