@@ -118,13 +118,11 @@ public:
 
 	void init(int width, int height, const char *pngPath, int options, int wheelNbr_, int game);
 
-
 	int touchActionToAction(int action);
 
 	void touchSettingsCallback(touchcontrols::tTouchSettings settings);
 
 	void gameButton(int state, int code);
-
 
 	void menuButton(int state, int code);
 
@@ -155,7 +153,6 @@ public:
 
 	void AutomapMultitouchMouseMove(int action, float x, float y, float dx, float dy);
 
-
 	void brightnessSlideMouse(int action, float x, float y, float dx, float dy);
 
 	void dPadInventoryButton(int state, int code);
@@ -172,25 +169,22 @@ public:
 
 	void customSettingsButton(int state);
 
-
-
 	void mobileBackButton(void);
 
 	void updateTouchScreenModeOut(touchscreemode_t mode);
 
 	void updateTouchScreenModeIn(touchscreemode_t mode);
 
-
-
 	void createCustomControls(touchcontrols::TouchControls* customControls);
-
 
 	void keyboardKeyPressed(uint32_t key);
 
 	void hideControls(void);
 
 	void processPointer(int action, int pid, float x, float y);
+
 	void gamepadAction(int state, int action);
+
 	void axisValue(int axis, float value);
 
 	int blockGamepad(void);
@@ -208,6 +202,7 @@ public:
 	void frameControls();
 
 	void showKeyboardCallback(int show);
+
 	void showMouseCallback(int show);
 
 	void moveMouseCallback(float x, float y);
