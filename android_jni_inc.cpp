@@ -24,6 +24,8 @@
 
 #define COMMAND_EXIT_APP  0x8007
 
+#pragma clang diagnostic ignored "-Winfinite-recursion"
+
 extern "C"
 {
 	int gameType;
@@ -55,6 +57,14 @@ extern "C"
 		}
 	}
 
+	// Latest version of Clang makes an optimisation which calls this function which is not present in Android, so define it here
+	char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
+	char *stpcpy(char *__restrict__ dest, const char *__restrict__ src)
+	{
+		while ((*dest++ = *src++) != '\0')
+			/* nothing */;
+		return --dest;
+	}
 #define JAVA_FUNC(x) Java_org_libsdl_app_NativeLib_##x
 
 #define EXPORT_ME __attribute__ ((visibility("default")))
