@@ -439,13 +439,20 @@ void TouchInterfaceBase::leftStick(float joy_x, float joy_y, float mouse_x, floa
 void TouchInterfaceBase::rightStick(float joy_x, float joy_y, float mouse_x, float mouse_y)
 {
 	//LOGI(" mouse x = %f",mouse_x);
-	int invert        = touchSettings.invertLook ? -1 : 1;
-	float scale       = (isShooting && touchSettings.precisionShoot) ? touchSettings.precisionSenitivity : 1;
-	float pitchMouse       = mouse_y * touchSettings.lookSensitivity * invert * scale;
-	float pitchJoystick    = joy_y * touchSettings.lookSensitivity * invert * scale * -2;
+	int invert          = touchSettings.invertLook ? -1 : 1;
+	float scale         = (isShooting && touchSettings.precisionShoot) ? touchSettings.precisionSenitivity : 1;
+	float pitchMouse    = mouse_y * touchSettings.lookSensitivity * invert * scale;
+	float pitchJoystick = joy_y * touchSettings.lookSensitivity * invert * scale * -2;
 
 	float yawMouse    = mouse_x * touchSettings.turnSensitivity * scale;
 	float yawJoystick = joy_x  * touchSettings.turnSensitivity * scale * 10;
+
+	// Disable mouse look for Doom, otherwise this should always be enabled
+	if(!touchSettings.mouseLook)
+	{
+		pitchMouse = 0;
+		pitchJoystick = 0;
+	}
 
 	if(touchSettings.joystickLookMode)
 		PortableLookPitch(LOOK_MODE_JOYSTICK, pitchJoystick);
@@ -655,7 +662,6 @@ void TouchInterfaceBase::customSettingsButton(int state)
 	if(state == 1)
 	{
 		showButtonListWindow(&controlsContainer);
-		//showEditButtons();
 	}
 }
 
@@ -972,6 +978,7 @@ void TouchInterfaceBase::processPointer(int action, int pid, float x, float y)
 void TouchInterfaceBase::gamepadAction(int state, int action)
 {
 	LOGI("gamepadAction, %d  %d", state, action);
+
 	bool used = false;
 
 	switch(action)

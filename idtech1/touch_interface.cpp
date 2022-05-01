@@ -406,7 +406,11 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 
 	std::string newSettings = (std::string)filesPath +  "/touch_settings_" ENGINE_NAME ".xml";
 
-	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings);
+	// Enable the Mouse Look setting for Doom engine games
+	touchcontrols::tTouchSettingsModifier modifier;
+	modifier.mouseLookVisible = true;
+
+	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings, &modifier);
 	UI_tc->setAlpha(1);
 
 	//---------------------------------------------------------------
@@ -514,7 +518,6 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	// SWAPFIX
 	touchJoyLeft->registerTouchJoySWAPFIX(touchJoyRight);
 	touchJoyRight->registerTouchJoySWAPFIX(touchJoyLeft);
-
 
 	tcGameMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::gameButton));
 	tcGameMain->signal_settingsButton.connect(sigc::mem_fun(this, &TouchInterface::gameSettingsButton));
@@ -631,7 +634,6 @@ void TouchInterface::automapButton(int state, int code)
 	if(state && code == PORT_ACT_MAP && mapState == 0)
 	{
 #ifdef RETRO_DOOM // Turn on follow mode to allow movement in map mode
-
 		AM_ToggleFollowMode();
 #endif
 		mapState = 1;
