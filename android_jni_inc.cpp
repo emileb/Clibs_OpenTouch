@@ -371,7 +371,7 @@ extern "C"
 
 			// File already open,
 			// can be unbound from the file system
-			//std::remove(path);
+            unlink(path);
 		}
 		else
 		{
