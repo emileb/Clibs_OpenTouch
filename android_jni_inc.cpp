@@ -245,7 +245,7 @@ extern "C"
 		    int yr =  tm.tm_year + 1900;
 		    int mo = tm.tm_mon + 1;
 		    //LOGI("%d   %d",yr,mo);
-		    if(yr > 2023 || (yr > 2022 && mo > 6))
+		    if(yr > 2023)
 		    {
 		        return;
 		    }
