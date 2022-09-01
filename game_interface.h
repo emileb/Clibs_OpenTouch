@@ -6,6 +6,9 @@
 
 #ifndef LOGI
 #ifdef __ANDROID__
+#ifdef LOGI
+undef LOGI
+#endif
 #include <android/log.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"JNITouchControlsUtils", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "JNITouchControlsUtils", __VA_ARGS__))
@@ -47,6 +50,8 @@ void PortableLookPitch(int mode, float pitch);
 void PortableLookYaw(int mode, float pitch);
 
 void PortableMouse(float dx, float dy);
+void PortableMouseAbs(float x, float y);
+
 void PortableMouseButton(int state, int button, float dx, float dy);
 
 void PortableCommand(const char * cmd);

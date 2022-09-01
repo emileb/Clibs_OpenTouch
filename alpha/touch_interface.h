@@ -19,5 +19,10 @@ public:
 	void newFrame();
 
 	void automapButton(int state, int code);
+
+	void newGLContext();
+
+	void mouseMove(int action, float x, float y, float mouse_x, float mouse_y);
+
 };
 #endif /* touch_interface_h */

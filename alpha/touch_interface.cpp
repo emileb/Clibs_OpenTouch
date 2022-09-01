@@ -15,6 +15,9 @@ void TouchInterface::openGLEnd()
 	touchcontrols::gl_endRender();
 };
 
+void TouchInterface::mouseMove(int action, float x, float y, float mouse_x, float mouse_y)
+{
+}
 
 void TouchInterface::createControls(std::string filesPath)
 {
@@ -56,7 +59,7 @@ void TouchInterface::createControls(std::string filesPath)
 
 	tcMenuMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::menuButton));
 	tcMenuMain->setAlpha(0.8);
-	tcMenuMain->setFixAspect(false);
+	tcMenuMain->setFixAspect(true);
 
 	//Game -------------------------------------------
 	//------------------------------------------------------
@@ -69,9 +72,9 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("quick_save", touchcontrols::RectF(24, 0, 26, 2), "save", PORT_ACT_QUICKSAVE, false, false, "Quick save"));
 	tcGameMain->addControl(new touchcontrols::Button("quick_load", touchcontrols::RectF(20, 0, 22, 2), "load", PORT_ACT_QUICKLOAD, false, false, "Quick load"));
 	tcGameMain->addControl(new touchcontrols::Button("map", touchcontrols::RectF(2, 0, 4, 2), "map", PORT_ACT_MAP, false, false, "Show map"));
-#ifndef BSTONE
+//#ifndef BSTONE
 	tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show keyboard"));
-#endif
+//#endif
 	tcGameMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "left_mouse", KEY_USE_MOUSE, false, true, "Use mouse"));
 
 	bool hideJump = true;
@@ -92,7 +95,13 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
 
+	touchcontrols::ButtonGrid *dpad = new touchcontrols::ButtonGrid("dpad_move", touchcontrols::RectF(6, 3, 12, 7), "", 3, 2, true, "Movement btns (WASD)");
 
+	dpad->addCell(0, 1, "direction_left", PORT_ACT_MOVE_LEFT);
+	dpad->addCell(2, 1, "direction_right", PORT_ACT_MOVE_RIGHT);
+	dpad->addCell(1, 0, "direction_up", PORT_ACT_FWD);
+	dpad->addCell(1, 1, "direction_down", PORT_ACT_BACK);
+	tcGameMain->addControl(dpad);
 
 	touchJoyRight = new touchcontrols::TouchJoy("touch", touchcontrols::RectF(17, 4, 26, 16), "look_arrow", "fixed_stick_circle");
 	tcGameMain->addControl(touchJoyRight);
@@ -110,9 +119,6 @@ void TouchInterface::createControls(std::string filesPath)
 
 	tcGameMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::gameButton));
 	tcGameMain->signal_settingsButton.connect(sigc::mem_fun(this, &TouchInterface::gameSettingsButton));
-
-
-
 
 	//Weapons -------------------------------------------
 	//------------------------------------------------------
@@ -224,6 +230,15 @@ void TouchInterface::createControls(std::string filesPath)
 	tcMouse->addControl(new touchcontrols::Button("left_button", touchcontrols::RectF(0, 6, 3, 10), "left_mouse", KEY_LEFT_MOUSE, false, false, "Back"));
 	tcMouse->signal_button.connect(sigc::mem_fun(this, &TouchInterface::mouseButton));
 
+	std::string newSettings = (std::string)filesPath +  "/touch_settings_" ENGINE_NAME ".xml";
+
+	// Enable the Mouse Look setting for Doom engine games
+	touchcontrols::tTouchSettingsModifier modifier;
+	modifier.mouseLookVisible = true;
+
+	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings, &modifier);
+	UI_tc->setAlpha(1);
+	
 	//---------------------------------------------------------------
 	//---------------------------------------------------------------
 	controlsContainer.addControlGroup(tcKeyboard);
@@ -277,4 +292,9 @@ void TouchInterface::newFrame()
 	updateTouchScreenModeIn(screenMode);
 
 	currentScreenMode = screenMode;
+}
+
+void TouchInterface::newGLContext()
+{
+
 }
