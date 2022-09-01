@@ -11,7 +11,7 @@
 #define GAME_TYPE_STRIFE   4
 extern "C"
 {
-	void AM_ToggleFollowMode(void);
+	void AM_ToggleFollowMode(bool value);
 	void jwzgles_restore(void);
 
 #if defined(PRBOOM_DOOM)
@@ -634,7 +634,7 @@ void TouchInterface::automapButton(int state, int code)
 	if(state && code == PORT_ACT_MAP && mapState == 0)
 	{
 #ifdef RETRO_DOOM // Turn on follow mode to allow movement in map mode
-		AM_ToggleFollowMode();
+		AM_ToggleFollowMode(true);
 #endif
 		mapState = 1;
 	}
