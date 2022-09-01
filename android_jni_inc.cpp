@@ -44,7 +44,7 @@ extern "C"
 		LogWritter_Close();
 		usleep(100); // Wait 100ms
 
-		LOGI("EXIT OVERRIDE!!!");
+		LOGI("EXIT OVERRIDE!!! (%d)", status);
 		Android_JNI_SendMessage(COMMAND_EXIT_APP, 0);
 
 		usleep(1000 * 1000 * 5); // Wait 5 seconds
@@ -409,14 +409,14 @@ extern "C"
 
 		if((fabs(mx) > 1) || (fabs(my) > 1))
 		{
-			SDL_InjectMouse(0, ACTION_MOVE, mx, my, SDL_TRUE);
+			SDL_InjectMouse(0, ACTION_MOVE, (int)mx, (int)my, SDL_TRUE);
 		}
 
 		if(fabs(mx) > 1)
-			mx = 0;
+			mx = fmod(mx, 1); // save remainder for smoother mouse
 
 		if(fabs(my) > 1)
-			my = 0;
+			my = fmod(my, 1);
 	}
 
 	int getGameType()
