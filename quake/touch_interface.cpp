@@ -81,11 +81,6 @@ void TouchInterface::openGLEnd()
 #endif
 };
 
-bool is_file_exist(const char *fileName)
-{
-	std::ifstream infile(fileName);
-	return infile.good();
-}
 
 void TouchInterface::createControls(std::string filesPath)
 {
@@ -431,19 +426,7 @@ void TouchInterface::createControls(std::string filesPath)
 	controlsContainer.addControlGroup(tcBlank);
 	controlsContainer.addControlGroup(tcMouse);
 
-	std::string oldSettings = (std::string)filesPath +  "/touch_settings.xml";
 	std::string newSettings = (std::string)filesPath +  "/touch_settings_" ENGINE_NAME ".xml";
-
-	// Copy old settings file
-	// Added 09/04/21 REMOVE AFTER SOME TIME
-	if(!is_file_exist(newSettings.c_str()))
-	{
-		LOGI("COPYING OLD SETTINGS");
-		std::ifstream  src(oldSettings, std::ios::binary);
-		std::ofstream  dst(newSettings,   std::ios::binary);
-
-		dst << src.rdbuf();
-	}
 
 	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings);
 	UI_tc->setAlpha(1);
