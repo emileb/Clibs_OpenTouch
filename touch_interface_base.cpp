@@ -814,7 +814,6 @@ void TouchInterfaceBase::updateTouchScreenModeIn(touchscreemode_t mode)
 
 			// Always set these so they are never wrong
 			if(tcGameMain) tcGameMain->setAlpha(touchSettings.alpha);
-
 			if(tcCustomButtons) tcCustomButtons->setAlpha(touchSettings.alpha);
 
 			if(!hideGameAndMenu)
@@ -838,6 +837,9 @@ void TouchInterfaceBase::updateTouchScreenModeIn(touchscreemode_t mode)
 			// Always enable wheel
 			if(touchSettings.weaponWheelEnabled)
 				tcWeaponWheel->setEnabled(true);
+
+            // Alway enable the gyro when going back to the game
+            allowGyro = true;
 
 			break;
 
