@@ -71,16 +71,19 @@ extern "C"
 
 	const char *nativeLibsPath;
 	const char *sourceFilePath_c;
+	const char *resFilePath_c;
+	const char *userFilesPath_c;
 	std::string filesPath;
 	std::string userFilesPath;
 	std::string tempFilesPath;
 	std::string sourceFilePath;
+	std::string resFilePath;
 
 	char keyGlobal[512];
 	char pkgGlobal[64];
 
 	jint EXPORT_ME
-	JAVA_FUNC(init)(JNIEnv* env, jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles, jstring tempFiles, jstring sourceFiles)
+	JAVA_FUNC(init)(JNIEnv* env, jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs, jstring userFiles, jstring tempFiles, jstring sourceFiles, jstring resFiles)
 	{
 		env_ = env;
 		gameType = game;
@@ -90,10 +93,17 @@ extern "C"
 		static std::string log_filename_path = (char *)(env)->GetStringUTFChars(logFilename, 0);
 		static std::string native_libs_path = (char *)(env)->GetStringUTFChars(nativeLibs, 0);
 		filesPath = (char *)(env)->GetStringUTFChars(graphics_dir, 0);
-		userFilesPath = (char *)(env)->GetStringUTFChars(userFiles, 0);
 		tempFilesPath = (char *)(env)->GetStringUTFChars(tempFiles, 0);
+
+		userFilesPath = (char *)(env)->GetStringUTFChars(userFiles, 0);
+		userFilesPath_c = userFilesPath.c_str();
+
 		sourceFilePath = (char *)(env)->GetStringUTFChars(sourceFiles, 0);
 		sourceFilePath_c = sourceFilePath.c_str();
+
+		resFilePath =  (char *)(env)->GetStringUTFChars(resFiles, 0)	;
+		resFilePath_c = resFilePath.c_str();
+
 		nativeLibsPath = native_libs_path.c_str();
 
 		LogWritter_Init(log_filename_path.c_str());
