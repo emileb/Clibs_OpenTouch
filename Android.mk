@@ -11,13 +11,13 @@ LOCAL_C_INCLUDES := .
 
 LOCAL_SRC_FILES =  LogWritter.c fts.c
 
-LOCAL_LDLIBS :=  -ldl -llog
-
 ifeq ($(G),D)
 LOCAL_STATIC_LIBRARIES := cert_chk
 else ifeq ($(G),Q)
 LOCAL_STATIC_LIBRARIES := cert_chk
 endif
+
+LOCAL_CFLAGS += -fvisibility=hidden -fdata-sections -ffunction-sections
 
 include $(BUILD_STATIC_LIBRARY)
 

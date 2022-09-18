@@ -4,8 +4,6 @@
 
 #include "touch_interface.h"
 #include "SDL_keycode.h"
-#include <fstream>
-
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
 #define GAME_TYPE_HEXEN    2
@@ -13,7 +11,7 @@
 #define GAME_TYPE_STRIFE   4
 extern "C"
 {
-	void AM_ToggleFollowMode(void);
+	void AM_ToggleFollowMode(bool value);
 	void jwzgles_restore(void);
 
 #if defined(PRBOOM_DOOM)
@@ -45,12 +43,6 @@ extern "C"
 #endif
 
 #endif
-}
-
-static bool is_file_exist(const char *fileName)
-{
-    std::ifstream infile(fileName);
-    return infile.good();
 }
 
 void TouchInterface::openGLStart()
@@ -219,6 +211,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("activate_inventory", touchcontrols::RectF(22, 3, 24, 5), "inventory_use_fade", PORT_ACT_INVUSE, false, true, "Use Inventory"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, true, "Crouch"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, true, "Crouch (toggle)"));
+	tcGameMain->addControl(new touchcontrols::Button("quick_command", touchcontrols::RectF(21, 3, 23, 5), "star", KEY_QUICK_COMMANDS, false, true, "Quick Commands"));
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack"));
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt2", touchcontrols::RectF(4, 3, 6, 5), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (duplicate)"));
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
@@ -277,18 +270,8 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	//Weapon wheel -------------------------------------------
 	//------------------------------------------------------
 
-	int weaponWheelNbr = 10;
 
-	if(gameType == GAME_TYPE_HERETIC)
-	{
-		weaponWheelNbr = 8;
-	}
-	else if(gameType == GAME_TYPE_HEXEN)
-	{
-		weaponWheelNbr = 4;
-	}
-
-	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", weaponWheelNbr);
+	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", wheelNbr);
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
@@ -421,21 +404,13 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcMouse->setAlpha(0.9);
 	tcMouse->signal_button.connect(sigc::mem_fun(this, &TouchInterface::mouseButton));
 
-	std::string oldSettings =  (std::string)filesPath +  "/touch_settings.xml";
-	std::string newSettings =  (std::string)filesPath +  "/touch_settings_" ENGINE_NAME ".xml";
+	std::string newSettings = (std::string)filesPath +  "/touch_settings_" ENGINE_NAME ".xml";
 
-	// Copy old settings file
-	// Added 09/04/21 REMOVE AFTER SOME TIME
-    if(!is_file_exist(newSettings.c_str()))
-    {
-    	LOGI("COPYING OLD SETTINGS");
-		std::ifstream  src(oldSettings, std::ios::binary);
-		std::ofstream  dst(newSettings,   std::ios::binary);
+	// Enable the Mouse Look setting for Doom engine games
+	touchcontrols::tTouchSettingsModifier modifier;
+	modifier.mouseLookVisible = true;
 
-		dst << src.rdbuf();
-    }
-
-	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings );
+	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings, &modifier);
 	UI_tc->setAlpha(1);
 
 	//---------------------------------------------------------------
@@ -498,6 +473,7 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 	tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
 	tcMenuMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(9, 0, 11, 2), "custom_show", KEY_SHOW_CUSTOM));
+	tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
 
 	// Hide mouse button, try to use tap for now..
 	//tcMenuMain->addControl(new touchcontrols::Button("left_button",touchcontrols::RectF(0,6,3,10),"left_mouse",KEY_LEFT_MOUSE,false,false,"Back"));
@@ -517,6 +493,7 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, false, "Jump"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, true, "Crouch"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, false, "Crouch (smart toggle)"));
+	tcGameMain->addControl(new touchcontrols::Button("quick_command", touchcontrols::RectF(18, 0, 20, 2), "star", KEY_QUICK_COMMANDS, false, true, "Quick Commands"));
 	tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
 	tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
@@ -541,7 +518,6 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	// SWAPFIX
 	touchJoyLeft->registerTouchJoySWAPFIX(touchJoyRight);
 	touchJoyRight->registerTouchJoySWAPFIX(touchJoyLeft);
-
 
 	tcGameMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::gameButton));
 	tcGameMain->signal_settingsButton.connect(sigc::mem_fun(this, &TouchInterface::gameSettingsButton));
@@ -581,9 +557,7 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 
 	//Weapon wheel -------------------------------------------
 	//------------------------------------------------------
-	int weaponWheelNbr = 10;
-
-	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", weaponWheelNbr);
+	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", wheelNbr);
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
@@ -659,9 +633,8 @@ void TouchInterface::automapButton(int state, int code)
 {
 	if(state && code == PORT_ACT_MAP && mapState == 0)
 	{
-#ifdef RETRO_DOOM // Turn on follow mode to allow movment in map mode
-
-		AM_ToggleFollowMode();
+#ifdef RETRO_DOOM // Turn on follow mode to allow movement in map mode
+		AM_ToggleFollowMode(true);
 #endif
 		mapState = 1;
 	}

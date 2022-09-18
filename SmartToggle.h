@@ -8,7 +8,7 @@ typedef struct
 	int wasActive;
 } SmartToggle_t;
 
-inline uint64_t getMS()
+static uint64_t getMS()
 {
 	uint64_t ms; // Milliseconds
 	time_t   s;  // Seconds

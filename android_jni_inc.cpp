@@ -24,6 +24,8 @@
 
 #define COMMAND_EXIT_APP  0x8007
 
+#pragma clang diagnostic ignored "-Winfinite-recursion"
+
 extern "C"
 {
 	int gameType;
@@ -42,7 +44,7 @@ extern "C"
 		LogWritter_Close();
 		usleep(100); // Wait 100ms
 
-		LOGI("EXIT OVERRIDE!!!");
+		LOGI("EXIT OVERRIDE!!! (%d)", status);
 		Android_JNI_SendMessage(COMMAND_EXIT_APP, 0);
 
 		usleep(1000 * 1000 * 5); // Wait 5 seconds
@@ -55,6 +57,14 @@ extern "C"
 		}
 	}
 
+	// Latest version of Clang makes an optimisation which calls this function which is not present in Android, so define it here
+	char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
+	char *stpcpy(char *__restrict__ dest, const char *__restrict__ src)
+	{
+		while ((*dest++ = *src++) != '\0')
+			/* nothing */;
+		return --dest;
+	}
 #define JAVA_FUNC(x) Java_org_libsdl_app_NativeLib_##x
 
 #define EXPORT_ME __attribute__ ((visibility("default")))
@@ -67,7 +77,7 @@ extern "C"
 	}
 
 	static int argc = 1;
-	static const char * argv[128];
+	static const char * argv[500];
 
 	const char *nativeLibsPath;
 	const char *sourceFilePath_c;
@@ -245,7 +255,7 @@ extern "C"
 		    int yr =  tm.tm_year + 1900;
 		    int mo = tm.tm_mon + 1;
 		    //LOGI("%d   %d",yr,mo);
-		    if(yr > 2023 || (yr > 2022 && mo > 4))
+		    if(yr > 2023)
 		    {
 		        return;
 		    }
@@ -371,7 +381,7 @@ extern "C"
 
 			// File already open,
 			// can be unbound from the file system
-			//std::remove(path);
+            unlink(path);
 		}
 		else
 		{
@@ -409,14 +419,14 @@ extern "C"
 
 		if((fabs(mx) > 1) || (fabs(my) > 1))
 		{
-			SDL_InjectMouse(0, ACTION_MOVE, mx, my, SDL_TRUE);
+			SDL_InjectMouse(0, ACTION_MOVE, (int)mx, (int)my, SDL_TRUE);
 		}
 
 		if(fabs(mx) > 1)
-			mx = 0;
+			mx = fmod(mx, 1); // save remainder for smoother mouse
 
 		if(fabs(my) > 1)
-			my = 0;
+			my = fmod(my, 1);
 	}
 
 	int getGameType()

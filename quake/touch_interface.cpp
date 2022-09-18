@@ -49,41 +49,38 @@ void TouchInterface::openGLEnd()
 	touchcontrols::gl_endRender();
 
 #ifdef FTEQW
-		if(touchcontrols::gl_getGLESVersion() == 1)
-		{
-			BE_FixPointers();
-		}
+
+	if(touchcontrols::gl_getGLESVersion() == 1)
+	{
+		BE_FixPointers();
+	}
+
 #endif
 
 #ifdef DARKPLACES
-		android_reset_vertex = 1;
-		android_reset_color = 1;
-		android_reset_tex = 1;
+	android_reset_vertex = 1;
+	android_reset_color = 1;
+	android_reset_tex = 1;
 #endif
 
 #ifdef QUAKE3
-		GL_FixState();
+	GL_FixState();
 #endif
 
 
 #ifdef QUAKE2
-		nanoPopState();
+	nanoPopState();
 #endif
 
 #ifdef QUAKESPASM
-		jwzgles_restore();
+	jwzgles_restore();
 #endif
 
 #ifdef QUAKESPASM_SPIKED
-		touchcontrols::gl_resetGL4ES();
+	touchcontrols::gl_resetGL4ES();
 #endif
 };
 
-bool is_file_exist(const char *fileName)
-{
-    std::ifstream infile(fileName);
-    return infile.good();
-}
 
 void TouchInterface::createControls(std::string filesPath)
 {
@@ -223,6 +220,7 @@ void TouchInterface::createControls(std::string filesPath)
 #if defined(QUAKE2) || defined(YQUAKE2)
 	hideQ2 = false;
 #endif
+
 	// If Hexen 2, also show these
 	if(gameType == Q1HEXEN2)
 		hideQ2 = false;
@@ -351,10 +349,10 @@ void TouchInterface::createControls(std::string filesPath)
 	tcCustomButtons->addControl(new touchcontrols::Button("I", touchcontrols::RectF(5, 13, 7, 15), "custom_c", PORT_ACT_CUSTOM_8, false, true, "Custom 9 (P)", touchcontrols::COLOUR_NONE));
 	tcCustomButtons->addControl(new touchcontrols::Button("J", touchcontrols::RectF(7, 13, 9, 15), "custom_d", PORT_ACT_CUSTOM_9, false, true, "Custom 10 (Q)", touchcontrols::COLOUR_NONE));
 
-	touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1",touchcontrols::RectF(10,7,12,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_10,PORT_ACT_CUSTOM_11,PORT_ACT_CUSTOM_12,PORT_ACT_CUSTOM_13,false,"Quad Slide 1 (R - U)");
+	touchcontrols::QuadSlide *qs1 = new touchcontrols::QuadSlide("quad_slide_1", touchcontrols::RectF(10, 7, 12, 9), "quad_slide", "slide_arrow", PORT_ACT_CUSTOM_10, PORT_ACT_CUSTOM_11, PORT_ACT_CUSTOM_12, PORT_ACT_CUSTOM_13, false, "Quad Slide 1 (R - U)");
 	tcCustomButtons->addControl(qs1);
 
-	touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2",touchcontrols::RectF(14,7,16,9),"quad_slide","slide_arrow",PORT_ACT_CUSTOM_14,PORT_ACT_CUSTOM_15,PORT_ACT_CUSTOM_16,PORT_ACT_CUSTOM_17,false,"Quad Slide 2 (V - Y)");
+	touchcontrols::QuadSlide *qs2 = new touchcontrols::QuadSlide("quad_slide_2", touchcontrols::RectF(14, 7, 16, 9), "quad_slide", "slide_arrow", PORT_ACT_CUSTOM_14, PORT_ACT_CUSTOM_15, PORT_ACT_CUSTOM_16, PORT_ACT_CUSTOM_17, false, "Quad Slide 2 (V - Y)");
 	tcCustomButtons->addControl(qs2);
 
 	//tcCustomButtons->setColor(0.7,0.7,1.f);
@@ -428,21 +426,9 @@ void TouchInterface::createControls(std::string filesPath)
 	controlsContainer.addControlGroup(tcBlank);
 	controlsContainer.addControlGroup(tcMouse);
 
-	std::string oldSettings =  (std::string)filesPath +  "/touch_settings.xml";
-	std::string newSettings =  (std::string)filesPath +  "/touch_settings_" ENGINE_NAME ".xml";
+	std::string newSettings = (std::string)filesPath +  "/touch_settings_" ENGINE_NAME ".xml";
 
-	// Copy old settings file
-	// Added 09/04/21 REMOVE AFTER SOME TIME
-    if(!is_file_exist(newSettings.c_str()))
-    {
-    	LOGI("COPYING OLD SETTINGS");
-		std::ifstream  src(oldSettings, std::ios::binary);
-		std::ofstream  dst(newSettings,   std::ios::binary);
-
-		dst << src.rdbuf();
-    }
-
-	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings );
+	UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings);
 	UI_tc->setAlpha(1);
 
 	if(gameType == Q1MALICE)
@@ -490,17 +476,17 @@ void TouchInterface::newFrame()
 		screenMode = TS_CUSTOM;
 	}
 
-/*
-	if(((screenMode == TS_GAME) || (screenMode == TS_MENU)) & useMouse)   // Show mouse screen
-	{
-		screenMode = TS_MOUSE;
-	}
+	/*
+		if(((screenMode == TS_GAME) || (screenMode == TS_MENU)) & useMouse)   // Show mouse screen
+		{
+			screenMode = TS_MOUSE;
+		}
 
-	if(gameShowMouse && useMouse)
-		controlsContainer.showMouse(true);
-	else
-		controlsContainer.showMouse(false);
-*/
+		if(gameShowMouse && useMouse)
+			controlsContainer.showMouse(true);
+		else
+			controlsContainer.showMouse(false);
+	*/
 
 	if((screenMode == TS_MENU) && (useMouse || gotMouseMove))
 		controlsContainer.showMouse(true);
@@ -520,10 +506,12 @@ void TouchInterface::newFrame()
 void TouchInterface::newGLContext()
 {
 #if defined(YQUAKE2) // When using GLES1 on YQ2, does not use glGenTextures
+
 	if(yquake2Renderer == 1)
 	{
 		touchcontrols::setTextureNumberStart(10000);
 	}
+
 #endif
 
 #if defined(QUAKE2)

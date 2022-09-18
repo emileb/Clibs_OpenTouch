@@ -439,13 +439,20 @@ void TouchInterfaceBase::leftStick(float joy_x, float joy_y, float mouse_x, floa
 void TouchInterfaceBase::rightStick(float joy_x, float joy_y, float mouse_x, float mouse_y)
 {
 	//LOGI(" mouse x = %f",mouse_x);
-	int invert        = touchSettings.invertLook ? -1 : 1;
-	float scale       = (isShooting && touchSettings.precisionShoot) ? touchSettings.precisionSenitivity : 1;
-	float pitchMouse       = mouse_y * touchSettings.lookSensitivity * invert * scale;
-	float pitchJoystick    = joy_y * touchSettings.lookSensitivity * invert * scale * -2;
+	int invert          = touchSettings.invertLook ? -1 : 1;
+	float scale         = (isShooting && touchSettings.precisionShoot) ? touchSettings.precisionSenitivity : 1;
+	float pitchMouse    = mouse_y * touchSettings.lookSensitivity * invert * scale;
+	float pitchJoystick = joy_y * touchSettings.lookSensitivity * invert * scale * -2;
 
 	float yawMouse    = mouse_x * touchSettings.turnSensitivity * scale;
 	float yawJoystick = joy_x  * touchSettings.turnSensitivity * scale * 10;
+
+	// Disable mouse look for Doom, otherwise this should always be enabled
+	if(!touchSettings.mouseLook)
+	{
+		pitchMouse = 0;
+		pitchJoystick = 0;
+	}
 
 	if(touchSettings.joystickLookMode)
 		PortableLookPitch(LOOK_MODE_JOYSTICK, pitchJoystick);
@@ -506,6 +513,12 @@ void TouchInterfaceBase::weaponWheelSelected(int enabled)
 {
 	if(enabled)
 		tcWeaponWheel->fade(touchcontrols::FADE_IN, 5); //fade in
+/*
+	if(enabled)
+		PortableCommand("i_timescale 0.1"); //doom3 timescale
+	else
+		PortableCommand("i_timescale 1");
+*/
 }
 
 void TouchInterfaceBase::weaponWheel(int segment)
@@ -556,7 +569,7 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 		else if(action == TOUCHMOUSE_TAP)
 		{
 			MouseButton(1, BUTTON_PRIMARY);
-			usleep(200 * 1000);
+			waitFrames(3);
 			MouseButton(0, BUTTON_PRIMARY);
 		}
 #endif
@@ -649,11 +662,8 @@ void TouchInterfaceBase::customSettingsButton(int state)
 	if(state == 1)
 	{
 		showButtonListWindow(&controlsContainer);
-		//showEditButtons();
 	}
 }
-
-
 
 void TouchInterfaceBase::mobileBackButton(void)
 {
@@ -874,8 +884,6 @@ void TouchInterfaceBase::updateTouchScreenModeIn(touchscreemode_t mode)
 	}
 }
 
-
-
 void TouchInterfaceBase::createCustomControls(touchcontrols::TouchControls* customControls)
 {
 	customControls->addControl(new touchcontrols::Button("A", touchcontrols::RectF(5, 5, 7, 7), "Custom_1", PORT_ACT_CUSTOM_0, false, false, "Custom 1 (KP1)", touchcontrols::COLOUR_RED2));
@@ -931,7 +939,6 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
 	{
 		text[0] = key;
 		text[1] = 0;
-
 	}
 
 	// Change upper case to lower case to get scan code
@@ -971,6 +978,7 @@ void TouchInterfaceBase::processPointer(int action, int pid, float x, float y)
 void TouchInterfaceBase::gamepadAction(int state, int action)
 {
 	LOGI("gamepadAction, %d  %d", state, action);
+
 	bool used = false;
 
 	switch(action)
@@ -1265,8 +1273,11 @@ void TouchInterfaceBase::moveMouseCallback(float x, float y)
 //Wait for N number of frame to pass. This MUST NOT be called from the game thread
 void TouchInterfaceBase::waitFrames(int nbrFrames)
 {
+	uint64_t startTime = touchcontrols::getMS();
+
 	int frameNow = framecount;
-	while(frameNow + nbrFrames + 1 > framecount)
+	// Wait for n Frames, OR 500ms has passed for safety
+	while((frameNow + nbrFrames + 1 > framecount) && ((touchcontrols::getMS() - startTime) < 500))
 	{
 		usleep(1000); // wait 1ms
 	}

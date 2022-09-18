@@ -27,4 +27,6 @@ LOCAL_SRC_FILES += \
 
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
 
+LOCAL_CFLAGS += -fvisibility=hidden -fdata-sections -ffunction-sections
+
 include $(BUILD_STATIC_LIBRARY)
