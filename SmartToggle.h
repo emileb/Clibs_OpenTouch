@@ -1,5 +1,7 @@
 #include <time.h>
 
+#pragma once
+
 #define TAP_TIME 300
 
 typedef struct
@@ -28,7 +30,7 @@ static uint64_t getMS()
 	return (s * 1000ull) + ms;
 }
 
-int SmartToggleAction(SmartToggle_t *data, int buttonState, int isActive)
+static int SmartToggleAction(SmartToggle_t *data, int buttonState, int isActive)
 {
 	uint64_t timeNow = getMS();
 

@@ -114,6 +114,8 @@
 #define PORT_ACT_FLY_DOWN           94
 #define PORT_ACT_FLY_CENTER         95
 
+#define PORT_ACT_GYRO_TOGGLE        96
+
 
 #define PORT_ACT_WEAP0              100
 #define PORT_ACT_WEAP1              101

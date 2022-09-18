@@ -13,6 +13,7 @@
 
 #include "UI_TouchDefaultSettings.h"
 
+#include "SmartToggle.h"
 
 #define KEY_SHOW_WEAPONS 0x1000
 #define KEY_SHOOT        0x1001
@@ -71,6 +72,7 @@ public:
 	// For Doom
 	int mapState = 0;
 	float demoControlsAlpha = 0; // Used to fade out demo controls
+	SmartToggle_t gyroSmartToggle;
 
 	int framecount = 0;
 

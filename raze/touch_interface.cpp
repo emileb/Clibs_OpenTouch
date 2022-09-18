@@ -120,6 +120,8 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
 	tcGameMain->addControl(new touchcontrols::Button("swap_weapon", touchcontrols::RectF(3, 3, 5, 5), "swap", PORT_ACT_WEAP_ALT, false, hideAltWeapon, "Weapon alternative"));
+	tcGameMain->addControl(new touchcontrols::Button("kick", touchcontrols::RectF(19, 3, 21, 5), "kick", PORT_ACT_KICK, false, true, "Kick"));
+	tcGameMain->addControl(new touchcontrols::Button("gyro_toggle", touchcontrols::RectF(17, 3, 19, 5), "gyro", PORT_ACT_GYRO_TOGGLE, false, true, "Gyro Smart Toggle"));
 
 	// Add ion fury specific buttons
 	if(gameType == RAZE_GAME_IONFURY)

@@ -56,6 +56,8 @@ extern "C"
 	extern int mobile_screen_width;
 	extern int mobile_screen_height;
 	int checkGfx();
+
+	extern bool allowGyro; // In android_jni_inc.cpp
 }
 
 
@@ -294,6 +296,10 @@ void TouchInterfaceBase::gameButton(int state, int code)
 	{
 		if(state)
 			Android_JNI_SendMessage(COMMAND_SHOW_QUICK_COMMANDS, 0);
+	}
+	else if(code == PORT_ACT_GYRO_TOGGLE)
+	{
+		allowGyro = SmartToggleAction(&gyroSmartToggle, state, allowGyro);
 	}
 	else
 	{

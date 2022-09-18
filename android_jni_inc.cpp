@@ -32,6 +32,8 @@ extern "C"
 	int mobile_screen_width;
 	int mobile_screen_height;
 
+	bool allowGyro = true; // Used to toggle gyro on/off
+
 	static TouchInterface touchInterface;
 
 	JNIEnv* env_;
@@ -290,6 +292,10 @@ extern "C"
 		if(mode == LOOK_MODE_JOYSTICK)
 			touchInterface.axisValue(ANALOGUE_AXIS_PITCH, raw);
 
+		// Used to toggle gyro on/off. Only gyro uses the LOOK_MODE_MOUSE mode from Java
+		if(mode == LOOK_MODE_MOUSE && !allowGyro)
+			return;
+
 		PortableLookPitch(mode, v);
 	}
 
@@ -298,6 +304,10 @@ extern "C"
 	{
 		if(mode == LOOK_MODE_JOYSTICK)
 			touchInterface.axisValue(ANALOGUE_AXIS_YAW, raw);
+
+		// Used to toggle gyro on/off. Only gyro uses the LOOK_MODE_MOUSE mode from Java
+		if(mode == LOOK_MODE_MOUSE && !allowGyro)
+			return;
 
 		PortableLookYaw(mode, v);
 	}
