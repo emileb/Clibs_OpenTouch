@@ -251,6 +251,7 @@ extern "C"
 				return;
 		}
 #else
+#if 0
 		    // Beta test time
 		    time_t t = time(NULL);
 		    struct tm tm = *localtime(&t);
@@ -261,6 +262,7 @@ extern "C"
 		    {
 		        return;
 		    }
+#endif
 #endif
 
 		touchInterface.processPointer(action, pid, x, y);

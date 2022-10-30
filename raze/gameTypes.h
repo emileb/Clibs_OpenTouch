@@ -4,5 +4,6 @@
 #define RAZE_GAME_RR     103
 #define RAZE_GAME_NAM    104
 #define RAZE_GAME_PS     105
-#define RAZE_GAME_IONFURY  106
+#define RAZE_GAME_IONFURY 106
 #define RAZE_GAME_EDUKE32 107
+#define RAZE_GAME_AWOL    108

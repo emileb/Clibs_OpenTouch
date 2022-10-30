@@ -86,7 +86,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 		hideAltAttack = false;
 	}
 
-	if(gameType == RAZE_GAME_IONFURY) // Does not use traditional inventory, nor alt weapon
+	if(gameType == RAZE_GAME_IONFURY || gameType == RAZE_GAME_AWOL) // Does not use traditional inventory, nor alt weapon
 	{
 		hideInventory = true;
 		hideAltWeapon = true;
@@ -120,7 +120,8 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
 	tcGameMain->addControl(new touchcontrols::Button("swap_weapon", touchcontrols::RectF(3, 3, 5, 5), "swap", PORT_ACT_WEAP_ALT, false, hideAltWeapon, "Weapon alternative"));
-	tcGameMain->addControl(new touchcontrols::Button("kick", touchcontrols::RectF(19, 3, 21, 5), "kick", PORT_ACT_KICK, false, true, "Kick"));
+	if(gameType != RAZE_GAME_AWOL)
+		tcGameMain->addControl(new touchcontrols::Button("kick", touchcontrols::RectF(19, 3, 21, 5), "kick", PORT_ACT_KICK, false, true, "Kick"));
 	tcGameMain->addControl(new touchcontrols::Button("gyro_toggle", touchcontrols::RectF(17, 3, 19, 5), "gyro", PORT_ACT_GYRO_TOGGLE, false, true, "Gyro Smart Toggle"));
 
 	// Add ion fury specific buttons
@@ -131,7 +132,17 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 		tcGameMain->addControl(new touchcontrols::Button("radar", touchcontrols::RectF(17, 0, 19, 2), "radar", PORT_ACT_RADAR, false, false, "Radar"));
 	}
 
-	touchcontrols::ButtonGrid *dpad = new touchcontrols::ButtonGrid("dpad_move", touchcontrols::RectF(6, 3, 12, 7), "", 3, 2, true, "Movement btns (WASD)");
+    // Add AWOL specific buttons
+    if(gameType == RAZE_GAME_AWOL)
+    {
+        tcGameMain->addControl(new touchcontrols::Button("reload", touchcontrols::RectF(3, 4, 5, 6), "reload", PORT_ACT_RELOAD, false, false, "Reload"));
+        tcGameMain->addControl(new touchcontrols::Button("medikit", touchcontrols::RectF(15, 0, 17, 2), "medikit", PORT_ACT_MEDKIT, false, false, "Medkit"));
+		tcGameMain->addControl(new touchcontrols::Button("give_command", touchcontrols::RectF(17, 0, 19, 2), "chat", PORT_ACT_MP_SAY, false, false, "Give command"));
+        tcGameMain->addControl(new touchcontrols::Button("zoom", touchcontrols::RectF(22, 3, 24, 5), "zoom", PORT_ACT_ZOOM_IN, false, false, "Aim"));
+    }
+
+
+    touchcontrols::ButtonGrid *dpad = new touchcontrols::ButtonGrid("dpad_move", touchcontrols::RectF(6, 3, 12, 7), "", 3, 2, true, "Movement btns (WASD)");
 
 	dpad->addCell(0, 1, "direction_left", PORT_ACT_MOVE_LEFT);
 	dpad->addCell(2, 1, "direction_right", PORT_ACT_MOVE_RIGHT);
