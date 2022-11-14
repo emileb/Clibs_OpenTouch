@@ -74,6 +74,10 @@ public:
 	float demoControlsAlpha = 0; // Used to fade out demo controls
 	SmartToggle_t gyroSmartToggle;
 
+	bool enableReloadSniperMode = false; // Set to true to enable sniper mdoe for the reload button
+	bool sniperMode = false; // Reduce look sensitivity when reload being held down
+	uint64_t  reloadDownTime = 0;
+
 	int framecount = 0;
 
 	touchcontrols::TouchControlsContainer controlsContainer;

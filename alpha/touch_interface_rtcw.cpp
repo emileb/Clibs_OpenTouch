@@ -14,10 +14,6 @@ extern "C"
 #include "SDL_keycode.h"
 #include <fstream>
 
-//set when holding down reload
-static bool sniperMode = false;
-
-
 void TouchInterface::openGLStart()
 {
 	touchcontrols::gl_startRender();
@@ -97,6 +93,7 @@ void TouchInterface::createControls(std::string filesPath)
 
 	tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 	tcMenuMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE));
+    tcMenuMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(9, 0, 11, 2), "custom_show", KEY_SHOW_CUSTOM));
 
 	tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 	tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
@@ -138,6 +135,7 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Show menu"));
 	tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(20, 7, 23, 10), "shoot", KEY_SHOOT, false, false, "Attack!"));
 	tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
+	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, false, "Alt attack"));
 
 	tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE,false,false,"Use/Open"));
 
@@ -151,9 +149,8 @@ void TouchInterface::createControls(std::string filesPath)
 
 
     tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch/Swim down"));
-
-	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (Mouse 2)"));
-	//tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
+//tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
+	tcGameMain->addControl(new touchcontrols::Button("kick", touchcontrols::RectF(19, 3, 21, 5), "kick", PORT_ACT_KICK, false, true, "Kick"));
 
 	tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, false, "Show Inventory"));
 
@@ -163,7 +160,7 @@ void TouchInterface::createControls(std::string filesPath)
 
 
 	tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
-	tcGameMain->addControl(new touchcontrols::Button("reload", touchcontrols::RectF(0, 5, 3, 7), "ammo_reload", PORT_ACT_RELOAD, false, false, "Reload/snip"));
+	tcGameMain->addControl(new touchcontrols::Button("reload", touchcontrols::RectF(0, 5, 3, 7), "ammo_reload", PORT_ACT_RELOAD, false, false, "Reload/Snip"));
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 7, 3, 9), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 
     // Quad slider for leaning left and right controls
@@ -356,6 +353,8 @@ void TouchInterface::createControls(std::string filesPath)
 	tcWeaponWheel->setXMLFile((std::string)filesPath +  "/weaponwheel_" ENGINE_NAME ".xml");
 	tcGameWeapons->setXMLFile((std::string)filesPath +  "/weapons_" ENGINE_NAME ".xml");
 	tcCustomButtons->setXMLFile((std::string)filesPath +  "/custom_buttons_0_" ENGINE_NAME ".xml");
+
+    enableReloadSniperMode = true; // Enable reload/sniper mode
 }
 
 

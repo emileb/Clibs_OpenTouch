@@ -67,6 +67,12 @@ extern "C"
 			/* nothing */;
 		return --dest;
 	}
+
+	// Expose this
+	void androidWaitFrames(int frames)
+	{
+		touchInterface.waitFrames(frames);
+	}
 #define JAVA_FUNC(x) Java_org_libsdl_app_NativeLib_##x
 
 #define EXPORT_ME __attribute__ ((visibility("default")))

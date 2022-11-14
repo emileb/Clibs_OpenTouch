@@ -301,6 +301,30 @@ void TouchInterfaceBase::gameButton(int state, int code)
 	{
 		allowGyro = SmartToggleAction(&gyroSmartToggle, state, allowGyro);
 	}
+	else if (code == PORT_ACT_RELOAD)
+	{
+		if(enableReloadSniperMode)
+		{
+			//If holding down the reload button, do not reload
+			if (state) //key down
+			{
+				reloadDownTime = getMS();
+			}
+			else //up
+			{
+				//if less than 0.5 sec, reload
+				if ((getMS() - reloadDownTime) < 500)
+				{
+					PortableAction(1, PORT_ACT_RELOAD);
+					PortableAction(0, PORT_ACT_RELOAD);
+				}
+			}
+
+			sniperMode = state; //Use reload button for precision aim also
+		}
+		else
+			PortableAction(state, code);
+	}
 	else
 	{
 		PortableAction(state, code);
@@ -447,11 +471,18 @@ void TouchInterfaceBase::rightStick(float joy_x, float joy_y, float mouse_x, flo
 	//LOGI(" mouse x = %f",mouse_x);
 	int invert          = touchSettings.invertLook ? -1 : 1;
 	float scale         = (isShooting && touchSettings.precisionShoot) ? touchSettings.precisionSenitivity : 1;
+
+	// Sniper mode overrides it to 10x slower
+	if(sniperMode)
+		scale = 0.1;
+
 	float pitchMouse    = mouse_y * touchSettings.lookSensitivity * invert * scale;
 	float pitchJoystick = joy_y * touchSettings.lookSensitivity * invert * scale * -2;
 
 	float yawMouse    = mouse_x * touchSettings.turnSensitivity * scale;
 	float yawJoystick = joy_x  * touchSettings.turnSensitivity * scale * 10;
+
+
 
 	// Disable mouse look for Doom, otherwise this should always be enabled
 	if(!touchSettings.mouseLook)
@@ -538,6 +569,7 @@ void TouchInterfaceBase::weaponWheel(int segment)
 		number = 1 + segment;
 
 	PortableAction(1, PORT_ACT_WEAP0 + number);
+    waitFrames(1);
 	PortableAction(0, PORT_ACT_WEAP0 + number);
 }
 
