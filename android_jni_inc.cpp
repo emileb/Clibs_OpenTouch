@@ -68,6 +68,14 @@ extern "C"
 		return --dest;
 	}
 
+    // Used in GZDoom 4.9+
+	char *get_current_dir_name(void)
+	{
+        char *cwd = (char *)malloc(PATH_MAX);
+        getcwd(cwd, PATH_MAX);
+        return cwd;
+	}
+
 	// Expose this
 	void androidWaitFrames(int frames)
 	{
