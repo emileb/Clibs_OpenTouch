@@ -15,6 +15,8 @@ ifeq ($(G),D)
 LOCAL_STATIC_LIBRARIES := cert_chk
 else ifeq ($(G),Q)
 LOCAL_STATIC_LIBRARIES := cert_chk
+else ifeq ($(G),GZ)
+LOCAL_STATIC_LIBRARIES := cert_chk
 endif
 
 LOCAL_CFLAGS += -fvisibility=hidden -fdata-sections -ffunction-sections
