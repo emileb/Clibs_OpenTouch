@@ -152,6 +152,7 @@ extern "C"
 		LOGI("game_path = %s", game_path.c_str());
 
 		setenv("TIMIDITY_CFG", "./audiopack/snd_timidity/timidity.cfg", 1);
+		//setenv("SDL_SOUNDFONTS", "fluidsynth.sf2", 1);
 
 		setenv("HOME", game_path.c_str(), 1);
 		setenv("USER_FILES", userFilesPath.c_str(), 1);

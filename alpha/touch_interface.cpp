@@ -142,13 +142,7 @@ void TouchInterface::createControls(std::string filesPath)
 	//Weapon wheel -------------------------------------------
 	//------------------------------------------------------
 
-	int weaponWheelNbr = 10;
-
-#ifdef ROTTEXPR
-    weaponWheelNbr = 4;
-#endif
-
-	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", weaponWheelNbr);
+	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", wheelNbr);
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);

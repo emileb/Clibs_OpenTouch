@@ -106,7 +106,7 @@
 #define PORT_ACT_MP_DUEL         90
 
 
-//Choloate
+//Chocolate
 #define PORT_ACT_GAMMA              90
 #define PORT_ACT_SHOW_WEAPONS       91
 #define PORT_ACT_SHOW_KEYS          92
