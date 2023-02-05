@@ -91,6 +91,8 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
 #ifdef ROTTEXPR
 	tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 6), "ammo", PORT_ACT_NEXT_WEP, false, false, "Switch weapon"));
+	tcGameMain->addControl(new touchcontrols::Button("fly_up", touchcontrols::RectF(24, 2, 26, 4), "direction_up", PORT_ACT_FLY_UP, false, false, "Fly Up"));
+	tcGameMain->addControl(new touchcontrols::Button("fly_down", touchcontrols::RectF(24, 4, 26, 6), "direction_down", PORT_ACT_FLY_DOWN, false, false, "Fly Down"));
 #else
 	tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
