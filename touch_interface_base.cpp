@@ -61,7 +61,7 @@ extern "C"
 }
 
 
-void TouchInterfaceBase::init(int width, int height, const char *pngPath, int options, int wheelNbr_, int game)
+void TouchInterfaceBase::init(int width, int height, const char *pngPath,const char *touchSettingsPath, int options, int wheelNbr_, int game)
 {
 	nativeWidth = width;
 	nativeHeight = height;
@@ -103,7 +103,8 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath, int op
 	SDL_SetShowKeyboardCallBack(showKeyboardCallbackSDLCallback);
 
 	// Call app specific control creation
-	createControls(pngPath);
+	createControls(touchSettingsPath);
+	//createControls(pngPath);
 }
 
 

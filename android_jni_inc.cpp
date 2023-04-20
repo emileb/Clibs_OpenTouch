@@ -105,6 +105,8 @@ extern "C"
 	std::string sourceFilePath;
 	std::string resFilePath;
 
+	std::string touchSettingsPath;
+
 	char keyGlobal[512];
 	char pkgGlobal[64];
 
@@ -131,6 +133,8 @@ extern "C"
 		resFilePath_c = resFilePath.c_str();
 
 		nativeLibsPath = native_libs_path.c_str();
+
+		touchSettingsPath = userFilesPath + "/touch_layouts";
 
 		LogWritter_Init(log_filename_path.c_str());
 
@@ -181,10 +185,8 @@ extern "C"
 		strcpy(keyGlobal, key);
 		strcpy(pkgGlobal, pkg);
 #endif
-		//mobile_init(android_screen_width, android_screen_height, graphics_path.c_str(), options, wheelNbr, game);
 
-		//touchInterface = new TouchInterface();
-		touchInterface.init(mobile_screen_width, mobile_screen_height, filesPath.c_str(), options, wheelNbr, game);
+		touchInterface.init(mobile_screen_width, mobile_screen_height, filesPath.c_str(), touchSettingsPath.c_str(), options, wheelNbr, game);
 
 		PortableInit(argc, argv); //Never returns!!
 

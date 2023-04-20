@@ -122,7 +122,7 @@ public:
 
 	virtual void newGLContext() = 0;
 
-	void init(int width, int height, const char *pngPath, int options, int wheelNbr_, int game);
+	void init(int width, int height, const char *pngPath, const char *touchSettingsPath, int options, int wheelNbr_, int game);
 
 	int touchActionToAction(int action);
 
