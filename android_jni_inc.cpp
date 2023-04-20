@@ -127,7 +127,7 @@ extern "C"
 		sourceFilePath = (char *)(env)->GetStringUTFChars(sourceFiles, 0);
 		sourceFilePath_c = sourceFilePath.c_str();
 
-		resFilePath =  (char *)(env)->GetStringUTFChars(resFiles, 0)	;
+		resFilePath =  (char *)(env)->GetStringUTFChars(resFiles, 0);
 		resFilePath_c = resFilePath.c_str();
 
 		nativeLibsPath = native_libs_path.c_str();

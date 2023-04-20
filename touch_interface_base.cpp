@@ -129,6 +129,10 @@ int TouchInterfaceBase::touchActionToAction(int action)
 		ret = PORT_ACT_ALT_ATTACK;
 		break;
 
+	case 5:
+		ret = PORT_ACT_TOGGLE_CROUCH;
+		break;
+
 	default:
 		ret = 0;
 	}
