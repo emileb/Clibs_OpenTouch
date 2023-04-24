@@ -531,7 +531,11 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	//------------------------------------------------------
 	tcPda->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
 	tcPda->addControl(new touchcontrols::Button("pda", touchcontrols::RectF(16, 0, 18, 2), "gamma", PORT_ACT_HELPCOMP, false, false, "Show PDA"));
-	tcPda->addControl(mouse); // Try to add the same mosue object from the main menu.. should work?...
+	touchcontrols::Mouse *mousePda = new touchcontrols::Mouse("mouse", touchcontrols::RectF(0, 2, 26, 16), ""); // Leave gap at top so dont click mouse when pressing those buttons
+	mousePda->setHideGraphics(true);
+	mousePda->setEditable(false);
+	mousePda->signal_action.connect(sigc::mem_fun(this, &TouchInterface::mouseMove));
+	tcPda->addControl(mousePda);
 	tcPda->signal_button.connect(sigc::mem_fun(this, &TouchInterface::gameButton));
 
 	//Blank -------------------------------------------

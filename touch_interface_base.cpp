@@ -594,7 +594,8 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 	else if(action == TOUCHMOUSE_TAP)
 	{
 		PortableMouseButton(1, 1, 0, 0);
-		usleep(200 * 1000); // Need this for the PDA to work in D3, needs a frame to react..
+		//usleep(200 * 1000); // Need this for the PDA to work in D3, needs a frame to react..
+		waitFrames(3);
 		PortableMouseButton(0, 1, 0, 0);
 	}
 #endif
