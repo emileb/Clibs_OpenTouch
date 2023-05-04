@@ -98,7 +98,7 @@ static float look_yaw_joy = 0;
 
 int PortableKeyEvent(int state, int code, int unicode)
 {
-	LOGI("PortableKeyEvent %d %d %d\n", state, code, unicode);
+	//LOGI("PortableKeyEvent %d %d %d\n", state, code, unicode);
 
 	if(state)
 		SDL_SendKeyboardKey(SDL_PRESSED, (SDL_Scancode)code);

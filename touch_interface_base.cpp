@@ -542,7 +542,7 @@ void TouchInterfaceBase::gameUtilitiesOutside(bool fromGamepad)
 
 void TouchInterfaceBase::customButton(int state, int code)
 {
-	LOGI("Cust %d, %d", state, code);
+	// LOGI("Cust %d, %d", state, code);
 	PortableAction(state, code);
 
 	// If we are binding keys hide the custom buttons again
