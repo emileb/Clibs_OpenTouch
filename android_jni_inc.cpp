@@ -204,15 +204,16 @@ extern "C"
 	}
 
 	void EXPORT_ME
-	JAVA_FUNC(setFramebufferSize)(JNIEnv* env,	jobject thiz, jint width, jint height)
+	JAVA_FUNC(setFramebufferSize)(JNIEnv* env,	jobject thiz, jint width, jint height, jint aspect)
 	{
-		LOGI("setFramebufferSize %d x %d", width, height);
+		LOGI("setFramebufferSize %d x %d, aspect = %d", width, height, aspect);
 
 		touchcontrols::fbConfig config;
 		config.vidWidth = width;
 		config.vidHeight = height;
 		config.vidWidthReal = mobile_screen_width;
 		config.vidHeightReal = mobile_screen_height;
+		config.maintainAspect = aspect;
 
 		touchcontrols::R_FrameBufferConfig(config);
 	}
