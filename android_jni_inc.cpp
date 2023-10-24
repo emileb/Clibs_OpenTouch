@@ -269,14 +269,14 @@ extern "C"
 				return;
 		}
 #else
-#if 0
+#if 1
 		    // Beta test time
 		    time_t t = time(NULL);
 		    struct tm tm = *localtime(&t);
 		    int yr =  tm.tm_year + 1900;
 		    int mo = tm.tm_mon + 1;
 		    //LOGI("%d   %d",yr,mo);
-		    if(yr > 2023)
+		    if(yr > 2024)
 		    {
 		        return;
 		    }

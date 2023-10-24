@@ -132,6 +132,9 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	// Hide the cog because when using the gamepad and weapon wheel is enabled, the cog will show otherwise
 	tcWeaponWheel->hideEditButton = true;
 
+	// Show main game controls when editing custom buttons
+	tcCustomButtons->setEditBackgroundControl(tcGameMain);
+
 	//Menu -------------------------------------------
 	//------------------------------------------------------
 	tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON));

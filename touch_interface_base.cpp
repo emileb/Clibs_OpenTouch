@@ -1123,6 +1123,10 @@ void TouchInterfaceBase::gamepadAction(int state, int action)
 			mobileBackButton();
 		}
 	}
+	else if(action == PORT_ACT_GYRO_TOGGLE)
+	{
+		allowGyro = SmartToggleAction(&gyroSmartToggle, state, allowGyro);
+	}
 	else
 	{
 		PortableAction(state, action);
