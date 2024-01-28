@@ -102,6 +102,9 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath,const c
 	SDL_MouseMoveCallBack(moveMouseSDLCallback);
 	SDL_SetShowKeyboardCallBack(showKeyboardCallbackSDLCallback);
 
+    // Create common Run button. can be used or not
+	runButton = new touchcontrols::Button("run_toggle", touchcontrols::RectF(8, 7, 10, 9), "sprint_slow;sprint", PORT_ACT_SMART_TOGGLE_RUN, false, true, "Run (smart toggle)");
+
 	// Call app specific control creation
 	createControls(touchSettingsPath);
 	//createControls(pngPath);
@@ -330,6 +333,10 @@ void TouchInterfaceBase::gameButton(int state, int code)
 		else
 			PortableAction(state, code);
 	}
+    else if (code == PORT_ACT_SMART_TOGGLE_RUN)
+    {
+        isWalking = SmartToggleAction(&runSmartToggle, state, isWalking);
+    }
 	else
 	{
 		PortableAction(state, code);
@@ -1273,8 +1280,14 @@ void TouchInterfaceBase::frameControls()
 	if(checkGfx())
 		return;
 
-	if(touchJoyLeft) touchJoyLeft->setHideGraphics(!touchSettings.showJoysticks);
+    // Update run button image
+    if(!isWalking)
+        runButton->setImage(1);
+    else
+        runButton->setImage(0);
 
+    // Update hide/show joysticks
+	if(touchJoyLeft) touchJoyLeft->setHideGraphics(!touchSettings.showJoysticks);
 	if(touchJoyRight) touchJoyRight->setHideGraphics(!touchSettings.showJoysticks);
 
 	newFrame();

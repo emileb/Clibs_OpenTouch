@@ -69,6 +69,7 @@ public:
 	bool showCustomOn = false;
 	bool showCustomMenu = false;
 	bool gotMouseMove = false; // Set to true if we ever got a mouse mouse from SDL, so we can choose if to show the mouse icon
+
 	// For Doom
 	int mapState = 0;
 	float demoControlsAlpha = 0; // Used to fade out demo controls
@@ -77,6 +78,9 @@ public:
 	bool enableReloadSniperMode = false; // Set to true to enable sniper mdoe for the reload button
 	bool sniperMode = false; // Reduce look sensitivity when reload being held down
 	uint64_t  reloadDownTime = 0;
+
+	bool isWalking = false; // Run toggle, default run on. NOTE need to do as isWalking so smarttoggle defautls to running
+    SmartToggle_t runSmartToggle;
 
 	int framecount = 0;
 
@@ -111,6 +115,9 @@ public:
 	// So gamepad can access it
 	touchcontrols::WheelSelect *wheelSelect;
 	touchcontrols::ButtonGrid *uiInventoryButtonGrid;
+
+	// Common 'Run/Sprint' button
+	touchcontrols::Button *runButton;
 
 	virtual void createControls(std::string filesPath) = 0;
 
@@ -214,6 +221,8 @@ public:
 	void moveMouseCallback(float x, float y);
 
 	void waitFrames(int nbrFrames);
+
+    int isPlayerRunning(){ return !isWalking; }
 };
 
 

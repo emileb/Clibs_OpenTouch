@@ -431,6 +431,11 @@ extern "C"
 		return touchInterface.blockGamepad();
 	}
 
+	int isPlayerRunning()
+	{
+		return touchInterface.isPlayerRunning();
+	}
+
 	void MouseButton(int state, int button)
 	{
 		if(state)
@@ -464,7 +469,6 @@ extern "C"
 		return gameType;
 	}
 
-
 	void frameControlsSDLCallback(void)
 	{
 		touchInterface.frameControls();
@@ -484,8 +488,6 @@ extern "C"
 	{
 		touchInterface.moveMouseCallback(x, y);
 	}
-
-
 
 	int checkGfx()
 	{

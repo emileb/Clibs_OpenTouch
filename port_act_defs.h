@@ -51,6 +51,9 @@
 //Multiplayer
 #define PORT_ACT_MP_SAY    41
 
+// Common 'Run' button
+#define PORT_ACT_SMART_TOGGLE_RUN 42
+
 //RTCW
 #define PORT_ACT_ZOOM_IN    50 //Also used for Quake 3 zoom
 #define PORT_ACT_ALT_FIRE   51

@@ -36,7 +36,5 @@ LOCAL_SRC_FILES := \
 	$(FREETYPE_SRC_PATH)src/smooth/smooth.c \
 	$(FREETYPE_SRC_PATH)src/truetype/truetype.c
 
-LOCAL_LDLIBS := -ldl -llog
-
 include $(BUILD_STATIC_LIBRARY)
 

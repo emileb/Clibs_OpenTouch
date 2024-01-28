@@ -30,7 +30,7 @@ static uint64_t getMS()
 	return (s * 1000ull) + ms;
 }
 
-static int SmartToggleAction(SmartToggle_t *data, int buttonState, int isActive)
+static inline int SmartToggleAction(SmartToggle_t *data, int buttonState, int isActive)
 {
 	uint64_t timeNow = getMS();
 
