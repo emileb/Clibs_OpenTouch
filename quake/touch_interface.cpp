@@ -186,7 +186,6 @@ void TouchInterface::createControls(std::string filesPath)
 	tcMenuMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::menuButton));
 	tcMenuMain->setAlpha(0.8);
 
-
 	//Game -------------------------------------------
 	//------------------------------------------------------
 	tcGameMain->setAlpha(touchSettings.alpha);
@@ -213,7 +212,7 @@ void TouchInterface::createControls(std::string filesPath)
 		tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch/Swim down"));
 
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (Mouse 2)"));
-	//tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
+	tcGameMain->addControl(runButton); // Common run button created in touch_interface_base
 
 	bool hideQ2 = true;
 
