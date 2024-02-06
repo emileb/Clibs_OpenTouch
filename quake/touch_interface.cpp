@@ -102,29 +102,32 @@ void TouchInterface::createControls(std::string filesPath)
 	tcDPadInventory = new touchcontrols::TouchControls("dpad_inventory", false, false);
 	tcMouse = new touchcontrols::TouchControls("mouse", false, false);
 
+    // Show main game controls when editing custom buttons
+    tcCustomButtons->setEditBackgroundControl(tcGameMain);
+
 	//Menu -------------------------------------------
 	//------------------------------------------------------
 	tcMenuMain->setFixAspect(true);
 	tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON));
 #ifndef QUAKE3
+
+#if !defined(WRATH) // No keyboard in menu for Wrath
 	tcMenuMain->addControl(new touchcontrols::Button("down_arrow", touchcontrols::RectF(20, 13, 23, 16), "arrow_down", PORT_ACT_MENU_DOWN));
 	tcMenuMain->addControl(new touchcontrols::Button("up_arrow", touchcontrols::RectF(20, 10, 23, 13), "arrow_up", PORT_ACT_MENU_UP));
 	tcMenuMain->addControl(new touchcontrols::Button("left_arrow", touchcontrols::RectF(17, 13, 20, 16), "arrow_left", PORT_ACT_MENU_LEFT));
 	tcMenuMain->addControl(new touchcontrols::Button("right_arrow", touchcontrols::RectF(23, 13, 26, 16), "arrow_right", PORT_ACT_MENU_RIGHT));
 
-	tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
+    tcMenuMain->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 10, 6, 16), "enter", PORT_ACT_MENU_SELECT));
+#endif
+
+    tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 	tcMenuMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE));
 	tcMenuMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(9, 0, 11, 2), "custom_show", KEY_SHOW_CUSTOM));
-
-#if  defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES)
-	//tcMenuMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE));
-#endif
 
 	tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 	tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
 	tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
 
-	tcMenuMain->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 10, 6, 16), "enter", PORT_ACT_MENU_SELECT));
 	touchcontrols::Mouse *brightnessSlide = new touchcontrols::Mouse("slide_mouse", touchcontrols::RectF(24, 3, 26, 11), "brightness_slider");
 	brightnessSlide->signal_action.connect(sigc::mem_fun(this, &TouchInterface::brightnessSlideMouse));
 	tcMenuMain->addControl(brightnessSlide);
@@ -190,10 +193,13 @@ void TouchInterface::createControls(std::string filesPath)
 	//------------------------------------------------------
 	tcGameMain->setAlpha(touchSettings.alpha);
 	tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Show menu"));
-	tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(23, 6, 26, 9), "shoot", KEY_SHOOT, false, false, "Attack!"));
+	tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(21, 5, 24, 8), "shoot", KEY_SHOOT, false, false, "Attack!"));
 	tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
 
-	//tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE,false,false,"Use/Open"));
+#if defined(WRATH)
+	tcGameMain->addControl(new touchcontrols::Button("use", touchcontrols::RectF(24,6,26,8), "use", PORT_ACT_USE, false, false, "Use/Open"));
+#endif
+
 #ifdef QUAKE3
 	tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", PORT_ACT_USE, false, false, "Use item"));
 	tcGameMain->addControl(new touchcontrols::Button("zoom", touchcontrols::RectF(24, 0, 26, 2), "binocular", PORT_ACT_ZOOM_IN, false, false, "Weapon zoom"));
@@ -211,7 +217,12 @@ void TouchInterface::createControls(std::string filesPath)
 	else
 		tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch/Swim down"));
 
+#if defined(WRATH) // Move alt attack to the left and unhide
+	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(3, 7, 5, 9), "shoot_alt", PORT_ACT_ALT_ATTACK, false, false, "Alt attack"));
+#else
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (Mouse 2)"));
+#endif
+
 	tcGameMain->addControl(runButton); // Common run button created in touch_interface_base
 
 	bool hideQ2 = true;
@@ -230,6 +241,12 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 2, 2, 4), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
 	tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
 	tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
+
+#if defined(WRATH)
+    tcGameMain->addControl(new touchcontrols::Button("notebook", touchcontrols::RectF(4, 0, 6, 2), "notebook", PORT_ACT_HELPCOMP, false, false, "Notebook"));
+	tcGameMain->addControl(new touchcontrols::Button("open_runes", touchcontrols::RectF(17, 0, 19, 2), "rune", PORT_ACT_INVEN, false, false, "Select Artifact"));
+	tcGameMain->addControl(new touchcontrols::Button("use_rune", touchcontrols::RectF(21, 3, 23, 5), "fist", PORT_ACT_INVUSE, false, false, "Use Artifact"));
+#endif
 
 	if(gameType != Q1MALICE)
 	{
