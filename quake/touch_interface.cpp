@@ -219,6 +219,7 @@ void TouchInterface::createControls(std::string filesPath)
 
 #if defined(WRATH) // Move alt attack to the left and unhide
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(3, 7, 5, 9), "shoot_alt", PORT_ACT_ALT_ATTACK, false, false, "Alt attack"));
+	tcGameMain->addControl(new touchcontrols::Button("attack_alt2", touchcontrols::RectF(17, 7, 19, 9), "shoot_alt", PORT_ACT_ALT_ATTACK, false, false, "Alt attack (duplicate)"));
 #else
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (Mouse 2)"));
 #endif

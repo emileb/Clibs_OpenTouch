@@ -153,6 +153,7 @@ extern "C"
 
 		LogWritter_Write("\n");
 
+		LOGI("game_type = %d", gameType);
 		LOGI("game_path = %s", game_path.c_str());
 
 		setenv("TIMIDITY_CFG", "./audiopack/snd_timidity/timidity.cfg", 1);
