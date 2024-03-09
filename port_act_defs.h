@@ -72,10 +72,10 @@
 //SMD for Q2
 #define PORT_SMD_USE        62
 
+// WRATH
+#define PORT_WRATH_USE      63
+
 //JK2
-//#define PORT_ACT_FORCE_LIGHTNING 60
-//#define PORT_ACT_SABER_BLOCK     62
-//#define PORT_ACT_FORCE_GRIP      63
 #define PORT_ACT_ALT_ATTACK      64
 #define PORT_ACT_NEXT_FORCE      65
 #define PORT_ACT_PREV_FORCE      66

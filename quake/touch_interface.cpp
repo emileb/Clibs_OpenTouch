@@ -197,7 +197,7 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
 
 #if defined(WRATH)
-	tcGameMain->addControl(new touchcontrols::Button("use", touchcontrols::RectF(24,6,26,8), "use", PORT_ACT_USE, false, false, "Use/Open"));
+	tcGameMain->addControl(new touchcontrols::Button("use", touchcontrols::RectF(24,6,26,8), "use", PORT_WRATH_USE, false, false, "Use/Open"));
 #endif
 
 #ifdef QUAKE3
