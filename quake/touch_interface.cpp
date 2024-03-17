@@ -84,7 +84,7 @@ void TouchInterface::openGLEnd()
 
 void TouchInterface::createControls(std::string filesPath)
 {
-	tcMenuMain = new touchcontrols::TouchControls("menu", false, true, 10, true);
+	tcMenuMain = new touchcontrols::TouchControls("menu", false, true, 10, false);
 	tcYesNo = new touchcontrols::TouchControls("yes_no", false, false);
 	tcGameMain = new touchcontrols::TouchControls("game", false, true, 1, true);
 	tcGameWeapons = new touchcontrols::TouchControls("weapons", false, true, 1, false);
@@ -245,7 +245,7 @@ void TouchInterface::createControls(std::string filesPath)
 
 #if defined(WRATH)
     tcGameMain->addControl(new touchcontrols::Button("notebook", touchcontrols::RectF(4, 0, 6, 2), "notebook", PORT_ACT_HELPCOMP, false, false, "Notebook"));
-	tcGameMain->addControl(new touchcontrols::Button("open_runes", touchcontrols::RectF(17, 0, 19, 2), "rune", PORT_ACT_INVEN, false, false, "Select Artifact"));
+	tcGameMain->addControl(new touchcontrols::Button("open_runes", touchcontrols::RectF(17, 0, 19, 2), "rune", PORT_ACT_INVEN, false, false, "Artifact (smart toggle)"));
 	tcGameMain->addControl(new touchcontrols::Button("use_rune", touchcontrols::RectF(21, 3, 23, 5), "fist", PORT_ACT_INVUSE, false, false, "Use Artifact"));
 #endif
 
