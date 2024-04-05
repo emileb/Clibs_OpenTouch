@@ -29,8 +29,12 @@
 extern "C"
 {
 	int gameType;
-	int mobile_screen_width;
+	int mobile_screen_width; // Device screen size in pix
 	int mobile_screen_height;
+
+	int game_screen_width; // Game screen size, could be smaller than above due to framebuffer
+	int game_screen_height;
+
 
 	bool allowGyro = true; // Used to toggle gyro on/off
 
@@ -215,6 +219,17 @@ extern "C"
 		config.vidWidthReal = mobile_screen_width;
 		config.vidHeightReal = mobile_screen_height;
 		config.maintainAspect = aspect;
+
+		if(config.vidWidth != 0 && config.vidHeight != 0)
+		{
+			game_screen_width = config.vidWidth;
+			game_screen_height = config.vidHeight;
+		}
+		else
+		{
+			game_screen_width = mobile_screen_width;
+			game_screen_height = mobile_screen_height;
+		}
 
 		touchcontrols::R_FrameBufferConfig(config);
 	}

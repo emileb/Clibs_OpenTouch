@@ -53,8 +53,13 @@ extern "C"
 
 	extern const char * getFilesPath();
 	extern const char *nativeLibsPath;
+
 	extern int mobile_screen_width;
 	extern int mobile_screen_height;
+
+	extern int game_screen_width;
+	extern int game_screen_height;
+
 	int checkGfx();
 
 	extern bool allowGyro; // In android_jni_inc.cpp
@@ -615,7 +620,7 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 #if defined(QUAKE3)  || defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES) || defined(FTEQW)
 		if(action == TOUCHMOUSE_MOVE)
 		{
-			MouseMove(mouse_x * mobile_screen_width, mouse_y * mobile_screen_height);
+			MouseMove(mouse_x * game_screen_width, mouse_y * game_screen_height);
 		}
 		else if(action == TOUCHMOUSE_TAP)
 		{
