@@ -1292,8 +1292,8 @@ void TouchInterfaceBase::frameControls()
         runButton->setImage(0);
 
     // Update hide/show joysticks
-	if(touchJoyLeft) touchJoyLeft->setHideGraphics(!touchSettings.showJoysticks);
-	if(touchJoyRight) touchJoyRight->setHideGraphics(!touchSettings.showJoysticks);
+	if(touchJoyLeft) touchJoyLeft->setHideGraphics(!touchSettings.showLeftStick);
+	if(touchJoyRight) touchJoyRight->setHideGraphics(!touchSettings.showRightStick);
 
 	newFrame();
 #if 1
