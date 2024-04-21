@@ -66,7 +66,7 @@ extern "C"
 }
 
 
-void TouchInterfaceBase::init(int width, int height, const char *pngPath,const char *touchSettingsPath, int options, int wheelNbr_, int game)
+void TouchInterfaceBase::init(int width, int height, const char *pngPath, const char *touchSettingsPath, int options, int wheelNbr_, int game)
 {
 	nativeWidth = width;
 	nativeHeight = height;
@@ -107,7 +107,7 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath,const c
 	SDL_MouseMoveCallBack(moveMouseSDLCallback);
 	SDL_SetShowKeyboardCallBack(showKeyboardCallbackSDLCallback);
 
-    // Create common Run button. can be used or not
+	// Create common Run button. can be used or not
 	runButton = new touchcontrols::Button("run_toggle", touchcontrols::RectF(8, 7, 10, 9), "sprint_slow;sprint", PORT_ACT_SMART_TOGGLE_RUN, false, true, "Run (smart toggle)");
 
 	// Call app specific control creation
@@ -314,19 +314,19 @@ void TouchInterfaceBase::gameButton(int state, int code)
 	{
 		allowGyro = SmartToggleAction(&gyroSmartToggle, state, allowGyro);
 	}
-	else if (code == PORT_ACT_RELOAD)
+	else if(code == PORT_ACT_RELOAD)
 	{
 		if(enableReloadSniperMode)
 		{
 			//If holding down the reload button, do not reload
-			if (state) //key down
+			if(state)  //key down
 			{
 				reloadDownTime = getMS();
 			}
 			else //up
 			{
 				//if less than 0.5 sec, reload
-				if ((getMS() - reloadDownTime) < 500)
+				if((getMS() - reloadDownTime) < 500)
 				{
 					PortableAction(1, PORT_ACT_RELOAD);
 					PortableAction(0, PORT_ACT_RELOAD);
@@ -338,10 +338,10 @@ void TouchInterfaceBase::gameButton(int state, int code)
 		else
 			PortableAction(state, code);
 	}
-    else if (code == PORT_ACT_SMART_TOGGLE_RUN)
-    {
-        isWalking = SmartToggleAction(&runSmartToggle, state, isWalking);
-    }
+	else if(code == PORT_ACT_SMART_TOGGLE_RUN)
+	{
+		isWalking = SmartToggleAction(&runSmartToggle, state, isWalking);
+	}
 	else
 	{
 		PortableAction(state, code);
@@ -399,11 +399,13 @@ void TouchInterfaceBase::menuButton(int state, int code)
 			useMouse = true;
 		}
 	}
+
 #if !defined(QUAKESPASM) &&  !defined(QUAKESPASM_SPIKED)  && !defined(FTEQW) && !defined(DARKPLACES) && !defined(QUAKE2) && !defined(YQUAKE2)  && !defined(QUAKE3) && !defined(UHEXEN2)
 	else if(code == PORT_ACT_CONSOLE)
 	{
 		PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
 	}
+
 #endif
 	else if(code == KEY_LEFT_MOUSE)
 	{
@@ -567,12 +569,13 @@ void TouchInterfaceBase::weaponWheelSelected(int enabled)
 {
 	if(enabled)
 		tcWeaponWheel->fade(touchcontrols::FADE_IN, 5); //fade in
-/*
-	if(enabled)
-		PortableCommand("i_timescale 0.1"); //doom3 timescale
-	else
-		PortableCommand("i_timescale 1");
-*/
+
+	/*
+		if(enabled)
+			PortableCommand("i_timescale 0.1"); //doom3 timescale
+		else
+			PortableCommand("i_timescale 1");
+	*/
 }
 
 void TouchInterfaceBase::weaponWheel(int segment)
@@ -586,7 +589,7 @@ void TouchInterfaceBase::weaponWheel(int segment)
 		number = 1 + segment;
 
 	PortableAction(1, PORT_ACT_WEAP0 + number);
-    waitFrames(1);
+	waitFrames(1);
 	PortableAction(0, PORT_ACT_WEAP0 + number);
 }
 
@@ -604,6 +607,7 @@ void TouchInterfaceBase::selectWeaponButton(int state, int code)
 void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, float mouse_y)
 {
 #if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) || defined(EDUKE32)// todo
+
 	if(action == TOUCHMOUSE_MOVE)
 	{
 		PortableMouse(mouse_x, mouse_y);
@@ -615,19 +619,22 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 		waitFrames(3);
 		PortableMouseButton(0, 1, 0, 0);
 	}
+
 #endif
 
 #if defined(QUAKE3)  || defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES) || defined(FTEQW)
-		if(action == TOUCHMOUSE_MOVE)
-		{
-			MouseMove(mouse_x * game_screen_width, mouse_y * game_screen_height);
-		}
-		else if(action == TOUCHMOUSE_TAP)
-		{
-			MouseButton(1, BUTTON_PRIMARY);
-			waitFrames(3);
-			MouseButton(0, BUTTON_PRIMARY);
-		}
+
+	if(action == TOUCHMOUSE_MOVE)
+	{
+		MouseMove(mouse_x * game_screen_width, mouse_y * game_screen_height);
+	}
+	else if(action == TOUCHMOUSE_TAP)
+	{
+		MouseButton(1, BUTTON_PRIMARY);
+		waitFrames(3);
+		MouseButton(0, BUTTON_PRIMARY);
+	}
+
 #endif
 }
 
@@ -864,6 +871,7 @@ void TouchInterfaceBase::updateTouchScreenModeIn(touchscreemode_t mode)
 
 			// Always set these so they are never wrong
 			if(tcGameMain) tcGameMain->setAlpha(touchSettings.alpha);
+
 			if(tcCustomButtons) tcCustomButtons->setAlpha(touchSettings.alpha);
 
 			if(!hideGameAndMenu)
@@ -888,8 +896,8 @@ void TouchInterfaceBase::updateTouchScreenModeIn(touchscreemode_t mode)
 			if(touchSettings.weaponWheelEnabled)
 				tcWeaponWheel->setEnabled(true);
 
-            // Alway enable the gyro when going back to the game
-            allowGyro = true;
+			// Alway enable the gyro when going back to the game
+			allowGyro = true;
 
 			break;
 
@@ -1285,15 +1293,22 @@ void TouchInterfaceBase::frameControls()
 	if(checkGfx())
 		return;
 
-    // Update run button image
-    if(!isWalking)
-        runButton->setImage(1);
-    else
-        runButton->setImage(0);
+	// Update run button image
+	if(!isWalking)
+	{
+		runButton->setImage(1);
+	}
+	else
+	{
+		runButton->setImage(0);
+	}
 
-    // Update hide/show joysticks
-	if(touchJoyLeft) touchJoyLeft->setHideGraphics(!touchSettings.showLeftStick);
-	if(touchJoyRight) touchJoyRight->setHideGraphics(!touchSettings.showRightStick);
+	// Update hide/show joysticks
+	if(touchJoyLeft)
+		touchJoyLeft->setHideGraphics(!touchSettings.showLeftStick);
+
+	if(touchJoyRight)
+		touchJoyRight->setHideGraphics(!touchSettings.showRightStick);
 
 	newFrame();
 #if 1
@@ -1344,6 +1359,7 @@ void TouchInterfaceBase::waitFrames(int nbrFrames)
 	uint64_t startTime = touchcontrols::getMS();
 
 	int frameNow = framecount;
+
 	// Wait for n Frames, OR 500ms has passed for safety
 	while((frameNow + nbrFrames + 1 > framecount) && ((touchcontrols::getMS() - startTime) < 500))
 	{

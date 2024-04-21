@@ -67,17 +67,18 @@ extern "C"
 	char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
 	char *stpcpy(char *__restrict__ dest, const char *__restrict__ src)
 	{
-		while ((*dest++ = *src++) != '\0')
+		while((*dest++ = *src++) != '\0')
 			/* nothing */;
+
 		return --dest;
 	}
 
-    // Used in GZDoom 4.9+
+	// Used in GZDoom 4.9+
 	char *get_current_dir_name(void)
 	{
-        char *cwd = (char *)malloc(PATH_MAX);
-        getcwd(cwd, PATH_MAX);
-        return cwd;
+		char *cwd = (char *)malloc(PATH_MAX);
+		getcwd(cwd, PATH_MAX);
+		return cwd;
 	}
 
 	// Expose this
@@ -133,7 +134,7 @@ extern "C"
 		sourceFilePath = (char *)(env)->GetStringUTFChars(sourceFiles, 0);
 		sourceFilePath_c = sourceFilePath.c_str();
 
-		resFilePath =  (char *)(env)->GetStringUTFChars(resFiles, 0);
+		resFilePath = (char *)(env)->GetStringUTFChars(resFiles, 0);
 		resFilePath_c = resFilePath.c_str();
 
 		nativeLibsPath = native_libs_path.c_str();
@@ -264,6 +265,7 @@ extern "C"
 	JAVA_FUNC(touchEvent)(JNIEnv *env, jobject obj, jint action, jint pid, jfloat x, jfloat y)
 	{
 #ifndef NO_SEC
+
 		//LOGI("TOUCHED");
 		if(apkRandomDelay == -1)
 		{
@@ -284,18 +286,21 @@ extern "C"
 			if(check != 1)
 				return;
 		}
+
 #else
 #if 1
-		    // Beta test time
-		    time_t t = time(NULL);
-		    struct tm tm = *localtime(&t);
-		    int yr =  tm.tm_year + 1900;
-		    int mo = tm.tm_mon + 1;
-		    //LOGI("%d   %d",yr,mo);
-		    if(yr > 2024)
-		    {
-		        return;
-		    }
+		// Beta test time
+		time_t t = time(NULL);
+		struct tm tm = *localtime(&t);
+		int yr =  tm.tm_year + 1900;
+		int mo = tm.tm_mon + 1;
+
+		//LOGI("%d   %d",yr,mo);
+		if(yr > 2024)
+		{
+			return;
+		}
+
 #endif
 #endif
 
@@ -412,7 +417,7 @@ extern "C"
 
 		snprintf(path, 256, "%s/fileXXXXXX", tempFilesPath.c_str());
 
-		LOGI("Temp file = %s", path );
+		LOGI("Temp file = %s", path);
 
 		int descriptor = mkstemp(path);
 
@@ -427,7 +432,7 @@ extern "C"
 
 			// File already open,
 			// can be unbound from the file system
-            unlink(path);
+			unlink(path);
 		}
 		else
 		{
@@ -508,10 +513,10 @@ extern "C"
 	int checkGfx()
 	{
 #ifndef NO_SEC
-	#include "./secure/check_include.h"
-	return 0;
+#include "./secure/check_include.h"
+		return 0;
 #else
-	return 0;
+		return 0;
 #endif
 	}
 }

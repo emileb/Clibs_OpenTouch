@@ -5,15 +5,15 @@
 
 
 static FILE *file;
-void LogWritter_Init( const char *filename )
+void LogWritter_Init(const char *filename)
 {
-    file = fopen(filename, "w");
+	file = fopen(filename, "w");
 }
 
-void LogWritter_Write( const char *msg )
+void LogWritter_Write(const char *msg)
 {
-    fprintf(file, "%s\n", msg);
-    fflush(file);
+	fprintf(file, "%s\n", msg);
+	fflush(file);
 }
 
 void LogWritter_Close()

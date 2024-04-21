@@ -102,8 +102,8 @@ void TouchInterface::createControls(std::string filesPath)
 	tcDPadInventory = new touchcontrols::TouchControls("dpad_inventory", false, false);
 	tcMouse = new touchcontrols::TouchControls("mouse", false, false);
 
-    // Show main game controls when editing custom buttons
-    tcCustomButtons->setEditBackgroundControl(tcGameMain);
+	// Show main game controls when editing custom buttons
+	tcCustomButtons->setEditBackgroundControl(tcGameMain);
 
 	//Menu -------------------------------------------
 	//------------------------------------------------------
@@ -117,10 +117,10 @@ void TouchInterface::createControls(std::string filesPath)
 	tcMenuMain->addControl(new touchcontrols::Button("left_arrow", touchcontrols::RectF(17, 13, 20, 16), "arrow_left", PORT_ACT_MENU_LEFT));
 	tcMenuMain->addControl(new touchcontrols::Button("right_arrow", touchcontrols::RectF(23, 13, 26, 16), "arrow_right", PORT_ACT_MENU_RIGHT));
 
-    tcMenuMain->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 10, 6, 16), "enter", PORT_ACT_MENU_SELECT));
+	tcMenuMain->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 10, 6, 16), "enter", PORT_ACT_MENU_SELECT));
 #endif
 
-    tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
+	tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 	tcMenuMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE));
 	tcMenuMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(9, 0, 11, 2), "custom_show", KEY_SHOW_CUSTOM));
 
@@ -197,7 +197,7 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
 
 #if defined(WRATH)
-	tcGameMain->addControl(new touchcontrols::Button("use", touchcontrols::RectF(24,6,26,8), "use", PORT_WRATH_USE, false, false, "Use/Open"));
+	tcGameMain->addControl(new touchcontrols::Button("use", touchcontrols::RectF(24, 6, 26, 8), "use", PORT_WRATH_USE, false, false, "Use/Open"));
 #endif
 
 #ifdef QUAKE3
@@ -244,7 +244,7 @@ void TouchInterface::createControls(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
 
 #if defined(WRATH)
-    tcGameMain->addControl(new touchcontrols::Button("notebook", touchcontrols::RectF(4, 0, 6, 2), "notebook", PORT_ACT_HELPCOMP, false, false, "Notebook"));
+	tcGameMain->addControl(new touchcontrols::Button("notebook", touchcontrols::RectF(4, 0, 6, 2), "notebook", PORT_ACT_HELPCOMP, false, false, "Notebook"));
 	tcGameMain->addControl(new touchcontrols::Button("open_runes", touchcontrols::RectF(17, 0, 19, 2), "rune", PORT_ACT_INVEN, false, false, "Artifact (smart toggle)"));
 	tcGameMain->addControl(new touchcontrols::Button("use_rune", touchcontrols::RectF(21, 3, 23, 5), "fist", PORT_ACT_INVUSE, false, false, "Use Artifact"));
 #endif

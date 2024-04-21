@@ -80,7 +80,7 @@ public:
 	uint64_t  reloadDownTime = 0;
 
 	bool isWalking = false; // Run toggle, default run on. NOTE need to do as isWalking so smarttoggle defautls to running
-    SmartToggle_t runSmartToggle;
+	SmartToggle_t runSmartToggle;
 
 	int framecount = 0;
 
@@ -222,7 +222,10 @@ public:
 
 	void waitFrames(int nbrFrames);
 
-    int isPlayerRunning(){ return !isWalking; }
+	int isPlayerRunning()
+	{
+		return !isWalking;
+	}
 };
 
 
