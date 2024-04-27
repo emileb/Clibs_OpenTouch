@@ -9,6 +9,7 @@
 #define GAME_TYPE_HEXEN    2
 #define GAME_TYPE_HERETIC  3
 #define GAME_TYPE_STRIFE   4
+#define GAME_TYPE_DOOM3_EOC 21
 extern "C"
 {
 	void AM_ToggleFollowMode(bool value);
@@ -252,8 +253,6 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::gameButton));
 	tcGameMain->signal_settingsButton.connect(sigc::mem_fun(this, &TouchInterface::gameSettingsButton));
 
-
-
 	//Weapons -------------------------------------------
 	//------------------------------------------------------
 	tcGameWeapons->addControl(new touchcontrols::Button("weapon1", touchcontrols::RectF(1, 14, 3, 16), "key_1", 1));
@@ -273,8 +272,6 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 
 	//Weapon wheel -------------------------------------------
 	//------------------------------------------------------
-
-
 	wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_%d", wheelNbr);
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
@@ -457,6 +454,7 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	tcMenuMain = new touchcontrols::TouchControls("menu", false, true, 10, false);
 	tcGameMain = new touchcontrols::TouchControls("game", false, true, 1, true);
 	tcGameWeapons = new touchcontrols::TouchControls("weapons", false, true, 1, false);
+	tcInventory  = new touchcontrols::TouchControls("inventory", false, true, 2, false); //Different edit group
 	tcWeaponWheel = new touchcontrols::TouchControls("weapon_wheel", false, true, 1, false);
 	tcBlank = new touchcontrols::TouchControls("blank", true, false);
 	tcKeyboard = new touchcontrols::TouchControls("keyboard", false, false);
@@ -485,6 +483,11 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 
 	tcMenuMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::menuButton));
 
+	bool hideInventory = true;
+
+	if(gameType == GAME_TYPE_DOOM3_EOC)
+		hideInventory = false;
+
 	// GAME------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------
 	tcGameMain->setAlpha(touchSettings.alpha);
@@ -496,6 +499,8 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show keyboard"));
 
 	tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, false, "Jump"));
+	tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, hideInventory, "Show Inventory"));
+	tcGameMain->addControl(new touchcontrols::Button("activate_inventory", touchcontrols::RectF(22, 3, 24, 5), "inventory_use_fade", PORT_ACT_INVUSE, false, true, "Use Inventory"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, true, "Crouch"));
 	tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, false, "Crouch (smart toggle)"));
 	tcGameMain->addControl(new touchcontrols::Button("quick_command", touchcontrols::RectF(18, 0, 20, 2), "star", KEY_QUICK_COMMANDS, false, true, "Quick Commands"));
@@ -504,7 +509,7 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("reload", touchcontrols::RectF(3, 4, 5, 6), "reload", PORT_ACT_RELOAD, false, false, "Reload"));
 	tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
-	tcGameMain->addControl(new touchcontrols::Button("flashlight", touchcontrols::RectF(21, 3, 23, 5), "flashlight", PORT_ACT_FLASH_LIGHT, false, false, "Flashlight"));
+	tcGameMain->addControl(new touchcontrols::Button("flashlight", touchcontrols::RectF(20, 3, 22, 5), "flashlight", PORT_ACT_FLASH_LIGHT, false, false, "Flashlight"));
 	tcGameMain->addControl(new touchcontrols::Button("pda", touchcontrols::RectF(16, 0, 18, 2), "gamma", PORT_ACT_HELPCOMP, false, false, "Show PDA"));
 	tcGameMain->addControl(new touchcontrols::Button("zoom", touchcontrols::RectF(18, 3, 20, 5), "zoom", PORT_ACT_ZOOM_IN, false, false, "Zoom (smart toggle)"));
 	tcGameMain->addControl(new touchcontrols::Button("sprint", touchcontrols::RectF(0, 7, 2, 9), "sprint", PORT_ACT_SPRINT, false, false, "Sprint (smart toggle)"));
@@ -572,6 +577,20 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	tcWeaponWheel->addControl(wheelSelect);
 	tcWeaponWheel->setAlpha(0.8);
 
+	// Inventory -------------------------------------------
+	//------------------------------------------------------
+	uiInventoryButtonGrid = new touchcontrols::ButtonGrid("inventory_grid", touchcontrols::RectF(3, 7, 10, 9), "inventory_bg", 3, 1);
+
+	uiInventoryButtonGrid->addCell(0, 0, "inventory_left", PORT_ACT_INVPREV);
+	uiInventoryButtonGrid->addCell(1, 0, "inventory_right", PORT_ACT_INVNEXT);
+	uiInventoryButtonGrid->addCell(2, 0, "inventory_use", PORT_ACT_INVUSE);
+	uiInventoryButtonGrid->signal_outside.connect(sigc::mem_fun(this, &TouchInterface::inventoryOutside));
+
+	tcInventory->addControl(uiInventoryButtonGrid);
+	tcInventory->setPassThroughTouch(touchcontrols::TouchControls::PassThrough::NO_CONTROL);
+	tcInventory->signal_button.connect(sigc::mem_fun(this, &TouchInterface::inventoryButton));
+	tcInventory->setAlpha(0.9);
+
 	//Gamepad utility -------------------------------------------
 	//------------------------------------------------------
 	touchcontrols::ButtonGrid *gamepadUtils = new touchcontrols::ButtonGrid("gamepad_grid", touchcontrols::RectF(8, 5, 18, 11), "gamepad_utils_bg", 3, 2);
@@ -604,6 +623,7 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	//---------------------------------------------------------------
 	//---------------------------------------------------------------
 	controlsContainer.addControlGroup(tcKeyboard);
+	controlsContainer.addControlGroup(tcInventory); // before gamemain so touches don't go through
 	controlsContainer.addControlGroup(tcGamepadUtility);
 	controlsContainer.addControlGroup(tcMenuMain);
 	controlsContainer.addControlGroup(tcCustomButtons);
@@ -615,6 +635,7 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 
 	tcMenuMain->setXMLFile((std::string)filesPath +  "/menu_d3es.xml");
 	tcGameMain->setXMLFile((std::string)filesPath +  "/game_d3es.xml");
+	tcInventory->setXMLFile((std::string)filesPath +  "/inventory_d3es_" ENGINE_NAME ".xml");
 	tcWeaponWheel->setXMLFile((std::string)filesPath +  "/weaponwheel_d3es.xml");
 	tcGameWeapons->setXMLFile((std::string)filesPath +  "/weapons_d3es.xml");
 	tcCustomButtons->setXMLFile((std::string)filesPath +  "/custom_buttons_d3es.xml");
