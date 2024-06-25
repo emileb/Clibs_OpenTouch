@@ -10,6 +10,7 @@ class TouchInterface : public TouchInterfaceBase
 	void createControlsDoom(std::string filesPath);
 	void createControlsDoom3(std::string filesPath);
 
+	touchcontrols::Button *doom3SprintButton = 0; // To enable changing of the graphic
 public:
 	void createControls(std::string filesPath);
 

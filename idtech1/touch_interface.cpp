@@ -9,6 +9,7 @@
 #define GAME_TYPE_HEXEN    2
 #define GAME_TYPE_HERETIC  3
 #define GAME_TYPE_STRIFE   4
+#define GAME_TYPE_D64EX    7
 #define GAME_TYPE_DOOM3_EOC 21
 extern "C"
 {
@@ -99,6 +100,10 @@ void TouchInterface::openGLEnd()
 		touchcontrols::gl_resetGL4ES();
 	}
 
+#endif
+
+#if defined(DOOM64EX)
+	touchcontrols::gl_resetGL4ES();
 #endif
 };
 
@@ -195,7 +200,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	bool hideInventory = true;
 	bool hideFlySlide = true;
 
-	if((gameType == GAME_TYPE_STRIFE) || (gameType == GAME_TYPE_HEXEN))
+	if((gameType == GAME_TYPE_STRIFE) || (gameType == GAME_TYPE_HEXEN) || (gameType == GAME_TYPE_D64EX))
 		hideJump = false;
 
 	if((gameType == GAME_TYPE_STRIFE) || (gameType == GAME_TYPE_HEXEN) || (gameType == GAME_TYPE_HERETIC))
@@ -478,9 +483,6 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
 	tcMenuMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE));
 
-	// Hide mouse button, try to use tap for now..
-	//tcMenuMain->addControl(new touchcontrols::Button("left_button",touchcontrols::RectF(0,6,3,10),"left_mouse",KEY_LEFT_MOUSE,false,false,"Back"));
-
 	tcMenuMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::menuButton));
 
 	bool hideInventory = true;
@@ -512,7 +514,8 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("flashlight", touchcontrols::RectF(20, 3, 22, 5), "flashlight", PORT_ACT_FLASH_LIGHT, false, false, "Flashlight"));
 	tcGameMain->addControl(new touchcontrols::Button("pda", touchcontrols::RectF(16, 0, 18, 2), "gamma", PORT_ACT_HELPCOMP, false, false, "Show PDA"));
 	tcGameMain->addControl(new touchcontrols::Button("zoom", touchcontrols::RectF(18, 3, 20, 5), "zoom", PORT_ACT_ZOOM_IN, false, false, "Zoom (smart toggle)"));
-	tcGameMain->addControl(new touchcontrols::Button("sprint", touchcontrols::RectF(0, 7, 2, 9), "sprint", PORT_ACT_SPRINT, false, false, "Sprint (smart toggle)"));
+	doom3SprintButton = new touchcontrols::Button("sprint", touchcontrols::RectF(0, 7, 2, 9), "sprint_slow;sprint", PORT_ACT_SPRINT, false, false, "Sprint (smart toggle)");
+	tcGameMain->addControl(doom3SprintButton);
 	tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 7, 2, 9), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
 
 	touchJoyRight = new touchcontrols::TouchJoy("touch", touchcontrols::RectF(17, 4, 26, 16), "look_arrow", "fixed_stick_circle");
@@ -633,9 +636,12 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	controlsContainer.addControlGroup(tcPda);
 	controlsContainer.addControlGroup(tcBlank);
 
+	if(gameType == GAME_TYPE_DOOM3_EOC)
+		touchcontrols::setGlobalXmlAppend(".eoc");
+
 	tcMenuMain->setXMLFile((std::string)filesPath +  "/menu_d3es.xml");
 	tcGameMain->setXMLFile((std::string)filesPath +  "/game_d3es.xml");
-	tcInventory->setXMLFile((std::string)filesPath +  "/inventory_d3es_" ENGINE_NAME ".xml");
+	tcInventory->setXMLFile((std::string)filesPath +  "/inventory_d3es.xml");
 	tcWeaponWheel->setXMLFile((std::string)filesPath +  "/weaponwheel_d3es.xml");
 	tcGameWeapons->setXMLFile((std::string)filesPath +  "/weapons_d3es.xml");
 	tcCustomButtons->setXMLFile((std::string)filesPath +  "/custom_buttons_d3es.xml");
@@ -669,6 +675,10 @@ void TouchInterface::automapButton(int state, int code)
 		mapState = 1;
 	}
 }
+
+#ifdef D3ES
+extern "C" bool Doom3IsRunning();
+#endif
 
 void TouchInterface::newFrame()
 {
@@ -717,6 +727,13 @@ void TouchInterface::newFrame()
 	updateTouchScreenModeIn(screenMode);
 
 	currentScreenMode = screenMode;
+
+#ifdef D3ES
+    if(Doom3IsRunning())
+        doom3SprintButton->setImage(1);
+    else
+        doom3SprintButton->setImage(0);
+#endif
 }
 
 void TouchInterface::newGLContext()
