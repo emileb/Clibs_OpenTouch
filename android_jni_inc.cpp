@@ -161,8 +161,15 @@ extern "C"
 		LOGI("game_type = %d", gameType);
 		LOGI("game_path = %s", game_path.c_str());
 
-		setenv("TIMIDITY_CFG", "./audiopack/snd_timidity/timidity.cfg", 1);
-		//setenv("SDL_SOUNDFONTS", "fluidsynth.sf2", 1);
+		if(options & GAME_OPTION_SDL_MIDI_FLUIDSYNTH)
+		{
+			setenv("SDL_SOUNDFONTS", "./audiopack/snd_fluidsynth/fluidsynth.sf2", 1);
+			//setenv("SDL_FORCE_SOUNDFONTS", "1", 1);
+		}
+		else // Default
+		{
+			setenv("TIMIDITY_CFG", "./audiopack/snd_timidity/timidity.cfg", 1);
+		}
 
 		setenv("HOME", game_path.c_str(), 1);
 		setenv("USER_FILES", userFilesPath.c_str(), 1);
