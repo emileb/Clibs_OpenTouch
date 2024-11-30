@@ -11,6 +11,9 @@
 #define GAME_TYPE_STRIFE   4
 #define GAME_TYPE_D64EX    7
 #define GAME_TYPE_DOOM3_EOC 21
+#define GAME_TYPE_DOOM3_PERFECTED 22
+#define GAME_TYPE_DOOM3_PHOBOS 23
+
 extern "C"
 {
 	void AM_ToggleFollowMode(bool value);
@@ -170,7 +173,6 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcMenuMain->addControl(brightnessSlide);
 #endif
 
-
 	tcMenuMain->signal_button.connect(sigc::mem_fun(this, &TouchInterface::menuButton));
 	tcMenuMain->setAlpha(0.8);
 	tcMenuMain->setFixAspect(true);
@@ -224,7 +226,10 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack"));
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt2", touchcontrols::RectF(4, 3, 6, 5), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (duplicate)"));
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
-	tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 7, 2, 9), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
+
+    tcGameMain->addControl(runButton); // Common run button created in touch_interface_base
+
+    tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 7, 2, 9), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
 	tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
 	tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
@@ -500,6 +505,9 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("quick_load", touchcontrols::RectF(20, 0, 22, 2), "load", PORT_ACT_QUICKLOAD, false, false, "Quick load"));
 	tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show keyboard"));
 
+	if(gameType == GAME_TYPE_DOOM3_PHOBOS)
+		tcGameMain->addControl(new touchcontrols::Button("use", touchcontrols::RectF(23, 6, 25, 8), "use", PORT_ACT_USE, false, false, "Use!"));
+
 	tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, false, "Jump"));
 	tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, hideInventory, "Show Inventory"));
 	tcGameMain->addControl(new touchcontrols::Button("activate_inventory", touchcontrols::RectF(22, 3, 24, 5), "inventory_use_fade", PORT_ACT_INVUSE, false, true, "Use Inventory"));
@@ -638,6 +646,9 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 
 	if(gameType == GAME_TYPE_DOOM3_EOC)
 		touchcontrols::setGlobalXmlAppend(".eoc");
+
+	if(gameType == GAME_TYPE_DOOM3_PHOBOS)
+		touchcontrols::setGlobalXmlAppend(".phobos");
 
 	tcMenuMain->setXMLFile((std::string)filesPath +  "/menu_d3es.xml");
 	tcGameMain->setXMLFile((std::string)filesPath +  "/game_d3es.xml");

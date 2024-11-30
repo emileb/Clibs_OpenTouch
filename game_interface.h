@@ -59,6 +59,8 @@ void PortableAutomapControl(float zoom, float x, float y);
 int PortableShowKeyboard(void);
 touchscreemode_t PortableGetScreenMode();
 
+int isPlayerRunning();
+
 #define ACTION_DOWN 0
 #define ACTION_UP 1
 #define ACTION_MOVE 2

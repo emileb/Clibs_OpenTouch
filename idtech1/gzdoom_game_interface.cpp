@@ -606,27 +606,28 @@ void Mobile_AM_controls(double *zoom, double *pan_x, double *pan_y)
 }
 
 extern fixed_t			forwardmove[2], sidemove[2];
-//extern void G_AddViewAngle (int yaw);
-//extern void G_AddViewPitch (int look);
-//void AddCommandString (char *cmd, int keynum=0);
 
 extern "C" int blockGamepad(void);
 
 void Mobile_IN_Move(ticcmd_t* cmd)
 {
-
 	int blockMove = blockGamepad() & ANALOGUE_AXIS_FWD;
 	int blockLook = blockGamepad() & ANALOGUE_AXIS_PITCH;
 
-
 	if(!blockMove)
 	{
-		cmd->ucmd.forwardmove  += forwardmove_android * forwardmove[1];
-		cmd->ucmd.sidemove  += sidemove_android   * sidemove[1];
-	}
+        float fwdSpeed =  forwardmove_android;
+        float sideSpeed = sidemove_android;
 
-	//LOGI("Side: %d   %d",(int)(sidemove_android  * sidemove[1]),(int)(-look_yaw_joy * 100000));
-//LOGI("LOGX %f  %f  %f  %f  %f  %f",forwardmove_android,sidemove_android,look_pitch_mouse,look_pitch_joy,look_yaw_mouse,look_yaw_joy);
+        if(!isPlayerRunning())
+        {
+            fwdSpeed = fwdSpeed / 2;
+            sideSpeed = sideSpeed /2;
+        }
+
+		cmd->ucmd.forwardmove  += fwdSpeed * forwardmove[1];
+		cmd->ucmd.sidemove  += sideSpeed   * sidemove[1];
+	}
 
 	if(!blockLook)
 	{
