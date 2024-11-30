@@ -7,3 +7,5 @@
 #define RAZE_GAME_IONFURY 106
 #define RAZE_GAME_EDUKE32 107
 #define RAZE_GAME_AWOL    108
+#define RAZE_GAME_AMC    109
+
