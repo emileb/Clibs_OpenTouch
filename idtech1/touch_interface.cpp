@@ -286,7 +286,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
-	tcWeaponWheel->setAlpha(0.8);
+    tcWeaponWheel->setAlpha(touchSettings.alpha)
 
 	// Inventory -------------------------------------------
 	//------------------------------------------------------
@@ -586,7 +586,7 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
-	tcWeaponWheel->setAlpha(0.8);
+    tcWeaponWheel->setAlpha(touchSettings.alpha)
 
 	// Inventory -------------------------------------------
 	//------------------------------------------------------

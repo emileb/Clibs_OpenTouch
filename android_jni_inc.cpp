@@ -163,11 +163,13 @@ extern "C"
 
 		if(options & GAME_OPTION_SDL_MIDI_FLUIDSYNTH)
 		{
+            LOGI("SDL Using ./audiopack/snd_fluidsynth/fluidsynth.sf2");
 			setenv("SDL_SOUNDFONTS", "./audiopack/snd_fluidsynth/fluidsynth.sf2", 1);
 			//setenv("SDL_FORCE_SOUNDFONTS", "1", 1);
 		}
 		else // Default
 		{
+            LOGI("SDL Using ./audiopack/snd_timidity/timidity.cfg");
 			setenv("TIMIDITY_CFG", "./audiopack/snd_timidity/timidity.cfg", 1);
 		}
 

@@ -168,6 +168,8 @@ void TouchInterfaceBase::touchSettingsCallback(touchcontrols::tTouchSettings set
 
 	if(tcCustomButtons)  tcCustomButtons->setAlpha(touchSettings.alpha);
 
+    if(tcWeaponWheel) tcWeaponWheel->setAlpha(touchSettings.alpha);
+
 	if(tcYesNo) tcYesNo->setColour(touchSettings.defaultColor);
 
 	if(tcGameMain) tcGameMain->setColour(touchSettings.defaultColor);

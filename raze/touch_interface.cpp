@@ -60,10 +60,6 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcMenuMain->addControl(new touchcontrols::Button("right_arrow", touchcontrols::RectF(23, 13, 26, 16), "arrow_right", PORT_ACT_MENU_RIGHT));
 	tcMenuMain->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 10, 6, 16), "enter", PORT_ACT_MENU_SELECT));
 	tcMenuMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
-	// Mouse pointer does not work with SDL
-#if defined(GZDOOM) || defined(ZANDRONUM_30)
-	//tcMenuMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE));
-#endif
 
 	tcMenuMain->addControl(new touchcontrols::Button("gamepad", touchcontrols::RectF(22, 0, 24, 2), "gamepad", KEY_SHOW_GAMEPAD));
 	tcMenuMain->addControl(new touchcontrols::Button("gyro", touchcontrols::RectF(24, 0, 26, 2), "gyro", KEY_SHOW_GYRO));
@@ -121,7 +117,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, true, "Crouch (toggle)"));
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, hideAltAttack, "Alt attack"));
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt2", touchcontrols::RectF(4, 3, 6, 5), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (duplicate)"));
-	//tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
+	tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(20, 5, 22, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
 	tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 7, 2, 9), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
 	tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
 	tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
@@ -212,7 +208,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
-	tcWeaponWheel->setAlpha(0.8);
+	tcWeaponWheel->setAlpha(touchSettings.alpha);
 
 	// Inventory -------------------------------------------
 	//------------------------------------------------------
