@@ -297,7 +297,7 @@ extern "C"
 		}
 
 #else
-#if 1
+#if 0
 		// Beta test time
 		time_t t = time(NULL);
 		struct tm tm = *localtime(&t);
