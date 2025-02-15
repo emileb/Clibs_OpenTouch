@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "Framebuffer.h"
 
@@ -62,6 +63,13 @@ extern "C"
 			while(1);
 		}
 	}
+
+    // Catch signals to stop Google thinking it has crashed.
+    static void androidGenericSignal(int s)
+    {
+        LOGE("SIGNAL! %d", s);
+        exit(0);
+    }
 
 	// Latest version of Clang makes an optimisation which calls this function which is not present in Android, so define it here
 	char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
@@ -202,6 +210,12 @@ extern "C"
 #endif
 
 		touchInterface.init(mobile_screen_width, mobile_screen_height, filesPath.c_str(), touchSettingsPath.c_str(), options, wheelNbr, game);
+
+        // Catch all these and exit for now. If this works add logging
+        signal(SIGSEGV, androidGenericSignal);
+        signal(SIGFPE,  androidGenericSignal);
+        signal(SIGILL,  androidGenericSignal);
+        signal(SIGBUS,  androidGenericSignal);
 
 		PortableInit(argc, argv); //Never returns!!
 
