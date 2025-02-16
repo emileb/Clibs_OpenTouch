@@ -1329,7 +1329,7 @@ void TouchInterfaceBase::frameControls()
 
 void TouchInterfaceBase::showKeyboardCallback(int show)
 {
-	LOGI("showKeyboardCallback %d", show);
+	//LOGI("showKeyboardCallback %d", show);
 
 	if(useSystemKeyboard)
 	{

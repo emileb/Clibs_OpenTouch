@@ -1,7 +1,7 @@
 #ifndef touch_interface_h
 #define touch_interface_h
 
-//#define NO_SEC
+#define NO_SEC
 
 #include "touch_interface_base.h"
 
