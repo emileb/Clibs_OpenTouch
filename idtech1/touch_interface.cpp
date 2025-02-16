@@ -18,6 +18,7 @@ extern "C"
 {
 	void AM_ToggleFollowMode(bool value);
 	void jwzgles_restore(void);
+    int V_IsOpenGLMode(void); // DSDA
 
 #if defined(PRBOOM_DOOM)
 	typedef enum
@@ -93,6 +94,15 @@ void TouchInterface::openGLEnd()
 	{
 		touchcontrols::gl_setupForSDLSW();
 	}
+
+#endif
+
+#if  defined(DSDA_DOOM)
+
+    if(V_IsOpenGLMode())
+    {
+        touchcontrols::gl_resetGL4ES();
+    }
 
 #endif
 
