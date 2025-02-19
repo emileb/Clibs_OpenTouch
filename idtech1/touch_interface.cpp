@@ -685,7 +685,10 @@ void TouchInterface::blankButton(int state, int code)
 
 	if(state)
 		mobileBackButton();
+#elif defined(DSDA_DOOM)
 
+    PortableAction(state, PORT_ACT_ATTACK);
+    
 #else
 	PortableAction(state, PORT_ACT_USE);
 	PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
