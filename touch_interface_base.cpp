@@ -1361,6 +1361,11 @@ void TouchInterfaceBase::moveMouseCallback(float x, float y)
 	controlsContainer.mousePos(x, y);
 }
 
+#ifdef DSDA_DOOM // DSDA separates rendering and game tick, we want waitFrames to act on gameticks
+extern "C" uint32_t DSDA_GAME_TICKER;
+#define framecount DSDA_GAME_TICKER
+#endif
+
 //Wait for N number of frame to pass. This MUST NOT be called from the game thread
 void TouchInterfaceBase::waitFrames(int nbrFrames)
 {
