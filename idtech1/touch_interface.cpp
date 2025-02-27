@@ -62,6 +62,8 @@ void TouchInterface::openGLEnd()
 
 #if defined(PRBOOM_DOOM)
 	bool sdlSWMode = (V_GetMode() != VID_MODEGL);
+#elif defined(DSDA_DOOM)
+    bool sdlSWMode = !V_IsOpenGLMode();
 #else
 	bool sdlSWMode = false;
 #endif
@@ -97,7 +99,7 @@ void TouchInterface::openGLEnd()
 
 #endif
 
-#if  defined(DSDA_DOOM)
+#if defined(DSDA_DOOM)
 
     if(V_IsOpenGLMode())
     {
