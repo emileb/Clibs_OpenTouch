@@ -54,7 +54,7 @@ extern "C"
 		LOGI("EXIT OVERRIDE!!! (%d)", status);
 		Android_JNI_SendMessage(COMMAND_EXIT_APP, 0);
 
-		usleep(1000 * 1000 * 5); // Wait 5 seconds
+		usleep(1000 * 1000 * 3); // Wait 5 seconds
 
 		if(abc) // To stop compiler warning
 			exit(0); // This should never happen because the SDLActivity should have killed the process already
@@ -210,13 +210,14 @@ extern "C"
 #endif
 
 		touchInterface.init(mobile_screen_width, mobile_screen_height, filesPath.c_str(), touchSettingsPath.c_str(), options, wheelNbr, game);
-
+//#if 0
         // Catch all these and exit for now. If this works add logging
         signal(SIGSEGV, androidGenericSignal);
         signal(SIGFPE,  androidGenericSignal);
         signal(SIGILL,  androidGenericSignal);
         signal(SIGBUS,  androidGenericSignal);
-
+        signal(SIGABRT,  androidGenericSignal);
+//#endif
 		PortableInit(argc, argv); //Never returns!!
 
 		LOGI("PortableInit returned");
