@@ -36,10 +36,11 @@ extern "C"
 	int game_screen_width; // Game screen size, could be smaller than above due to framebuffer
 	int game_screen_height;
 
-
 	bool allowGyro = true; // Used to toggle gyro on/off
 
 	static TouchInterface touchInterface;
+
+    bool mobile_initialised = false;
 
 	JNIEnv* env_;
 
@@ -217,7 +218,9 @@ extern "C"
         signal(SIGILL,  androidGenericSignal);
         signal(SIGBUS,  androidGenericSignal);
         signal(SIGABRT,  androidGenericSignal);
-//#endif
+//#
+        mobile_initialised = true;
+
 		PortableInit(argc, argv); //Never returns!!
 
 		LOGI("PortableInit returned");
@@ -327,14 +330,15 @@ extern "C"
 
 #endif
 #endif
-
-		touchInterface.processPointer(action, pid, x, y);
+        if(mobile_initialised)
+		    touchInterface.processPointer(action, pid, x, y);
 	}
 
 	void EXPORT_ME
 	JAVA_FUNC(backButton)(JNIEnv *env, jobject obj)
 	{
-		touchInterface.mobileBackButton();
+        if(mobile_initialised)
+		    touchInterface.mobileBackButton();
 	}
 
 	void EXPORT_ME
