@@ -175,6 +175,10 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcMenuMain->addControl(new touchcontrols::Button("load_save_touch", touchcontrols::RectF(20, 0, 22, 2), "touchscreen_save", KEY_LOAD_SAVE_CONTROLS));
 #endif
 
+#if defined(GZDOOM) || defined(ZANDRONUM_30)
+    tcMenuMain->addControl(new touchcontrols::Button("unbind_keys", touchcontrols::RectF(18, 0, 20, 2), "inventory_drop", KEY_ZDOOM_CLEAR_BIND));
+#endif
+
 #ifdef CHOC_SETUP
 	tcMenuMain->addControl(new touchcontrols::Button("f10", touchcontrols::RectF(24, 0, 26, 2), "key_f10", SDL_SCANCODE_F10));
 #endif

@@ -29,7 +29,6 @@
 #include "intermission/intermission.h"
 #include "m_argv.h"
 #include "m_misc.h"
-//#include "menu/menu.h"
 #include "c_console.h"
 #include "c_dispatch.h"
 #include "i_system.h"
@@ -76,6 +75,8 @@
 #include "p_local.h"
 #include "autosegs.h"
 #include "fragglescript/t_fs.h"
+
+//#include "common/menu/menu.h"
 
 #include "SDL_beloko_extra.h"
 
@@ -538,11 +539,17 @@ void PortableInit(int argc, const char ** argv)
 }
 
 extern bool		automapactive;
+//extern DMenu    *CurrentMenu;
 
 touchscreemode_t PortableGetScreenMode()
 {
 	if(menuactive != MENU_Off)
 	{
+        /*
+        bool inCustomKeys =  CurrentMenu && CurrentMenu->IsKindOf("ConversationMenu");
+        const char * name  = CurrentMenu->GetClass()->TypeName.GetChars();
+        LOGI("Menu %s", name);
+         */
 		if(g_bindingbutton)
 			return TS_CUSTOM;
 		else

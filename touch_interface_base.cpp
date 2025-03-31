@@ -378,7 +378,7 @@ void TouchInterfaceBase::menuButton(int state, int code)
 		if(state)
 			showCustomMenu = true;
 	}
-	else if(code == SDL_SCANCODE_F10)  //for choch setup f10 to work!
+	else if(code == SDL_SCANCODE_F10)  //for choc setup f10 to work!
 	{
 		PortableKeyEvent(state, code, 0);
 	}
@@ -421,6 +421,10 @@ void TouchInterfaceBase::menuButton(int state, int code)
 		PortableMouseButton(state, 1, 0, 0);
 #endif
 	}
+    else if(code == KEY_ZDOOM_CLEAR_BIND)
+    {
+        PortableKeyEvent(state, SDL_SCANCODE_BACKSPACE, 0);
+    }
 	else
 	{
 		PortableAction(state, code);
