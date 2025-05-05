@@ -572,14 +572,14 @@ void Mobile_IN_Move(ticcmd_t* cmd)
 
 	if(!blockMove)
 	{
-        float fwdSpeed =  forwardmove_android;
-        float sideSpeed = sidemove_android;
+		float fwdSpeed =  forwardmove_android;
+		float sideSpeed = sidemove_android;
 
-        if(!isPlayerRunning())
-        {
-            fwdSpeed = fwdSpeed / 2;
-            sideSpeed = sideSpeed /2;
-        }
+		if(!isPlayerRunning())
+		{
+			fwdSpeed = fwdSpeed / 2;
+			sideSpeed = sideSpeed / 2;
+		}
 
 		cmd->ucmd.forwardmove  += fwdSpeed * forwardmove[1];
 		cmd->ucmd.sidemove  += sideSpeed   * sidemove[1];

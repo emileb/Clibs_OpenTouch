@@ -40,7 +40,7 @@ extern "C"
 
 	static TouchInterface touchInterface;
 
-    bool mobile_initialised = false;
+	bool mobile_initialised = false;
 
 	JNIEnv* env_;
 
@@ -65,12 +65,12 @@ extern "C"
 		}
 	}
 
-    // Catch signals to stop Google thinking it has crashed.
-    static void androidGenericSignal(int s)
-    {
-        LOGE("SIGNAL! %d", s);
-        exit(0);
-    }
+	// Catch signals to stop Google thinking it has crashed.
+	static void androidGenericSignal(int s)
+	{
+		LOGE("SIGNAL! %d", s);
+		exit(0);
+	}
 
 	// Latest version of Clang makes an optimisation which calls this function which is not present in Android, so define it here
 	char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
@@ -172,13 +172,13 @@ extern "C"
 
 		if(options & GAME_OPTION_SDL_MIDI_FLUIDSYNTH)
 		{
-            LOGI("SDL Using ./audiopack/snd_fluidsynth/fluidsynth.sf2");
+			LOGI("SDL Using ./audiopack/snd_fluidsynth/fluidsynth.sf2");
 			setenv("SDL_SOUNDFONTS", "./audiopack/snd_fluidsynth/fluidsynth.sf2", 1);
 			//setenv("SDL_FORCE_SOUNDFONTS", "1", 1);
 		}
 		else // Default
 		{
-            LOGI("SDL Using ./audiopack/snd_timidity/timidity.cfg");
+			LOGI("SDL Using ./audiopack/snd_timidity/timidity.cfg");
 			setenv("TIMIDITY_CFG", "./audiopack/snd_timidity/timidity.cfg", 1);
 		}
 
@@ -212,14 +212,14 @@ extern "C"
 
 		touchInterface.init(mobile_screen_width, mobile_screen_height, filesPath.c_str(), touchSettingsPath.c_str(), options, wheelNbr, game);
 //#if 0
-        // Catch all these and exit for now. If this works add logging
-        signal(SIGSEGV, androidGenericSignal);
-        signal(SIGFPE,  androidGenericSignal);
-        signal(SIGILL,  androidGenericSignal);
-        signal(SIGBUS,  androidGenericSignal);
-        signal(SIGABRT,  androidGenericSignal);
+		// Catch all these and exit for now. If this works add logging
+		signal(SIGSEGV, androidGenericSignal);
+		signal(SIGFPE,  androidGenericSignal);
+		signal(SIGILL,  androidGenericSignal);
+		signal(SIGBUS,  androidGenericSignal);
+		signal(SIGABRT,  androidGenericSignal);
 //#
-        mobile_initialised = true;
+		mobile_initialised = true;
 
 		PortableInit(argc, argv); //Never returns!!
 
@@ -265,19 +265,22 @@ extern "C"
 	int EXPORT_ME
 	JAVA_FUNC(doAction)(JNIEnv *env, jobject obj,	jint state, jint action)
 	{
-        if(mobile_initialised)
-        {
-            if ((action == PORT_ACT_VOLUME_UP) || (action == PORT_ACT_VOLUME_DOWN)) {
-                return touchInterface.volumeKey(state, (action == PORT_ACT_VOLUME_UP));
-            } else {
-                touchInterface.gamepadAction(state, action);
-                return 0;
-            }
-        }
-        else
-        {
-            return 0;
-        }
+		if(mobile_initialised)
+		{
+			if((action == PORT_ACT_VOLUME_UP) || (action == PORT_ACT_VOLUME_DOWN))
+			{
+				return touchInterface.volumeKey(state, (action == PORT_ACT_VOLUME_UP));
+			}
+			else
+			{
+				touchInterface.gamepadAction(state, action);
+				return 0;
+			}
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 #ifndef NO_SEC
@@ -334,15 +337,16 @@ extern "C"
 
 #endif
 #endif
-        if(mobile_initialised)
-		    touchInterface.processPointer(action, pid, x, y);
+
+		if(mobile_initialised)
+			touchInterface.processPointer(action, pid, x, y);
 	}
 
 	void EXPORT_ME
 	JAVA_FUNC(backButton)(JNIEnv *env, jobject obj)
 	{
-        if(mobile_initialised)
-		    touchInterface.mobileBackButton();
+		if(mobile_initialised)
+			touchInterface.mobileBackButton();
 	}
 
 	void EXPORT_ME
@@ -441,12 +445,12 @@ extern "C"
 		return 0;
 	}
 
-    int EXPORT_ME
-    JAVA_FUNC(renderControls)(JNIEnv *env, jobject obj)
-    {
-        touchInterface.frameControls();
-        return 0;
-    }
+	int EXPORT_ME
+	JAVA_FUNC(renderControls)(JNIEnv *env, jobject obj)
+	{
+		touchInterface.frameControls();
+		return 0;
+	}
 
 	FILE *tmpfile()
 	{

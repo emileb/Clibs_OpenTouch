@@ -312,10 +312,11 @@ void TouchInterface::createControls(std::string filesPath)
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
-    if(touchSettings.weaponWheelOpaque)
-        tcWeaponWheel->setAlpha(0.8);
-    else
-        tcWeaponWheel->setAlpha(touchSettings.alpha);
+
+	if(touchSettings.weaponWheelOpaque)
+		tcWeaponWheel->setAlpha(0.8);
+	else
+		tcWeaponWheel->setAlpha(touchSettings.alpha);
 
 	// Inventory -------------------------------------------
 	//------------------------------------------------------

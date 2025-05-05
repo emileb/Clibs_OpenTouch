@@ -91,10 +91,10 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 		hideAltWeapon = true;
 	}
 
-    if(gameType == RAZE_GAME_AMC)
-    {
-        hideAltWeapon = true;
-    }
+	if(gameType == RAZE_GAME_AMC)
+	{
+		hideAltWeapon = true;
+	}
 
 	tcGameMain->setAlpha(touchSettings.alpha);
 	tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
@@ -147,13 +147,13 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 		tcGameMain->addControl(new touchcontrols::Button("zoom", touchcontrols::RectF(22, 3, 24, 5), "zoom", PORT_ACT_ZOOM_IN, false, false, "Aim"));
 	}
 
-    // Add AMC specific buttons
-    if(gameType == RAZE_GAME_AMC)
-    {
-        tcGameMain->addControl(new touchcontrols::Button("reload", touchcontrols::RectF(3, 4, 5, 6), "reload", PORT_ACT_RELOAD, false, false, "Reload"));
-        tcGameMain->addControl(new touchcontrols::Button("medikit", touchcontrols::RectF(15, 0, 17, 2), "medikit", PORT_ACT_MEDKIT, false, false, "Medkit"));
-        tcGameMain->addControl(new touchcontrols::Button("pda", touchcontrols::RectF(4, 0, 6, 2), "notebook", PORT_ACT_HELPCOMP, false, false, "PDA"));
-    }
+	// Add AMC specific buttons
+	if(gameType == RAZE_GAME_AMC)
+	{
+		tcGameMain->addControl(new touchcontrols::Button("reload", touchcontrols::RectF(3, 4, 5, 6), "reload", PORT_ACT_RELOAD, false, false, "Reload"));
+		tcGameMain->addControl(new touchcontrols::Button("medikit", touchcontrols::RectF(15, 0, 17, 2), "medikit", PORT_ACT_MEDKIT, false, false, "Medkit"));
+		tcGameMain->addControl(new touchcontrols::Button("pda", touchcontrols::RectF(4, 0, 6, 2), "notebook", PORT_ACT_HELPCOMP, false, false, "PDA"));
+	}
 
 	touchcontrols::ButtonGrid *dpad = new touchcontrols::ButtonGrid("dpad_move", touchcontrols::RectF(6, 3, 12, 7), "", 3, 2, true, "Movement btns (WASD)");
 
@@ -208,10 +208,11 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
-    if(touchSettings.weaponWheelOpaque)
-        tcWeaponWheel->setAlpha(0.8);
-    else
-        tcWeaponWheel->setAlpha(touchSettings.alpha);
+
+	if(touchSettings.weaponWheelOpaque)
+		tcWeaponWheel->setAlpha(0.8);
+	else
+		tcWeaponWheel->setAlpha(touchSettings.alpha);
 
 	// Inventory -------------------------------------------
 	//------------------------------------------------------

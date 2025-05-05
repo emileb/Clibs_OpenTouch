@@ -18,7 +18,7 @@ extern "C"
 {
 	void AM_ToggleFollowMode(bool value);
 	void jwzgles_restore(void);
-    int V_IsOpenGLMode(void); // DSDA
+	int V_IsOpenGLMode(void); // DSDA
 
 #if defined(PRBOOM_DOOM)
 	typedef enum
@@ -63,7 +63,7 @@ void TouchInterface::openGLEnd()
 #if defined(PRBOOM_DOOM)
 	bool sdlSWMode = (V_GetMode() != VID_MODEGL);
 #elif defined(DSDA_DOOM)
-    bool sdlSWMode = !V_IsOpenGLMode();
+	bool sdlSWMode = !V_IsOpenGLMode();
 #else
 	bool sdlSWMode = false;
 #endif
@@ -101,10 +101,10 @@ void TouchInterface::openGLEnd()
 
 #if defined(DSDA_DOOM)
 
-    if(V_IsOpenGLMode())
-    {
-        touchcontrols::gl_resetGL4ES();
-    }
+	if(V_IsOpenGLMode())
+	{
+		touchcontrols::gl_resetGL4ES();
+	}
 
 #endif
 
@@ -176,7 +176,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 #endif
 
 #if defined(GZDOOM) || defined(ZANDRONUM_30)
-    tcMenuMain->addControl(new touchcontrols::Button("unbind_keys", touchcontrols::RectF(18, 0, 20, 2), "inventory_drop", KEY_ZDOOM_CLEAR_BIND));
+	tcMenuMain->addControl(new touchcontrols::Button("unbind_keys", touchcontrols::RectF(18, 0, 20, 2), "inventory_drop", KEY_ZDOOM_CLEAR_BIND));
 #endif
 
 #ifdef CHOC_SETUP
@@ -243,9 +243,9 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt2", touchcontrols::RectF(4, 3, 6, 5), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt attack (duplicate)"));
 	tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
 
-    tcGameMain->addControl(runButton); // Common run button created in touch_interface_base
+	tcGameMain->addControl(runButton); // Common run button created in touch_interface_base
 
-    tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 7, 2, 9), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
+	tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 7, 2, 9), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
 	tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
 	tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
 	tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
@@ -302,10 +302,11 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
-    if(touchSettings.weaponWheelOpaque)
-        tcWeaponWheel->setAlpha(0.8);
-    else
-        tcWeaponWheel->setAlpha(touchSettings.alpha);
+
+	if(touchSettings.weaponWheelOpaque)
+		tcWeaponWheel->setAlpha(0.8);
+	else
+		tcWeaponWheel->setAlpha(touchSettings.alpha);
 
 	// Inventory -------------------------------------------
 	//------------------------------------------------------
@@ -605,10 +606,11 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 	wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
 	wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
 	tcWeaponWheel->addControl(wheelSelect);
-    if(touchSettings.weaponWheelOpaque)
-        tcWeaponWheel->setAlpha(0.8);
-    else
-        tcWeaponWheel->setAlpha(touchSettings.alpha);
+
+	if(touchSettings.weaponWheelOpaque)
+		tcWeaponWheel->setAlpha(0.8);
+	else
+		tcWeaponWheel->setAlpha(touchSettings.alpha);
 
 	// Inventory -------------------------------------------
 	//------------------------------------------------------
@@ -691,10 +693,11 @@ void TouchInterface::blankButton(int state, int code)
 
 	if(state)
 		mobileBackButton();
+
 #elif defined(DSDA_DOOM)
 
-    PortableAction(state, PORT_ACT_ATTACK);
-    
+	PortableAction(state, PORT_ACT_ATTACK);
+
 #else
 	PortableAction(state, PORT_ACT_USE);
 	PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
@@ -765,10 +768,12 @@ void TouchInterface::newFrame()
 	currentScreenMode = screenMode;
 
 #ifdef D3ES
-    if(Doom3IsRunning())
-        doom3SprintButton->setImage(1);
-    else
-        doom3SprintButton->setImage(0);
+
+	if(Doom3IsRunning())
+		doom3SprintButton->setImage(1);
+	else
+		doom3SprintButton->setImage(0);
+
 #endif
 }
 

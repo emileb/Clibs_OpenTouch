@@ -94,8 +94,8 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath, const 
 		touchcontrols::gl_setGLESVersion(3);
 
 
-    // Set framebuffer rendering mode
-    touchcontrols::R_FrameBufferSetRenderer(options & GAME_OPTION_GL4ES, options & GAME_OPTION_GLES2 || options & GAME_OPTION_GLES3);
+	// Set framebuffer rendering mode
+	touchcontrols::R_FrameBufferSetRenderer(options & GAME_OPTION_GL4ES, options & GAME_OPTION_GLES2 || options & GAME_OPTION_GLES3);
 
 	touchcontrols::GLScaleWidth = (float)nativeWidth;
 	touchcontrols::GLScaleHeight = (float) - nativeHeight;
@@ -172,13 +172,13 @@ void TouchInterfaceBase::touchSettingsCallback(touchcontrols::tTouchSettings set
 
 	if(tcCustomButtons)  tcCustomButtons->setAlpha(touchSettings.alpha);
 
-    if(tcWeaponWheel)
-    {
-        if(touchSettings.weaponWheelOpaque)
-            tcWeaponWheel->setAlpha(0.8);
-        else
-            tcWeaponWheel->setAlpha(touchSettings.alpha);
-    }
+	if(tcWeaponWheel)
+	{
+		if(touchSettings.weaponWheelOpaque)
+			tcWeaponWheel->setAlpha(0.8);
+		else
+			tcWeaponWheel->setAlpha(touchSettings.alpha);
+	}
 
 	if(tcYesNo) tcYesNo->setColour(touchSettings.defaultColor);
 
@@ -425,10 +425,10 @@ void TouchInterfaceBase::menuButton(int state, int code)
 		PortableMouseButton(state, 1, 0, 0);
 #endif
 	}
-    else if(code == KEY_ZDOOM_CLEAR_BIND)
-    {
-        PortableKeyEvent(state, SDL_SCANCODE_BACKSPACE, 0);
-    }
+	else if(code == KEY_ZDOOM_CLEAR_BIND)
+	{
+		PortableKeyEvent(state, SDL_SCANCODE_BACKSPACE, 0);
+	}
 	else
 	{
 		PortableAction(state, code);
@@ -1297,7 +1297,7 @@ bool TouchInterfaceBase::loadControlSettings(std::string path)
 
 void TouchInterfaceBase::frameControls()
 {
-    framecount++;
+	framecount++;
 
 	if(SDL_NewEGLCreated())
 	{
@@ -1305,7 +1305,7 @@ void TouchInterfaceBase::frameControls()
 		newGLContext();
 		touchcontrols::clearGlTexCache();
 		controlsContainer.initGL();
-        touchcontrols::R_FrameBufferInit();
+		touchcontrols::R_FrameBufferInit();
 	}
 
 	if(checkGfx())
