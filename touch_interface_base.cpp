@@ -5,6 +5,7 @@
 
 #include "TouchControlsInterface.h"
 #include "TouchControlsContainer.h"
+#include "Framebuffer.h"
 #include "SDL_beloko_extra.h"
 #include "SDL.h"
 
@@ -92,6 +93,9 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath, const 
 	if(options & GAME_OPTION_GLES3)
 		touchcontrols::gl_setGLESVersion(3);
 
+
+    // Set framebuffer rendering mode
+    touchcontrols::R_FrameBufferSetRenderer(options & GAME_OPTION_GL4ES, options & GAME_OPTION_GLES2 || options & GAME_OPTION_GLES3);
 
 	touchcontrols::GLScaleWidth = (float)nativeWidth;
 	touchcontrols::GLScaleHeight = (float) - nativeHeight;
@@ -1290,9 +1294,10 @@ bool TouchInterfaceBase::loadControlSettings(std::string path)
 	return false;
 }
 
+
 void TouchInterfaceBase::frameControls()
 {
-	framecount++;
+    framecount++;
 
 	if(SDL_NewEGLCreated())
 	{
@@ -1300,6 +1305,7 @@ void TouchInterfaceBase::frameControls()
 		newGLContext();
 		touchcontrols::clearGlTexCache();
 		controlsContainer.initGL();
+        touchcontrols::R_FrameBufferInit();
 	}
 
 	if(checkGfx())

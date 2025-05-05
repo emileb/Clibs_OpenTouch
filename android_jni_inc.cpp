@@ -265,15 +265,19 @@ extern "C"
 	int EXPORT_ME
 	JAVA_FUNC(doAction)(JNIEnv *env, jobject obj,	jint state, jint action)
 	{
-		if((action == PORT_ACT_VOLUME_UP) || (action == PORT_ACT_VOLUME_DOWN))
-		{
-			return touchInterface.volumeKey(state, (action == PORT_ACT_VOLUME_UP));
-		}
-		else
-		{
-			touchInterface.gamepadAction(state, action);
-			return 0;
-		}
+        if(mobile_initialised)
+        {
+            if ((action == PORT_ACT_VOLUME_UP) || (action == PORT_ACT_VOLUME_DOWN)) {
+                return touchInterface.volumeKey(state, (action == PORT_ACT_VOLUME_UP));
+            } else {
+                touchInterface.gamepadAction(state, action);
+                return 0;
+            }
+        }
+        else
+        {
+            return 0;
+        }
 	}
 
 #ifndef NO_SEC
@@ -436,6 +440,13 @@ extern "C"
 		env->ReleaseStringUTFChars(command, command_c);
 		return 0;
 	}
+
+    int EXPORT_ME
+    JAVA_FUNC(renderControls)(JNIEnv *env, jobject obj)
+    {
+        touchInterface.frameControls();
+        return 0;
+    }
 
 	FILE *tmpfile()
 	{
