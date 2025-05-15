@@ -42,6 +42,11 @@ extern "C"
 
 	bool mobile_initialised = false;
 
+    static bool touch_surface_view = false;
+    static bool game_vulkan = false;
+
+    static volatile bool game_finished_load = false;
+
 	JNIEnv* env_;
 
 	int Android_JNI_SendMessage(int command, int param);
@@ -204,21 +209,35 @@ extern "C"
 		if(options & GAME_OPTION_SDL_AAUDIO_AUDIO)
 			setenv("SDL_AUDIODRIVER", "AAudio", 1);
 
+        if(options & GAME_OPTION_TOUCH_SURFACE_VIEW)
+        {
+            touch_surface_view = true;
+            LOGI("Touch Surfaceview ACTIVE");
+        }
+
+        if(options & GAME_OPTION_VULKAN)
+        {
+            game_vulkan = true;
+            LOGI("Game is VULKAN");
+        }
+
 		chdir(game_path.c_str());
+
 #ifndef NO_SEC
 		strcpy(keyGlobal, key);
 		strcpy(pkgGlobal, pkg);
 #endif
 
 		touchInterface.init(mobile_screen_width, mobile_screen_height, filesPath.c_str(), touchSettingsPath.c_str(), options, wheelNbr, game);
-//#if 0
+#if 1
 		// Catch all these and exit for now. If this works add logging
 		signal(SIGSEGV, androidGenericSignal);
 		signal(SIGFPE,  androidGenericSignal);
 		signal(SIGILL,  androidGenericSignal);
 		signal(SIGBUS,  androidGenericSignal);
 		signal(SIGABRT,  androidGenericSignal);
-//#
+#endif
+
 		mobile_initialised = true;
 
 		PortableInit(argc, argv); //Never returns!!
@@ -448,7 +467,13 @@ extern "C"
 	int EXPORT_ME
 	JAVA_FUNC(renderControls)(JNIEnv *env, jobject obj)
 	{
-		touchInterface.frameControls();
+        // Wait for game thread to have rendered at least one frame
+        while(!game_finished_load)
+        {
+            usleep(1000);
+        }
+
+		touchInterface.frameControls(false, true); // FRAMEBUFFER = false, TOUCH = true
 		return 0;
 	}
 
@@ -535,7 +560,9 @@ extern "C"
 
 	void frameControlsSDLCallback(void)
 	{
-		touchInterface.frameControls();
+        touchInterface.newGameFrame();
+		touchInterface.frameControls((game_vulkan == false), (touch_surface_view == false)); // FRAMEBUFFER = true, TOUCH = true
+        game_finished_load = true;
 	}
 
 	void showKeyboardCallbackSDLCallback(int show)

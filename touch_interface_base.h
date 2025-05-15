@@ -213,9 +213,11 @@ public:
 
 	void executeCommand(const char *cmd);
 
-	void frameControls();
+	void frameControls(bool REND_FRAMEBUFFER, bool REND_TOUCH);
 
-	void showKeyboardCallback(int show);
+    void newGameFrame();
+
+    void showKeyboardCallback(int show);
 
 	void showMouseCallback(int show);
 

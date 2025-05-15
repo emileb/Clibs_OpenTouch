@@ -3,6 +3,7 @@
 //
 
 #include "touch_interface.h"
+#include "FrameBuffer.h"
 #include "SDL_keycode.h"
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
@@ -71,7 +72,7 @@ void TouchInterface::openGLEnd()
 
 #if ( defined(GZDOOM) || defined(ZANDRONUM_30) ) && !defined(GZDOOM_GL3)
 
-	if(touchcontrols::gl_getGLESVersion() == 1)
+	if(touchcontrols::fb_getGLESVersion() == 1)
 	{
 		if(currentrenderer == 1) //GL mode
 		{
@@ -82,7 +83,7 @@ void TouchInterface::openGLEnd()
 			sdlSWMode = true;
 		}
 	}
-	else if(touchcontrols::gl_getGLESVersion() == 2)
+	else if(touchcontrols::fb_getGLESVersion() == 2)
 	{
 		touchcontrols::gl_resetGL4ES();
 	}

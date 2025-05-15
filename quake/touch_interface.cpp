@@ -3,6 +3,7 @@
 //
 
 #include "touch_interface.h"
+#include "FrameBuffer.h"
 #include "quake_game_dll.h"
 #include "SDL_keycode.h"
 #include <fstream>
@@ -50,7 +51,7 @@ void TouchInterface::openGLEnd()
 
 #ifdef FTEQW
 
-	if(touchcontrols::gl_getGLESVersion() == 1)
+	if(touchcontrols::fb_getGLESVersion() == 1)
 	{
 		BE_FixPointers();
 	}

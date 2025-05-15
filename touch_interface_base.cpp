@@ -84,18 +84,29 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath, const 
 	if(options & GAME_OPTION_USE_SYSTEM_KEYBOARD)
 		useSystemKeyboard = true;
 
-	if(options & GAME_OPTION_GLES2)
-		touchcontrols::gl_setGLESVersion(2);
+    int glesVersion = 1;
 
-	if(options & GAME_OPTION_GL4ES)
-		touchcontrols::gl_useGL4ES();
+    if(options & GAME_OPTION_GLES2)
+        glesVersion = 2;
 
-	if(options & GAME_OPTION_GLES3)
-		touchcontrols::gl_setGLESVersion(3);
+    if(options & GAME_OPTION_GLES3)
+        glesVersion = 3;
 
+	// Set framebuffer rendering mode, needs to be same as the game
+	touchcontrols::R_FrameBufferSetRenderer(options & GAME_OPTION_GL4ES, glesVersion);
 
-	// Set framebuffer rendering mode
-	touchcontrols::R_FrameBufferSetRenderer(options & GAME_OPTION_GL4ES, options & GAME_OPTION_GLES2 || options & GAME_OPTION_GLES3);
+    if(options & GAME_OPTION_TOUCH_SURFACE_VIEW) // Touch control rendered on
+    {
+        touchcontrols::setTextureNumberStart(100); // Force it not use glGenTextures
+        touchcontrols::gl_setGLESVersion(2); //Force GLES 2 normal for surface view
+    }
+    else
+    {
+        touchcontrols::gl_setGLESVersion(glesVersion);
+
+        if (options & GAME_OPTION_GL4ES)
+            touchcontrols::gl_useGL4ES();
+    }
 
 	touchcontrols::GLScaleWidth = (float)nativeWidth;
 	touchcontrols::GLScaleHeight = (float) - nativeHeight;
@@ -103,8 +114,11 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath, const 
 	touchcontrols::gl_setGraphicsBasePath(pngPath);
 	touchcontrols::getSettingsSignal()->connect(sigc::mem_fun(this, &TouchInterfaceBase::touchSettingsCallback));
 
-	controlsContainer.openGL_start.connect(sigc::mem_fun(this, &TouchInterfaceBase::openGLStart));
-	controlsContainer.openGL_end.connect(sigc::mem_fun(this, &TouchInterfaceBase::openGLEnd));
+    if(!(options & GAME_OPTION_TOUCH_SURFACE_VIEW))
+    {
+        controlsContainer.openGL_start.connect(sigc::mem_fun(this, &TouchInterfaceBase::openGLStart));
+        controlsContainer.openGL_end.connect(sigc::mem_fun(this, &TouchInterfaceBase::openGLEnd));
+    }
 
 	SDL_SetSwapBufferCallBack(frameControlsSDLCallback);
 	SDL_ShowMouseCallBack(showMouseSDLCallback);
@@ -1294,46 +1308,76 @@ bool TouchInterfaceBase::loadControlSettings(std::string path)
 	return false;
 }
 
-
-void TouchInterfaceBase::frameControls()
+void TouchInterfaceBase::newGameFrame()
 {
-	framecount++;
+    framecount++;
 
-	if(SDL_NewEGLCreated())
+    // Update run button image
+    if(!isWalking)
+    {
+        runButton->setImage(1);
+    }
+    else
+    {
+        runButton->setImage(0);
+    }
+
+    // Update hide/show joysticks
+    if(touchJoyLeft)
+        touchJoyLeft->setHideGraphics(!touchSettings.showLeftStick);
+
+    if(touchJoyRight)
+        touchJoyRight->setHideGraphics(!touchSettings.showRightStick);
+
+    newFrame();
+}
+
+
+void TouchInterfaceBase::frameControls(bool REND_FRAMEBUFFER, bool REND_TOUCH)
+{
+	if(REND_FRAMEBUFFER)
 	{
-		LOGI("NEW EGL CONTEXT");
-		newGLContext();
-		touchcontrols::clearGlTexCache();
-		controlsContainer.initGL();
-		touchcontrols::R_FrameBufferInit();
+		if(SDL_NewEGLCreated())
+		{
+			LOGI("NEW EGL CONTEXT");
+
+			if(REND_TOUCH)
+			{
+				newGLContext();
+				controlsContainer.initGL();
+			}
+
+			touchcontrols::R_FrameBufferInit();
+		}
+
+		if(!REND_TOUCH)
+		{
+			openGLStart();
+			openGLEnd();
+		}
 	}
 
-	if(checkGfx())
-		return;
+    // Coming from surface view
+    if(!REND_FRAMEBUFFER && REND_TOUCH)
+    {
+        static bool first = true;
+        if(first)
+        {
+            controlsContainer.initGL();
+            first = false;
+        }
+    }
 
-	// Update run button image
-	if(!isWalking)
+	if(REND_TOUCH)
 	{
-		runButton->setImage(1);
-	}
-	else
-	{
-		runButton->setImage(0);
-	}
-
-	// Update hide/show joysticks
-	if(touchJoyLeft)
-		touchJoyLeft->setHideGraphics(!touchSettings.showLeftStick);
-
-	if(touchJoyRight)
-		touchJoyRight->setHideGraphics(!touchSettings.showRightStick);
-
-	newFrame();
+		if(checkGfx())
+			return;
 #if 1
-	//openGLStart();
-	//openGLEnd();
-	controlsContainer.draw();
+		//openGLStart();
+		//openGLEnd();
+		controlsContainer.draw();
 #endif
+	}
 }
 
 
