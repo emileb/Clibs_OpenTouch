@@ -3,7 +3,7 @@
 //
 
 #include "touch_interface.h"
-#include "FrameBuffer.h"
+#include "Framebuffer.h"
 #include "SDL_keycode.h"
 
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
