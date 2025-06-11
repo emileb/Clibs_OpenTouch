@@ -2,7 +2,7 @@
 #define game_interface_h
 
 #include "port_act_defs.h"
-
+#include <stdbool.h>
 
 #ifndef LOGI
 #ifdef __ANDROID__
@@ -57,6 +57,8 @@ void PortableMouseButton(int state, int button, float dx, float dy);
 void PortableCommand(const char * cmd);
 void PortableAutomapControl(float zoom, float x, float y);
 int PortableShowKeyboard(void);
+bool PortableSetAlwaysRun(bool run);
+
 touchscreemode_t PortableGetScreenMode();
 
 int isPlayerRunning();

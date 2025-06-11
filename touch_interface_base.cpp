@@ -367,6 +367,7 @@ void TouchInterfaceBase::gameButton(int state, int code)
 	else if(code == PORT_ACT_SMART_TOGGLE_RUN)
 	{
 		isWalking = SmartToggleAction(&runSmartToggle, state, isWalking);
+        PortableSetAlwaysRun(!isWalking);
 	}
 	else
 	{

@@ -541,6 +541,17 @@ void PortableAutomapControl(float zoom, float x, float y)
 	//LOGI("am_pan_x = %f",am_pan_x);
 }
 
+EXTERN_CVAR (Bool, cl_run)
+
+bool PortableSetAlwaysRun(bool run)
+{
+    if (run)
+        PortableCommand("cl_run 1");
+    else
+        PortableCommand("cl_run  0");
+
+    return false;
+}
 
 void Mobile_AM_controls(double *zoom, double *pan_x, double *pan_y)
 {

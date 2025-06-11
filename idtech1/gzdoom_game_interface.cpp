@@ -580,6 +580,18 @@ void PortableCommand(const char * cmd)
 	cmd_to_run = cmdBuffer;
 }
 
+EXTERN_CVAR(Bool, cl_run);
+
+bool PortableSetAlwaysRun(bool run)
+{
+    if (run)
+        PortableCommand("cl_run 1");
+    else
+        PortableCommand("cl_run  0");
+
+    return false;
+}
+
 static float am_zoom = 0;
 static float am_pan_x = 0;
 static float am_pan_y = 0;
