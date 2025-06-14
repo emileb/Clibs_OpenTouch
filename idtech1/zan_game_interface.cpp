@@ -81,6 +81,7 @@ extern "C"
 {
 	extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
 #include "SmartToggle.h"
+#include "CStringFifo.h"
 }
 
 //Move left/right fwd/back
@@ -95,6 +96,7 @@ static float look_pitch_joy = 0;
 static float look_yaw_mouse = 0;
 static float look_yaw_joy = 0;
 
+static CStringFIFO m_CmdFifo;
 
 int PortableKeyEvent(int state, int code, int unicode)
 {
@@ -520,14 +522,12 @@ int PortableShowKeyboard(void)
 	return 0;
 }
 
-const char *cmd_to_run = NULL;
 void PortableCommand(const char * cmd)
 {
-	LOGI("Zandronum cmd: %s", cmd);
-	static char cmdBuffer[256];
-	snprintf(cmdBuffer, 256, "%s\n", cmd);
-	cmd_to_run = cmdBuffer;
+    LOGI("PortableCommand: %s", cmd);
+    cstr_fifo_push(&m_CmdFifo, cmd);
 }
+
 
 static float am_zoom = 0;
 static float am_pan_x = 0;
@@ -609,11 +609,12 @@ void Mobile_IN_Move(ticcmd_t* cmd)
 		G_AddViewAngle(-look_yaw_joy * 1000);
 	}
 
-	if(cmd_to_run)
-	{
-		AddCommandString((char*)cmd_to_run, 0);
-		cmd_to_run = NULL;
-	}
+    char *consoleCmd;
+    while((consoleCmd = cstr_fifo_pop(&m_CmdFifo)))
+    {
+        AddCommandString((char*)consoleCmd, 0);
+        free(consoleCmd);
+    }
 }
 
 

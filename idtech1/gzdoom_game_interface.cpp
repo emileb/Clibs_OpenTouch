@@ -84,6 +84,7 @@ extern "C"
 {
 	extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
 #include "SmartToggle.h"
+#include "CStringFifo.h"
 }
 
 //Move left/right fwd/back
@@ -97,7 +98,7 @@ static float look_pitch_joy = 0;
 //left right
 static float look_yaw_mouse = 0;
 static float look_yaw_joy = 0;
-
+static CStringFIFO m_CmdFifo;
 
 bool            g_bindingbutton = false;
 
@@ -534,6 +535,8 @@ void PortableLookYaw(int mode, float yaw)
 // Start game, does not return!
 void PortableInit(int argc, const char ** argv)
 {
+    cstr_fifo_init(&m_CmdFifo);
+
 	extern int main_android(int argc, char **argv);
 	main_android(argc, (char **)argv);
 }
@@ -545,11 +548,6 @@ touchscreemode_t PortableGetScreenMode()
 {
 	if(menuactive != MENU_Off)
 	{
-		/*
-		bool inCustomKeys =  CurrentMenu && CurrentMenu->IsKindOf("ConversationMenu");
-		const char * name  = CurrentMenu->GetClass()->TypeName.GetChars();
-		LOGI("Menu %s", name);
-		 */
 		if(g_bindingbutton)
 			return TS_CUSTOM;
 		else
@@ -572,12 +570,11 @@ int PortableShowKeyboard(void)
 	return 0;
 }
 
-const char *cmd_to_run = NULL;
+
 void PortableCommand(const char * cmd)
 {
-	static char cmdBuffer[256];
-	snprintf(cmdBuffer, 256, "%s\n", cmd);
-	cmd_to_run = cmdBuffer;
+    LOGI("PortableCommand: %s", cmd);
+    cstr_fifo_push(&m_CmdFifo, cmd);
 }
 
 EXTERN_CVAR(Bool, cl_run);
@@ -661,10 +658,11 @@ void Mobile_IN_Move(ticcmd_t* cmd)
 		G_AddViewAngle(-look_yaw_joy * 1000);
 	}
 
-	if(cmd_to_run)
+    char *consoleCmd;
+	while((consoleCmd = cstr_fifo_pop(&m_CmdFifo)))
 	{
-		AddCommandString((char*)cmd_to_run, 0);
-		cmd_to_run = NULL;
+		AddCommandString((char*)consoleCmd, 0);
+		free(consoleCmd);
 	}
 }
 
