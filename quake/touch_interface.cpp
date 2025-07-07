@@ -3,7 +3,7 @@
 //
 
 #include "touch_interface.h"
-#include "FrameBuffer.h"
+#include "Framebuffer.h"
 #include "quake_game_dll.h"
 #include "SDL_keycode.h"
 #include <fstream>
@@ -109,7 +109,7 @@ void TouchInterface::createControls(std::string filesPath)
 	//Menu -------------------------------------------
 	//------------------------------------------------------
 	tcMenuMain->setFixAspect(true);
-	tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON));
+	tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON));
 #ifndef QUAKE3
 
 #if !defined(WRATH) // No keyboard in menu for Wrath
@@ -268,6 +268,14 @@ void TouchInterface::createControls(std::string filesPath)
 	{
 		tcGameMain->addControl(new touchcontrols::Button("use", touchcontrols::RectF(22, 3, 24, 5), "use", PORT_SMD_USE, false, false, "Use"));
 	}
+
+    touchcontrols::ButtonGrid *dpad = new touchcontrols::ButtonGrid("dpad_move", touchcontrols::RectF(6, 3, 12, 7), "", 3, 2, true, "Movement btns (WASD)");
+
+    dpad->addCell(0, 1, "direction_left", PORT_ACT_MOVE_LEFT);
+    dpad->addCell(2, 1, "direction_right", PORT_ACT_MOVE_RIGHT);
+    dpad->addCell(1, 0, "direction_up", PORT_ACT_FWD);
+    dpad->addCell(1, 1, "direction_down", PORT_ACT_BACK);
+    tcGameMain->addControl(dpad);
 
 	touchJoyRight = new touchcontrols::TouchJoy("touch", touchcontrols::RectF(17, 4, 26, 16), "look_arrow", "fixed_stick_circle");
 	tcGameMain->addControl(touchJoyRight);
