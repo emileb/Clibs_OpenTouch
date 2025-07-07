@@ -8,6 +8,7 @@ typedef struct
 {
 	uint64_t timeDown;
 	int wasActive;
+    bool buttonDown;
 } SmartToggle_t;
 
 static uint64_t getMS()
@@ -41,6 +42,7 @@ static inline int SmartToggleAction(SmartToggle_t *data, int buttonState, int is
 		data->wasActive = isActive;
 		data->timeDown = timeNow;
 		newState = 1; // When being press, we always activate
+        data->buttonDown = true;
 	}
 	else // Button released
 	{
@@ -50,8 +52,9 @@ static inline int SmartToggleAction(SmartToggle_t *data, int buttonState, int is
 		}
 		else // Long press, action off
 		{
-			newState = 0;
+            newState = 0;
 		}
+        data->buttonDown = false;
 	}
 
 	return newState;

@@ -93,7 +93,7 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath, const 
         glesVersion = 3;
 
 	// Set framebuffer rendering mode, needs to be same as the game
-	touchcontrols::R_FrameBufferSetRenderer(options & GAME_OPTION_GL4ES, glesVersion);
+    touchcontrols::R_FrameBufferSetRenderer(options & GAME_OPTION_GL4ES, glesVersion);
 
     if(options & GAME_OPTION_TOUCH_SURFACE_VIEW) // Touch control rendered on
     {
@@ -181,6 +181,11 @@ void TouchInterfaceBase::touchSettingsCallback(touchcontrols::tTouchSettings set
 	controlsContainer.setAlpha(touchSettings.alpha);
 
 	touchJoyLeft->setCenterAnchor(touchSettings.fixedMoveStick);
+
+    if (isWalking == -1)
+        isWalking = !touchSettings.alwaysRunDefault;
+
+    // LOGI("run %d %d", isWalking, touchSettings.alwaysRunDefault);
 
 	if(tcGameMain) tcGameMain->setAlpha(touchSettings.alpha);
 
@@ -366,6 +371,12 @@ void TouchInterfaceBase::gameButton(int state, int code)
 	}
 	else if(code == PORT_ACT_SMART_TOGGLE_RUN)
 	{
+        // Check if getting key UP without a corresponding key DOWN. This happens when changing screens.
+        // Don't want to change running state if this happens so ignore
+        if(!state && !runSmartToggle.buttonDown)
+        {
+            return;
+        }
 		isWalking = SmartToggleAction(&runSmartToggle, state, isWalking);
         PortableSetAlwaysRun(!isWalking);
 	}
@@ -478,12 +489,12 @@ void TouchInterfaceBase::leftStick(float joy_x, float joy_y, float mouse_x, floa
 
 	if(touchSettings.digitalMove)
 	{
-		if(fwdback > 0.5)
+		if(fwdback > touchSettings.digMoveYSensitivity)
 		{
 			PortableAction(1, PORT_ACT_FWD);
 			PortableAction(0, PORT_ACT_BACK);
 		}
-		else if(fwdback < -0.5)
+		else if(fwdback < -touchSettings.digMoveYSensitivity)
 		{
 			PortableAction(0, PORT_ACT_FWD);
 			PortableAction(1, PORT_ACT_BACK);
@@ -494,12 +505,12 @@ void TouchInterfaceBase::leftStick(float joy_x, float joy_y, float mouse_x, floa
 			PortableAction(0, PORT_ACT_BACK);
 		}
 
-		if(strafe > 0.5)
+		if(strafe > touchSettings.digMoveXSensitivity)
 		{
 			PortableAction(1, PORT_ACT_MOVE_RIGHT);
 			PortableAction(0, PORT_ACT_MOVE_LEFT);
 		}
-		else if(strafe < -0.5)
+		else if(strafe < -touchSettings.digMoveXSensitivity)
 		{
 			PortableAction(0, PORT_ACT_MOVE_RIGHT);
 			PortableAction(1, PORT_ACT_MOVE_LEFT);
@@ -520,7 +531,7 @@ void TouchInterfaceBase::rightStick(float joy_x, float joy_y, float mouse_x, flo
 {
 	//LOGI(" mouse x = %f",mouse_x);
 	int invert          = touchSettings.invertLook ? -1 : 1;
-	float scale         = (isShooting && touchSettings.precisionShoot) ? touchSettings.precisionSenitivity : 1;
+	float scale         = (isShooting && touchSettings.precisionShoot) ? touchSettings.precisionSensitivity : 1;
 
 	// Sniper mode overrides it to 10x slower
 	if(sniperMode)
@@ -531,7 +542,6 @@ void TouchInterfaceBase::rightStick(float joy_x, float joy_y, float mouse_x, flo
 
 	float yawMouse    = mouse_x * touchSettings.turnSensitivity * scale;
 	float yawJoystick = joy_x  * touchSettings.turnSensitivity * scale * 10;
-
 
 
 	// Disable mouse look for Doom, otherwise this should always be enabled

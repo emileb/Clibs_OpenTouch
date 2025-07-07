@@ -80,7 +80,7 @@ public:
 	bool sniperMode = false; // Reduce look sensitivity when reload being held down
 	uint64_t  reloadDownTime = 0;
 
-	bool isWalking = false; // Run toggle, default run on. NOTE need to do as isWalking so smarttoggle defautls to running
+	int isWalking = -1; // Run toggle. Initial -1 so first time settings update gets called it can be set to its default
 	SmartToggle_t runSmartToggle;
 
 	int framecount = 0;
@@ -227,7 +227,7 @@ public:
 
 	int isPlayerRunning()
 	{
-		return !isWalking;
+		return (isWalking == 0);
 	}
 };
 
