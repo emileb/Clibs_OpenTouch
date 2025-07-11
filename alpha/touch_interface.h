@@ -8,21 +8,22 @@
 class TouchInterface : public TouchInterfaceBase
 {
 public:
-	void createControls(std::string filesPath);
+    void createControls(std::string filesPath);
 
-	void openGLEnd();
+    void openGLEnd();
 
-	void openGLStart();
+    void openGLStart();
 
-	void blankButton(int state, int code);
+    void blankButton(int state, int code);
 
-	void newFrame();
+    void newFrame();
 
-	void automapButton(int state, int code);
+    void automapButton(int state, int code);
 
-	void newGLContext();
+    void newGLContext();
 
-	void mouseMove(int action, float x, float y, float mouse_x, float mouse_y);
+    void mouseMove(int action, float x, float y, float mouse_x, float mouse_y);
 
 };
+
 #endif /* touch_interface_h */

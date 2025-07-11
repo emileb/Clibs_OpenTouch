@@ -8,7 +8,6 @@
 #define Q2DLL_ZAERO   7
 
 
-
 #define Q1MALICE      10
 
 #define Q1HEXEN2      20

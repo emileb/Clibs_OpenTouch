@@ -7,23 +7,25 @@
 
 class TouchInterface : public TouchInterfaceBase
 {
-	void createControlsDoom(std::string filesPath);
-	void createControlsDoom3(std::string filesPath);
+    void createControlsDoom(std::string filesPath);
 
-	touchcontrols::Button *doom3SprintButton = 0; // To enable changing of the graphic
+    void createControlsDoom3(std::string filesPath);
+
+    touchcontrols::Button *doom3SprintButton = 0; // To enable changing of the graphic
 public:
-	void createControls(std::string filesPath);
+    void createControls(std::string filesPath);
 
-	void openGLEnd();
+    void openGLEnd();
 
-	void openGLStart();
+    void openGLStart();
 
-	void blankButton(int state, int code);
+    void blankButton(int state, int code);
 
-	void newFrame();
+    void newFrame();
 
-	void automapButton(int state, int code);
+    void automapButton(int state, int code);
 
-	void newGLContext();
+    void newGLContext();
 };
+
 #endif /* touch_interface_h */

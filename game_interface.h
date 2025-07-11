@@ -23,40 +23,49 @@ extern "C"
 
 typedef enum
 {
-	TS_BLANK,
-	TS_MENU,
-	TS_GAME,
-	TS_MAP,
-	TS_CONSOLE,
-	TS_Y_N,
-	TS_CUSTOM,
-	TS_DEMO,
-	TS_MOUSE,
-	TS_PDA, // Doom 3
+    TS_BLANK,
+    TS_MENU,
+    TS_GAME,
+    TS_MAP,
+    TS_CONSOLE,
+    TS_Y_N,
+    TS_CUSTOM,
+    TS_DEMO,
+    TS_MOUSE,
+    TS_PDA, // Doom 3
 } touchscreemode_t;
 
 
-void PortableInit(int argc, const char ** argv);
+void PortableInit(int argc, const char **argv);
 
 void PortableBackButton(void);
 
 int PortableKeyEvent(int state, int code, int unitcode);
+
 void PortableAction(int state, int action);
 
 void PortableMove(float fwd, float strafe);
+
 void PortableMoveFwd(float fwd);
+
 void PortableMoveSide(float strafe);
+
 void PortableLookPitch(int mode, float pitch);
+
 void PortableLookYaw(int mode, float pitch);
 
 void PortableMouse(float dx, float dy);
+
 void PortableMouseAbs(float x, float y);
 
 void PortableMouseButton(int state, int button, float dx, float dy);
 
-void PortableCommand(const char * cmd);
+void PortableCommand(const char *cmd);
+
 void PortableAutomapControl(float zoom, float x, float y);
+
 int PortableShowKeyboard(void);
+
 bool PortableSetAlwaysRun(bool run);
 
 touchscreemode_t PortableGetScreenMode();

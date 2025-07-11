@@ -39,198 +39,199 @@
 
 class TouchInterfaceBase
 {
-	int licTest = 0;
+    int licTest = 0;
 public:
 
-	int gameType = 0;
-	int wheelNbr = 10;
+    int gameType = 0;
+    int wheelNbr = 10;
 
-	int nativeWidth = 0;
-	int nativeHeight = 0;
+    int nativeWidth = 0;
+    int nativeHeight = 0;
 
-	bool gamepadHideTouch = false;
-	bool hideGameAndMenu = false;
-	bool useSystemKeyboard = false;
+    bool gamepadHideTouch = false;
+    bool hideGameAndMenu = false;
+    bool useSystemKeyboard = false;
 
-	bool weaponWheelMoveStick = true;
-	touchcontrols::WheelSelectMode weaponWheelGamepadMode = touchcontrols::WHEELSELECT_GP_MODE_HOLD;
-	int weaponWheelAutoTimout = 0;
+    bool weaponWheelMoveStick = true;
+    touchcontrols::WheelSelectMode weaponWheelGamepadMode = touchcontrols::WHEELSELECT_GP_MODE_HOLD;
+    int weaponWheelAutoTimout = 0;
 
-	int leftDoubleAction = 0;
-	int rightDoubleAction = 0;
-	int volumeUpAction = 0;
-	int volumeDownAction = 0;
+    int leftDoubleAction = 0;
+    int rightDoubleAction = 0;
+    int volumeUpAction = 0;
+    int volumeDownAction = 0;
 
-	touchscreemode_t currentScreenMode = TS_BLANK;
-	touchcontrols::tTouchSettings touchSettings;
-	bool useMouse = false;
-	bool gameShowMouse = false;
-	bool isShooting = false;
-	bool showWeaponNumbersOn = false;
-	bool showCustomOn = false;
-	bool showCustomMenu = false;
-	bool gotMouseMove = false; // Set to true if we ever got a mouse mouse from SDL, so we can choose if to show the mouse icon
+    touchscreemode_t currentScreenMode = TS_BLANK;
+    touchcontrols::tTouchSettings touchSettings;
+    bool useMouse = false;
+    bool gameShowMouse = false;
+    bool isShooting = false;
+    bool showWeaponNumbersOn = false;
+    bool showCustomOn = false;
+    bool showCustomMenu = false;
+    bool gotMouseMove = false; // Set to true if we ever got a mouse mouse from SDL, so we can choose if to show the mouse icon
 
-	// For Doom
-	int mapState = 0;
-	float demoControlsAlpha = 0; // Used to fade out demo controls
-	SmartToggle_t gyroSmartToggle;
+    // For Doom
+    int mapState = 0;
+    float demoControlsAlpha = 0; // Used to fade out demo controls
+    SmartToggle_t gyroSmartToggle;
 
-	bool enableReloadSniperMode = false; // Set to true to enable sniper mdoe for the reload button
-	bool sniperMode = false; // Reduce look sensitivity when reload being held down
-	uint64_t  reloadDownTime = 0;
+    bool enableReloadSniperMode = false; // Set to true to enable sniper mdoe for the reload button
+    bool sniperMode = false; // Reduce look sensitivity when reload being held down
+    uint64_t reloadDownTime = 0;
 
-	int isWalking = -1; // Run toggle. Initial -1 so first time settings update gets called it can be set to its default
-	SmartToggle_t runSmartToggle;
+    int isWalking = -1; // Run toggle. Initial -1 so first time settings update gets called it can be set to its default
+    SmartToggle_t runSmartToggle;
 
-	int framecount = 0;
+    int framecount = 0;
 
-	touchcontrols::TouchControlsContainer controlsContainer;
+    touchcontrols::TouchControlsContainer controlsContainer;
 
-	touchcontrols::UI_Controls *UI_tc = 0;
+    touchcontrols::UI_Controls *UI_tc = 0;
 
-	touchcontrols::TouchControls *tcMenuMain = 0;
-	touchcontrols::TouchControls *tcYesNo = 0;
-	touchcontrols::TouchControls *tcGameMain = 0;
-	touchcontrols::TouchControls *tcGameWeapons = 0;
-	touchcontrols::TouchControls *tcWeaponWheel = 0;
-	touchcontrols::TouchControls *tcInventory = 0;
-	touchcontrols::TouchControls *tcAutomap = 0;
-	touchcontrols::TouchControls *tcBlank = 0;
-	touchcontrols::TouchControls *tcKeyboard = 0;
-	touchcontrols::TouchControls *tcCustomButtons = 0;
-	touchcontrols::TouchControls *tcDemo = 0;
-	touchcontrols::TouchControls *tcGamepadUtility = 0;
-	touchcontrols::TouchControls *tcDPadInventory = 0;
-	touchcontrols::TouchControls *tcMouse = 0;
-	touchcontrols::TouchControls *tcPda = 0;
+    touchcontrols::TouchControls *tcMenuMain = 0;
+    touchcontrols::TouchControls *tcYesNo = 0;
+    touchcontrols::TouchControls *tcGameMain = 0;
+    touchcontrols::TouchControls *tcGameWeapons = 0;
+    touchcontrols::TouchControls *tcWeaponWheel = 0;
+    touchcontrols::TouchControls *tcInventory = 0;
+    touchcontrols::TouchControls *tcAutomap = 0;
+    touchcontrols::TouchControls *tcBlank = 0;
+    touchcontrols::TouchControls *tcKeyboard = 0;
+    touchcontrols::TouchControls *tcCustomButtons = 0;
+    touchcontrols::TouchControls *tcDemo = 0;
+    touchcontrols::TouchControls *tcGamepadUtility = 0;
+    touchcontrols::TouchControls *tcDPadInventory = 0;
+    touchcontrols::TouchControls *tcMouse = 0;
+    touchcontrols::TouchControls *tcPda = 0;
 
 
-	// So can hide and show these buttons
-	touchcontrols::TouchJoy *touchJoyLeft;
-	touchcontrols::TouchJoy *touchJoyRight;
+    // So can hide and show these buttons
+    touchcontrols::TouchJoy *touchJoyLeft;
+    touchcontrols::TouchJoy *touchJoyRight;
 
-	// So gampad can control keyboard
-	touchcontrols::UI_Keyboard *uiKeyboard;
+    // So gampad can control keyboard
+    touchcontrols::UI_Keyboard *uiKeyboard;
 
-	// So gamepad can access it
-	touchcontrols::WheelSelect *wheelSelect;
-	touchcontrols::ButtonGrid *uiInventoryButtonGrid;
+    // So gamepad can access it
+    touchcontrols::WheelSelect *wheelSelect;
+    touchcontrols::ButtonGrid *uiInventoryButtonGrid;
 
-	// Common 'Run/Sprint' button
-	touchcontrols::Button *runButton;
+    // Common 'Run/Sprint' button
+    touchcontrols::Button *runButton;
 
-	virtual void createControls(std::string filesPath) = 0;
+    virtual void createControls(std::string filesPath) = 0;
 
-	virtual void openGLEnd() = 0;
-	virtual void openGLStart() = 0;
-	virtual void blankButton(int state, int code) = 0;
+    virtual void openGLEnd() = 0;
 
-	virtual void newFrame() = 0;
+    virtual void openGLStart() = 0;
 
-	virtual void newGLContext() = 0;
+    virtual void blankButton(int state, int code) = 0;
 
-	void init(int width, int height, const char *pngPath, const char *touchSettingsPath, int options, int wheelNbr_, int game);
+    virtual void newFrame() = 0;
 
-	int touchActionToAction(int action);
+    virtual void newGLContext() = 0;
 
-	void touchSettingsCallback(touchcontrols::tTouchSettings settings);
+    void init(int width, int height, const char *pngPath, const char *touchSettingsPath, int options, int wheelNbr_, int game);
 
-	void gameButton(int state, int code);
+    int touchActionToAction(int action);
 
-	void menuButton(int state, int code);
+    void touchSettingsCallback(touchcontrols::tTouchSettings settings);
 
-	void leftStick(float joy_x, float joy_y, float mouse_x, float mouse_y);
+    void gameButton(int state, int code);
 
-	void rightStick(float joy_x, float joy_y, float mouse_x, float mouse_y);
+    void menuButton(int state, int code);
 
-	void inventoryButton(int state, int code);
+    void leftStick(float joy_x, float joy_y, float mouse_x, float mouse_y);
 
-	void inventoryOutside(bool fromGamepad);
+    void rightStick(float joy_x, float joy_y, float mouse_x, float mouse_y);
 
-	void gameUtilitiesButton(int state, int code);
+    void inventoryButton(int state, int code);
 
-	void gameUtilitiesOutside(bool fromGamepad);
+    void inventoryOutside(bool fromGamepad);
 
-	void customButton(int state, int code);
+    void gameUtilitiesButton(int state, int code);
 
-	//Weapon wheel callbacks
-	void weaponWheelSelected(int enabled);
+    void gameUtilitiesOutside(bool fromGamepad);
 
-	void weaponWheel(int segment);
+    void customButton(int state, int code);
 
-	void selectWeaponButton(int state, int code);
+    //Weapon wheel callbacks
+    void weaponWheelSelected(int enabled);
 
-	void mouseMove(int action, float x, float y, float mouse_x, float mouse_y);
+    void weaponWheel(int segment);
 
-	void mouseButton(int state, int code);
+    void selectWeaponButton(int state, int code);
 
-	void AutomapMultitouchMouseMove(int action, float x, float y, float dx, float dy);
+    void mouseMove(int action, float x, float y, float mouse_x, float mouse_y);
 
-	void brightnessSlideMouse(int action, float x, float y, float dx, float dy);
+    void mouseButton(int state, int code);
 
-	void dPadInventoryButton(int state, int code);
+    void AutomapMultitouchMouseMove(int action, float x, float y, float dx, float dy);
 
-	void dPadInventoryOutside(bool fromGamepad);
+    void brightnessSlideMouse(int action, float x, float y, float dx, float dy);
 
-	void leftDoubleTap(int state);
+    void dPadInventoryButton(int state, int code);
 
-	void rightDoubleTap(int state);
+    void dPadInventoryOutside(bool fromGamepad);
 
-	void vibrate(int duration);
+    void leftDoubleTap(int state);
 
-	void gameSettingsButton(int state);
+    void rightDoubleTap(int state);
 
-	void customSettingsButton(int state);
+    void vibrate(int duration);
 
-	void mobileBackButton(void);
+    void gameSettingsButton(int state);
 
-	void updateTouchScreenModeOut(touchscreemode_t mode);
+    void customSettingsButton(int state);
 
-	void updateTouchScreenModeIn(touchscreemode_t mode);
+    void mobileBackButton(void);
 
-	void createCustomControls(touchcontrols::TouchControls* customControls);
+    void updateTouchScreenModeOut(touchscreemode_t mode);
 
-	void keyboardKeyPressed(uint32_t key);
+    void updateTouchScreenModeIn(touchscreemode_t mode);
 
-	void hideControls(void);
+    void createCustomControls(touchcontrols::TouchControls *customControls);
 
-	void processPointer(int action, int pid, float x, float y);
+    void keyboardKeyPressed(uint32_t key);
 
-	void gamepadAction(int state, int action);
+    void hideControls(void);
 
-	void axisValue(int axis, float value);
+    void processPointer(int action, int pid, float x, float y);
 
-	int blockGamepad(void);
+    void gamepadAction(int state, int action);
 
-	void weaponWheelSettings(bool useMoveStick, int mode, int autoTimeout);
+    void axisValue(int axis, float value);
 
-	int volumeKey(int state, bool volumeUp);
+    int blockGamepad(void);
 
-	bool saveControlSettings(std::string path);
+    void weaponWheelSettings(bool useMoveStick, int mode, int autoTimeout);
 
-	bool loadControlSettings(std::string path);
+    int volumeKey(int state, bool volumeUp);
 
-	void executeCommand(const char *cmd);
+    bool saveControlSettings(std::string path);
 
-	void frameControls(bool REND_FRAMEBUFFER, bool REND_TOUCH);
+    bool loadControlSettings(std::string path);
+
+    void executeCommand(const char *cmd);
+
+    void frameControls(bool REND_FRAMEBUFFER, bool REND_TOUCH);
 
     void newGameFrame();
 
     void showKeyboardCallback(int show);
 
-	void showMouseCallback(int show);
+    void showMouseCallback(int show);
 
-	void moveMouseCallback(float x, float y);
+    void moveMouseCallback(float x, float y);
 
-	void waitFrames(int nbrFrames);
+    void waitFrames(int nbrFrames);
 
-	int isPlayerRunning()
-	{
-		return (isWalking == 0);
-	}
+    int isPlayerRunning()
+    {
+        return (isWalking == 0);
+    }
 };
-
 
 
 #endif //OPENTOUCH_TOUCH_INTERFACE_BASE_H
