@@ -581,6 +581,12 @@ void moveMouseSDLCallback(float x, float y)
     touchInterface.moveMouseCallback(x, y);
 }
 
+// Returns if the game wants to show the mouse, used by NZP to enable the menu when mouse wants to be shown
+int gameShowMouseActive()
+{
+    return touchInterface.gameShowMouse;
+};
+
 int checkGfx()
 {
 #ifndef NO_SEC
