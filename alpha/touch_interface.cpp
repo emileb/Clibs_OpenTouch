@@ -38,7 +38,7 @@ void TouchInterface::createControls(std::string filesPath)
 
     //Menu -------------------------------------------
     //------------------------------------------------------
-    tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON));
+    tcMenuMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON));
     tcMenuMain->addControl(new touchcontrols::Button("down_arrow", touchcontrols::RectF(20, 13, 23, 16), "arrow_down", PORT_ACT_MENU_DOWN));
     tcMenuMain->addControl(new touchcontrols::Button("up_arrow", touchcontrols::RectF(20, 10, 23, 13), "arrow_up", PORT_ACT_MENU_UP));
     tcMenuMain->addControl(new touchcontrols::Button("left_arrow", touchcontrols::RectF(17, 13, 20, 16), "arrow_left", PORT_ACT_MENU_LEFT));
@@ -63,7 +63,7 @@ void TouchInterface::createControls(std::string filesPath)
     //Game -------------------------------------------
     //------------------------------------------------------
     tcGameMain->setAlpha(touchSettings.alpha);
-    tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Show menu"));
+    tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
     tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(20, 7, 23, 10), "shoot", KEY_SHOOT, false, false, "Attack!"));
     tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
 
@@ -198,7 +198,7 @@ void TouchInterface::createControls(std::string filesPath)
     //------------------------------------------------------
     touchcontrols::ButtonGrid *gamepadUtils = new touchcontrols::ButtonGrid("gamepad_grid", touchcontrols::RectF(8, 5, 18, 11), "gamepad_utils_bg", 3, 2);
 
-    gamepadUtils->addCell(0, 0, "ui_back_arrow", KEY_BACK_BUTTON);
+    gamepadUtils->addCell(0, 0, "back_button", KEY_BACK_BUTTON);
     gamepadUtils->addCell(0, 1, "map", PORT_ACT_MAP);
     gamepadUtils->addCell(1, 0, "keyboard", KEY_SHOW_KBRD);
     gamepadUtils->addCell(1, 1, "tild", PORT_ACT_CONSOLE);
@@ -232,7 +232,7 @@ void TouchInterface::createControls(std::string filesPath)
     mouse->setEditable(false);
     tcMouse->addControl(mouse);
     mouse->signal_action.connect(sigc::mem_fun(this, &TouchInterface::mouseMove));
-    tcMouse->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Back"));
+    tcMouse->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Back"));
     tcMouse->addControl(new touchcontrols::Button("left_button", touchcontrols::RectF(0, 6, 3, 10), "left_mouse", KEY_LEFT_MOUSE, false, false, "Back"));
     tcMouse->signal_button.connect(sigc::mem_fun(this, &TouchInterface::mouseButton));
 

@@ -193,7 +193,7 @@ void TouchInterface::createControls(std::string filesPath)
     //Game -------------------------------------------
     //------------------------------------------------------
     tcGameMain->setAlpha(touchSettings.alpha);
-    tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "ui_back_arrow", KEY_BACK_BUTTON, false, false, "Show menu"));
+    tcGameMain->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Show menu"));
     tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(21, 5, 24, 8), "shoot", KEY_SHOOT, false, false, "Attack!"));
     tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
 
@@ -400,7 +400,7 @@ void TouchInterface::createControls(std::string filesPath)
     //------------------------------------------------------
     touchcontrols::ButtonGrid *gamepadUtils = new touchcontrols::ButtonGrid("gamepad_grid", touchcontrols::RectF(8, 5, 18, 11), "gamepad_utils_bg", 3, 2);
 
-    gamepadUtils->addCell(0, 0, "ui_back_arrow", KEY_BACK_BUTTON);
+    gamepadUtils->addCell(0, 0, "back_button", KEY_BACK_BUTTON);
     gamepadUtils->addCell(0, 1, "scores", PORT_ACT_MP_SCORES);
     gamepadUtils->addCell(1, 0, "keyboard", KEY_SHOW_KBRD);
     gamepadUtils->addCell(1, 1, "tild", PORT_ACT_CONSOLE);
