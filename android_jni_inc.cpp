@@ -230,7 +230,7 @@ JAVA_FUNC(init)(JNIEnv *env, jobject thiz, jstring graphics_dir, jint options, j
 #endif
 
     touchInterface.init(mobile_screen_width, mobile_screen_height, filesPath.c_str(), touchSettingsPath.c_str(), options, wheelNbr, game);
-#if 1
+#if 0
     // Catch all these and exit for now. If this works add logging
     signal(SIGSEGV, androidGenericSignal);
     signal(SIGFPE, androidGenericSignal);
