@@ -147,27 +147,23 @@ void TouchInterface::createControls(std::string filesPath)
     tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, false, "Jump/Swim up"));
     tcGameMain->addControl(new touchcontrols::Button("quick_command", touchcontrols::RectF(21, 3, 23, 5), "star", KEY_QUICK_COMMANDS, false, true, "Quick Commands"));
 
-
     tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch/Swim down"));
-//tcGameMain->addControl(new touchcontrols::Button("attack_alt_toggle", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_TOGGLE_ALT_ATTACK, false, true, "Alt attack (toggle)"));
-    tcGameMain->addControl(new touchcontrols::Button("kick", touchcontrols::RectF(19, 3, 21, 5), "kick", PORT_ACT_KICK, false, true, "Kick"));
-
-    tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, false, "Show Inventory"));
 
     tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 2, 2, 4), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
     tcGameMain->addControl(new touchcontrols::Button("show_weapons", touchcontrols::RectF(12, 14, 14, 16), "show_weapons", KEY_SHOW_WEAPONS, false, false, "Show numbers"));
     tcGameMain->addControl(new touchcontrols::Button("console", touchcontrols::RectF(6, 0, 8, 2), "tild", PORT_ACT_CONSOLE, false, true, "Console"));
 
-
     tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
     tcGameMain->addControl(new touchcontrols::Button("reload", touchcontrols::RectF(0, 5, 3, 7), "ammo_reload", PORT_ACT_RELOAD, false, false, "Reload/Snip"));
     tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 7, 3, 9), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 
+#if 0
     // Quad slider for leaning left and right controls
     touchcontrols::QuadSlide *flyQs = new touchcontrols::QuadSlide("quad_slide_lean", touchcontrols::RectF(4, 3, 6, 5), "lean", "slide_arrow", 0, PORT_ACT_LEAN_RIGHT, 0, PORT_ACT_LEAN_LEFT, true,
                                                                    "Lean left/right slider");
     flyQs->signal.connect(sigc::mem_fun(this, &TouchInterface::gameButton));
     tcGameMain->addControl(flyQs);
+#endif
 
     touchJoyRight = new touchcontrols::TouchJoy("touch", touchcontrols::RectF(17, 4, 26, 16), "look_arrow", "fixed_stick_circle");
     tcGameMain->addControl(touchJoyRight);
@@ -209,7 +205,7 @@ void TouchInterface::createControls(std::string filesPath)
 
     //Weapon wheel -------------------------------------------
     //------------------------------------------------------
-    wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_rtcw", 10);
+    wheelSelect = new touchcontrols::WheelSelect("weapon_wheel", touchcontrols::RectF(7, 2, 19, 14), "weapon_wheel_8", 8);
     wheelSelect->signal_selected.connect(sigc::mem_fun(this, &TouchInterface::weaponWheel));
     wheelSelect->signal_enabled.connect(sigc::mem_fun(this, &TouchInterface::weaponWheelSelected));
     tcWeaponWheel->addControl(wheelSelect);
@@ -357,7 +353,7 @@ void TouchInterface::createControls(std::string filesPath)
     UI_tc = touchcontrols::createDefaultSettingsUI(&controlsContainer, newSettings);
     UI_tc->setAlpha(1);
 
-    tcMenuMain->setXMLFile((std::string) filesPath + "/menu_rtcw.xml");
+    tcMenuMain->setXMLFile((std::string) filesPath + "/menu_mohaa.xml");
     tcGameMain->setXMLFile((std::string) filesPath + "/game_"
     ENGINE_NAME
     ".xml");
