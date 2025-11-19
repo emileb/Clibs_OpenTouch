@@ -625,6 +625,49 @@ extern fixed_t forwardmove[2], sidemove[2];
 
 extern "C" int blockGamepad(void);
 
+#ifdef GZDOOM_DEV_DEV
+void Mobile_IN_Move(usercmd_t *cmd)
+{
+
+    int blockMove = blockGamepad() & ANALOGUE_AXIS_FWD;
+    int blockLook = blockGamepad() & ANALOGUE_AXIS_PITCH;
+
+    if(!blockMove)
+    {
+        float fwdSpeed = forwardmove_android;
+        float sideSpeed = sidemove_android;
+
+        if(!isPlayerRunning())
+        {
+            fwdSpeed = fwdSpeed / 2;
+            sideSpeed = sideSpeed / 2;
+        }
+
+        cmd->forwardmove += fwdSpeed * forwardmove[1];
+        cmd->sidemove += sideSpeed * sidemove[1];
+    }
+
+   if(!blockLook)
+    {
+        // Add pitch
+        G_AddViewPitch(look_pitch_mouse * 30000);
+        look_pitch_mouse = 0;
+        G_AddViewPitch(-look_pitch_joy * 800);
+
+        // Add yaw
+        G_AddViewAngle(-look_yaw_mouse * 100000);
+        look_yaw_mouse = 0;
+        G_AddViewAngle(-look_yaw_joy * 1000);
+    }
+
+    char *consoleCmd;
+    while((consoleCmd = cstr_fifo_pop(&m_CmdFifo)))
+    {
+        AddCommandString((char *) consoleCmd, 0);
+        free(consoleCmd);
+    }
+}
+#else
 void Mobile_IN_Move(ticcmd_t *cmd)
 {
     int blockMove = blockGamepad() & ANALOGUE_AXIS_FWD;
@@ -666,5 +709,4 @@ void Mobile_IN_Move(ticcmd_t *cmd)
     }
 }
 
-
-
+#endif
