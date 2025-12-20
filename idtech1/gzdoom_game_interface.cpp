@@ -625,7 +625,7 @@ extern fixed_t forwardmove[2], sidemove[2];
 
 extern "C" int blockGamepad(void);
 
-#ifdef GZDOOM_DEV_DEV
+#ifdef UZDOOM
 void Mobile_IN_Move(usercmd_t *cmd)
 {
 
