@@ -210,8 +210,9 @@ void PortableMouse(float dx, float dy)
 
 void PortableMouseButton(int state, int button, float dx, float dy)
 {
+    LOGI("PortableMouseButton %d %d", state, button);
     if(state)
-        SDL_InjectMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0, SDL_TRUE);
+        SDL_InjectMouse(button, ACTION_DOWN, 0, 0, SDL_TRUE);
     else
         SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
 }

@@ -447,7 +447,7 @@ void TouchInterfaceBase::menuButton(int state, int code)
     else if(code == KEY_LEFT_MOUSE)
     {
 #if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES)
-        PortableMouseButton(state, 1, 0, 0);
+        PortableMouseButton(state, BUTTON_PRIMARY, 0, 0);
 #endif
     }
     else if(code == KEY_ZDOOM_CLEAR_BIND)
@@ -654,10 +654,10 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
     }
     else if(action == TOUCHMOUSE_TAP)
     {
-        PortableMouseButton(1, 1, 0, 0);
+        PortableMouseButton(1, BUTTON_PRIMARY, 0, 0);
         //usleep(200 * 1000); // Need this for the PDA to work in D3, needs a frame to react..
         waitFrames(3);
-        PortableMouseButton(0, 1, 0, 0);
+        PortableMouseButton(0, BUTTON_PRIMARY, 0, 0);
     }
 
 #endif
@@ -681,6 +681,7 @@ void TouchInterfaceBase::mouseMove(int action, float x, float y, float mouse_x, 
 void TouchInterfaceBase::mouseButton(int state, int code)
 {
 #if defined(GZDOOM) || defined(ZANDRONUM_30) || defined(D3ES) || defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES) || defined(FTEQW) || defined(EDUKE32)
+    LOGI("mouseButton %d, %d", state, code);
 
     // Hide the mouse
     if((code == KEY_USE_MOUSE) && state)
@@ -692,8 +693,12 @@ void TouchInterfaceBase::mouseButton(int state, int code)
 #if defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES) || defined(FTEQW)
         MouseButton(state, BUTTON_PRIMARY);
 #else
-        PortableMouseButton(state, 1, 0, 0);
+        PortableMouseButton(state, BUTTON_PRIMARY, 0, 0);
 #endif
+    }
+    else if(code == KEY_RIGHT_MOUSE)
+    {
+        PortableMouseButton(state, BUTTON_SECONDARY, 0, 0);
     }
     else if((code == KEY_BACK_BUTTON) && state)
     {
@@ -1418,7 +1423,7 @@ void TouchInterfaceBase::executeCommand(const char *cmd)
 
 void TouchInterfaceBase::showMouseCallback(int show)
 {
-    LOGI("showMouseCallback = %d", show);
+    // LOGI("showMouseCallback = %d", show);
     gameShowMouse = show;
 }
 

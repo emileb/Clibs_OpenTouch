@@ -432,7 +432,7 @@ void TouchInterface::createControlsDoom(std::string filesPath)
     mouse->signal_action.connect(sigc::mem_fun(this, &TouchInterface::mouseMove));
     tcMouse->addControl(new touchcontrols::Button("back", touchcontrols::RectF(0, 0, 2, 2), "back_button", KEY_BACK_BUTTON, false, false, "Back"));
     // Hide the mouse button because we can now use a tap
-    //tcMouse->addControl(new touchcontrols::Button("left_button", touchcontrols::RectF(0, 6, 3, 10), "mouse2", KEY_LEFT_MOUSE, false, false, "Back"));
+    tcMouse->addControl(new touchcontrols::Button("right_button", touchcontrols::RectF(24, 0, 26, 2), "mouse_right_button", KEY_RIGHT_MOUSE, false, false, "Right button"));
     tcMouse->addControl(new touchcontrols::Button("hide_mouse", touchcontrols::RectF(4, 0, 6, 2), "mouse2", KEY_USE_MOUSE, false, false, "Hide mouse"));
     tcMouse->setAlpha(0.9);
     tcMouse->signal_button.connect(sigc::mem_fun(this, &TouchInterface::mouseButton));

@@ -32,7 +32,7 @@
 #define KEY_LOAD_SAVE_CONTROLS 0x1010
 #define KEY_QUICK_COMMANDS     0x1011
 #define KEY_ZDOOM_CLEAR_BIND     0x1012
-
+#define KEY_RIGHT_MOUSE   0x10013
 
 #define DEMO_ALPHA_RESET      1
 #define DEMO_ALPFA_DEC        0.001f
