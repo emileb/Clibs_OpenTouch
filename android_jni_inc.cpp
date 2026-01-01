@@ -114,15 +114,18 @@ __attribute__((visibility("default"))) jint JNI_OnLoad(JavaVM *vm, void *reserve
 static int argc = 1;
 static const char *argv[500];
 
-const char *nativeLibsPath;
-const char *sourceFilePath_c;
-const char *resFilePath_c;
-const char *userFilesPath_c;
+const char *nativeLibsPath = nullptr;
+const char *sourceFilePath_c = nullptr;
+const char *resFilePath_c = nullptr;
+const char *userFilesPath_c = nullptr;
+const char *secondaryPath_c = nullptr;
+
 std::string filesPath;
 std::string userFilesPath;
 std::string tempFilesPath;
 std::string sourceFilePath;
 std::string resFilePath;
+std::string secondaryPath;
 
 std::string touchSettingsPath;
 
@@ -130,7 +133,7 @@ char keyGlobal[512];
 char pkgGlobal[64];
 
 jint EXPORT_ME
-JAVA_FUNC(init)(JNIEnv *env, jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring logFilename, jstring nativeLibs,
+JAVA_FUNC(init)(JNIEnv *env, jobject thiz, jstring graphics_dir, jint options, jint wheelNbr, jobjectArray argsArray, jint game, jstring game_path_, jstring secondary_path, jstring logFilename, jstring nativeLibs,
                 jstring userFiles, jstring tempFiles, jstring sourceFiles, jstring resFiles)
 {
     env_ = env;
@@ -151,6 +154,12 @@ JAVA_FUNC(init)(JNIEnv *env, jobject thiz, jstring graphics_dir, jint options, j
 
     resFilePath = (char *) (env)->GetStringUTFChars(resFiles, 0);
     resFilePath_c = resFilePath.c_str();
+
+    if(secondary_path)
+    {
+        secondaryPath = (char *) (env)->GetStringUTFChars(secondary_path, 0);
+        secondaryPath_c = secondaryPath.c_str();
+    }
 
     nativeLibsPath = native_libs_path.c_str();
 
@@ -222,6 +231,14 @@ JAVA_FUNC(init)(JNIEnv *env, jobject thiz, jstring graphics_dir, jint options, j
         LOGI("Game is VULKAN");
     }
 
+    if(options & GAME_OPTION_DOOM_SET_DOOMWADDIR)
+    {
+        if(secondaryPath_c)
+        {
+            setenv("DOOMWADDIR", secondaryPath_c, 1);
+        }
+    }
+
     chdir(game_path.c_str());
 
 #ifndef NO_SEC
@@ -230,7 +247,8 @@ JAVA_FUNC(init)(JNIEnv *env, jobject thiz, jstring graphics_dir, jint options, j
 #endif
 
     touchInterface.init(mobile_screen_width, mobile_screen_height, filesPath.c_str(), touchSettingsPath.c_str(), options, wheelNbr, game);
-#if 0
+
+#if 1
     // Catch all these and exit for now. If this works add logging
     signal(SIGSEGV, androidGenericSignal);
     signal(SIGFPE, androidGenericSignal);
