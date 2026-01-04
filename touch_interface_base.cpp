@@ -698,7 +698,11 @@ void TouchInterfaceBase::mouseButton(int state, int code)
     }
     else if(code == KEY_RIGHT_MOUSE)
     {
+#if defined(QUAKESPASM_SPIKED) || defined(QUAKESPASM) || defined(DARKPLACES) || defined(FTEQW)
+        MouseButton(state, BUTTON_SECONDARY);
+#else
         PortableMouseButton(state, BUTTON_SECONDARY, 0, 0);
+#endif
     }
     else if((code == KEY_BACK_BUTTON) && state)
     {
