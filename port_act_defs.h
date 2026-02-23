@@ -137,6 +137,11 @@
 
 #define PORT_ACT_WEAP_ALT           114
 
+// Perfect Dark N64  - Reuses CUSTOMX button values
+#define PORT_ACT_N64_BUTTON_A        150
+#define PORT_ACT_N64_BUTTON_B        151
+
+
 // IONFURY
 #define PORT_ACT_MEDKIT            115
 #define PORT_ACT_RADAR             116
