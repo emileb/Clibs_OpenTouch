@@ -239,6 +239,12 @@ JAVA_FUNC(init)(JNIEnv *env, jobject thiz, jstring graphics_dir, jint options, j
         }
     }
 
+    //setenv("ALSOFT_LOGLEVEL", "3", 1);
+    if(options & GAME_OPTION_OPENAL_USE_OBOE)
+        setenv("ALSOFT_DRIVERS", "oboe", 1);
+    else
+        setenv("ALSOFT_DRIVERS", "opensl", 1);
+
     chdir(game_path.c_str());
 
 #ifndef NO_SEC
@@ -613,5 +619,11 @@ int checkGfx()
 #else
     return 0;
 #endif
+}
+
+
+void OpenSL_android_set_pause( void *Device, int pause )
+{
+
 }
 }
