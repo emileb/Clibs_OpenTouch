@@ -3,6 +3,7 @@
 //
 
 #include "touch_interface.h"
+#include "SDL_keycode.h"
 
 
 void TouchInterface::openGLStart()
@@ -67,24 +68,31 @@ void TouchInterface::createControls(std::string filesPath)
     tcGameMain->addControl(new touchcontrols::Button("attack", touchcontrols::RectF(20, 7, 23, 10), "shoot", KEY_SHOOT, false, false, "Attack!"));
     tcGameMain->addControl(new touchcontrols::Button("attack2", touchcontrols::RectF(3, 5, 6, 8), "shoot", KEY_SHOOT, false, true, "Attack! (duplicate)"));
 
+#ifdef PERFECT_DARK
+    tcGameMain->addControl(new touchcontrols::Button("a_button", touchcontrols::RectF(23, 6, 26, 9), "n64_a_button", PORT_ACT_N64_BUTTON_A, false, false, "A button"));
+    tcGameMain->addControl(new touchcontrols::Button("b_button", touchcontrols::RectF(20, 3, 23, 6), "n64_b_button", PORT_ACT_N64_BUTTON_B, false, false, "B button"));
+    tcGameMain->addControl(new touchcontrols::Button("radial", touchcontrols::RectF(3, 3, 5, 5), "inventory", PORT_ACT_INVEN, false, false, "Show radial menu"));
+    tcGameMain->addControl(new touchcontrols::Button("fire_mode", touchcontrols::RectF(24, 3, 26, 5), "toggle", PORT_ACT_ALT_ATTACK, false, false, "Fire mode"));
+#else
     tcGameMain->addControl(new touchcontrols::Button("use", touchcontrols::RectF(23, 6, 26, 9), "use", PORT_ACT_USE, false, false, "Use/Open"));
     tcGameMain->addControl(new touchcontrols::Button("quick_save", touchcontrols::RectF(24, 0, 26, 2), "save", PORT_ACT_QUICKSAVE, false, false, "Quick save"));
     tcGameMain->addControl(new touchcontrols::Button("quick_load", touchcontrols::RectF(20, 0, 22, 2), "load", PORT_ACT_QUICKLOAD, false, false, "Quick load"));
     tcGameMain->addControl(new touchcontrols::Button("map", touchcontrols::RectF(2, 0, 4, 2), "map", PORT_ACT_MAP, false, false, "Show map"));
-//#ifndef BSTONE
+#endif
+
     tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show keyboard"));
-//#endif
     tcGameMain->addControl(new touchcontrols::Button("show_mouse", touchcontrols::RectF(4, 0, 6, 2), "left_mouse", KEY_USE_MOUSE, false, true, "Use mouse"));
 
     bool hideJump = true;
-
     tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, hideJump, "Jump"));
 
     bool hideInventory = true;
-
     tcGameMain->addControl(new touchcontrols::Button("use_inventory", touchcontrols::RectF(0, 9, 2, 11), "inventory", KEY_SHOW_INV, false, hideInventory, "Show Inventory"));
-
+#ifdef PERFECT_DARK
+    tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, false, "Crouch"));
+#else
     tcGameMain->addControl(new touchcontrols::Button("crouch", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_DOWN, false, true, "Crouch"));
+#endif
     tcGameMain->addControl(new touchcontrols::Button("crouch_toggle", touchcontrols::RectF(24, 14, 26, 16), "crouch", PORT_ACT_TOGGLE_CROUCH, false, true, "Crouch (toggle)"));
     tcGameMain->addControl(new touchcontrols::Button("attack_alt", touchcontrols::RectF(21, 5, 23, 7), "shoot_alt", PORT_ACT_ALT_ATTACK, false, true, "Alt fire"));
     tcGameMain->addControl(new touchcontrols::Button("show_custom", touchcontrols::RectF(0, 7, 2, 9), "custom_show", KEY_SHOW_CUSTOM, false, true, "Show custom"));
@@ -93,6 +101,10 @@ void TouchInterface::createControls(std::string filesPath)
     tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 6), "ammo", PORT_ACT_NEXT_WEP, false, false, "Switch weapon"));
     tcGameMain->addControl(new touchcontrols::Button("fly_up", touchcontrols::RectF(24, 2, 26, 4), "direction_up", PORT_ACT_FLY_UP, false, false, "Fly Up"));
     tcGameMain->addControl(new touchcontrols::Button("fly_down", touchcontrols::RectF(24, 4, 26, 6), "direction_down", PORT_ACT_FLY_DOWN, false, false, "Fly Down"));
+#elifdef PERFECT_DARK
+    tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
+    tcGameMain->addControl(new touchcontrols::Button("reload", touchcontrols::RectF(0, 5, 3, 7), "reload", PORT_ACT_RELOAD, false, false, "Reload"));
+    tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 7, 3, 9), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
 #else
     tcGameMain->addControl(new touchcontrols::Button("next_weapon", touchcontrols::RectF(0, 3, 3, 5), "next_weap", PORT_ACT_NEXT_WEP, false, false, "Next weapon"));
     tcGameMain->addControl(new touchcontrols::Button("prev_weapon", touchcontrols::RectF(0, 5, 3, 7), "prev_weap", PORT_ACT_PREV_WEP, false, false, "Prev weapon"));
@@ -284,7 +296,7 @@ void TouchInterface::createControls(std::string filesPath)
 
 void TouchInterface::blankButton(int state, int code)
 {
-
+    PortableKeyEvent(state, SDL_SCANCODE_SPACE, 0);
 }
 
 void TouchInterface::automapButton(int state, int code)
