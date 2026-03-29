@@ -1,7 +1,7 @@
 #include <jni.h>
 #include "TouchControlsInterface.h"
 #include "JNITouchControlsUtils.h"
-#include "SDL_beloko_extra.h"
+#include "../../SDL_beloko_extra.h"
 
 #include "TouchControlsInterface.h"
 #include "touch_interface.h"
@@ -553,9 +553,9 @@ int isPlayerRunning()
 void MouseButton(int state, int button)
 {
     if(state)
-        SDL_InjectMouse(button, ACTION_DOWN, 0, 0, SDL_TRUE);
+        SDL_InjectMouse(button, ACTION_DOWN, 0, 0, 1);
     else
-        SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
+        SDL_InjectMouse(0, ACTION_UP, 0, 0, 1);
 }
 
 void MouseMove(float dx, float dy)
@@ -568,7 +568,7 @@ void MouseMove(float dx, float dy)
 
     if((fabs(mx) > 1) || (fabs(my) > 1))
     {
-        SDL_InjectMouse(0, ACTION_MOVE, (int) mx, (int) my, SDL_TRUE);
+        SDL_InjectMouse(0, ACTION_MOVE, (int) mx, (int) my, 1);
     }
 
     if(fabs(mx) > 1)

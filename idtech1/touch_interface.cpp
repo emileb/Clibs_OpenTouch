@@ -4,8 +4,11 @@
 
 #include "touch_interface.h"
 #include "Framebuffer.h"
+#ifdef USE_SDL3
+#include "SDL3/SDL_keycode.h"
+#else
 #include "SDL_keycode.h"
-
+#endif
 #define GAME_TYPE_DOOM     1 // Dont use 0 so we can detect serialization
 #define GAME_TYPE_HEXEN    2
 #define GAME_TYPE_HERETIC  3

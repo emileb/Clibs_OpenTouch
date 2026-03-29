@@ -6,8 +6,15 @@
 #include "TouchControlsInterface.h"
 #include "TouchControlsContainer.h"
 #include "Framebuffer.h"
-#include "SDL_beloko_extra.h"
+#include "../../SDL_beloko_extra.h"
+
+#ifdef USE_SDL3
+#include "SDL3/SDL.h"
+#include "SDL3/SDL_keycode.h"
+#else
 #include "SDL.h"
+#include "SDL_keycode.h"
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -18,7 +25,6 @@
 
 #include "touch_interface.h"
 #include "game_interface.h"
-#include "SDL_keycode.h"
 
 #ifdef CHOC_SETUP
 #define DEFAULT_FADE_FRAMES 0
@@ -38,9 +44,13 @@
 
 extern "C"
 {
+#ifdef USE_SDL3
+
+#else
 int Android_JNI_SendMessage(int command, int param);
 int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
 int SDL_SendKeyboardText(const char *text);
+#endif
 
 extern void setupStatic(void);
 extern void frameControlsSDLCallback(void);
@@ -309,7 +319,10 @@ void TouchInterfaceBase::gameButton(int state, int code)
     {
         if(state)
         {
+#ifdef USE_SDL3
+#else
             SDL_StartTextInput();
+#endif
         }
     }
     else if(code == KEY_BACK_BUTTON)
@@ -393,7 +406,12 @@ void TouchInterfaceBase::menuButton(int state, int code)
     if(code == KEY_SHOW_KBRD)
     {
         if(state)
+        {
+#ifdef USE_SDL3
+#else
             SDL_StartTextInput();
+#endif
+        }
 
         return;
     }
@@ -783,7 +801,10 @@ void TouchInterfaceBase::mobileBackButton(void)
 
     if(tcKeyboard->isEnabled())
     {
+#ifdef USE_SDL3
+#else
         SDL_StopTextInput();
+#endif
     }
     else if(tcInventory && tcInventory->isEnabled())
     {
@@ -1047,7 +1068,10 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
 
     if(key == UI_KEYBOARD_HIDE)
     {
+#ifdef USE_SDL3
+#else
         SDL_StopTextInput();
+#endif
         return;
     }
 
@@ -1065,7 +1089,8 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
     {
         key = key + 32;
     }
-
+#ifdef USE_SDL3
+#else
     SDL_Scancode sc = SDL_GetScancodeFromKey(key);
 
     // Send scancode
@@ -1075,10 +1100,15 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
         waitFrames(1); // Some games (EDuke) need a frame to register
         SDL_SendKeyboardKey(SDL_RELEASED, sc);
     }
-
+#endif
     // Send text if avaliable
     if(text[0])
+    {
+#ifdef USE_SDL3
+#else
         SDL_SendKeyboardText(text);
+#endif
+    }
 }
 
 void TouchInterfaceBase::hideControls(void)
@@ -1150,7 +1180,10 @@ void TouchInterfaceBase::gamepadAction(int state, int action)
     {
         if(state)
         {
+#ifdef USE_SDL3
+#else
             SDL_StartTextInput();
+#endif
         }
     }
     else if(action == PORT_ACT_SHOW_GP_UTILS)
