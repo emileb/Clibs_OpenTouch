@@ -45,7 +45,8 @@
 extern "C"
 {
 #ifdef USE_SDL3
-
+void SDL_SendKeyboardText(const char *text);
+bool SDL_SendKeyboardKey(Uint64 timestamp, SDL_KeyboardID keyboardID, int rawcode, SDL_Scancode scancode, bool down);
 #else
 int Android_JNI_SendMessage(int command, int param);
 int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
@@ -227,6 +228,8 @@ void TouchInterfaceBase::touchSettingsCallback(touchcontrols::tTouchSettings set
     if(tcDPadInventory) tcDPadInventory->setColour(touchSettings.defaultColor);
 }
 
+extern "C" SDL_Window* window;
+
 void TouchInterfaceBase::gameButton(int state, int code)
 {
 #ifndef NO_SEC
@@ -320,6 +323,7 @@ void TouchInterfaceBase::gameButton(int state, int code)
         if(state)
         {
 #ifdef USE_SDL3
+            SDL_StartTextInput(window);
 #else
             SDL_StartTextInput();
 #endif
@@ -408,6 +412,7 @@ void TouchInterfaceBase::menuButton(int state, int code)
         if(state)
         {
 #ifdef USE_SDL3
+            SDL_StartTextInput(window);
 #else
             SDL_StartTextInput();
 #endif
@@ -802,6 +807,7 @@ void TouchInterfaceBase::mobileBackButton(void)
     if(tcKeyboard->isEnabled())
     {
 #ifdef USE_SDL3
+        SDL_StopTextInput(window);
 #else
         SDL_StopTextInput();
 #endif
@@ -1069,6 +1075,7 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
     if(key == UI_KEYBOARD_HIDE)
     {
 #ifdef USE_SDL3
+        SDL_StopTextInput(window);
 #else
         SDL_StopTextInput();
 #endif
@@ -1090,6 +1097,15 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
         key = key + 32;
     }
 #ifdef USE_SDL3
+    #define SDL_DEFAULT_KEYBOARD_ID    1
+
+    SDL_Scancode sc = SDL_GetScancodeFromKey(key, NULL);
+    if(sc != SDL_SCANCODE_UNKNOWN)
+    {
+        SDL_SendKeyboardKey(0, SDL_DEFAULT_KEYBOARD_ID, key, sc, 1);
+        waitFrames(1); // Some games (EDuke) need a frame to register
+        SDL_SendKeyboardKey(0, SDL_DEFAULT_KEYBOARD_ID, key, sc, 0);
+    }
 #else
     SDL_Scancode sc = SDL_GetScancodeFromKey(key);
 
@@ -1105,6 +1121,7 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
     if(text[0])
     {
 #ifdef USE_SDL3
+        SDL_SendKeyboardText(text);
 #else
         SDL_SendKeyboardText(text);
 #endif
@@ -1181,6 +1198,7 @@ void TouchInterfaceBase::gamepadAction(int state, int action)
         if(state)
         {
 #ifdef USE_SDL3
+            SDL_StartTextInput(window);
 #else
             SDL_StartTextInput();
 #endif
