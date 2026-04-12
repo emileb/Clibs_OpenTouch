@@ -325,11 +325,7 @@ void TouchInterfaceBase::gameButton(int state, int code)
     {
         if(state)
         {
-#ifdef USE_SDL3
-            SDL_StartTextInput(window);
-#else
-            SDL_StartTextInput();
-#endif
+            startTextInput();
         }
     }
     else if(code == KEY_BACK_BUTTON)
@@ -414,11 +410,7 @@ void TouchInterfaceBase::menuButton(int state, int code)
     {
         if(state)
         {
-#ifdef USE_SDL3
-            SDL_StartTextInput(window);
-#else
-            SDL_StartTextInput();
-#endif
+            startTextInput();
         }
 
         return;
@@ -1200,11 +1192,7 @@ void TouchInterfaceBase::gamepadAction(int state, int action)
     {
         if(state)
         {
-#ifdef USE_SDL3
-            SDL_StartTextInput(window);
-#else
-            SDL_StartTextInput();
-#endif
+            startTextInput();
         }
     }
     else if(action == PORT_ACT_SHOW_GP_UTILS)
@@ -1509,4 +1497,13 @@ void TouchInterfaceBase::waitFrames(int nbrFrames)
     {
         usleep(1000); // wait 1ms
     }
+}
+
+void TouchInterfaceBase::startTextInput()
+{
+#ifdef USE_SDL3
+    SDL_StartTextInput(window);
+#else
+    SDL_StartTextInput();
+#endif
 }

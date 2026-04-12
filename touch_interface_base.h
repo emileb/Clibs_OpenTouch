@@ -231,6 +231,8 @@ public:
     {
         return (isWalking == 0);
     }
+
+    void startTextInput();
 };
 
 

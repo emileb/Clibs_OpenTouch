@@ -358,7 +358,8 @@ void TouchInterface::createControlsDoom(std::string filesPath)
 
     //Blank -------------------------------------------
     //------------------------------------------------------
-    tcBlank->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 0, 26, 16), "", 0x123));
+    tcBlank->addControl(new touchcontrols::Button("enter", touchcontrols::RectF(0, 2, 26, 16), "", 0x123));
+    tcBlank->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(2, 0, 4, 2), "keyboard", KEY_SHOW_KBRD));
 #if defined(GZDOOM1_9) || defined(ZANDRONUM_30)
     tcBlank->addControl(new touchcontrols::Button("fmod", touchcontrols::RectF(22, 0, 26, 1), "fmod_logo", 0));
     tcBlank->setAlpha(0.8);
@@ -702,24 +703,28 @@ void TouchInterface::createControlsDoom3(std::string filesPath)
 
 void TouchInterface::blankButton(int state, int code)
 {
+    if(code == KEY_SHOW_KBRD)
+    {
+        if(state)
+        {
+            TouchInterfaceBase::startTextInput();
+        }
+    }
+    else
+    {
 #if defined(PRBOOM_DOOM)
-
-    if(state)
-        PortableBackButton();
-
+        if(state)
+            PortableBackButton();
 #elif defined(D3ES) // Blank is used for cinematic, allow to skip them
-
-    if(state)
-        mobileBackButton();
-
+        if(state)
+            mobileBackButton();
 #elif defined(DSDA_DOOM)
-
-    PortableAction(state, PORT_ACT_ATTACK);
-
+        PortableAction(state, PORT_ACT_ATTACK);
 #else
-    PortableAction(state, PORT_ACT_USE);
-    PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
+        PortableAction(state, PORT_ACT_USE);
+        PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
 #endif
+    }
 }
 
 void TouchInterface::automapButton(int state, int code)
