@@ -88,6 +88,9 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath, const 
     if(options & GAME_OPTION_AUTO_HIDE_GAMEPAD)
         gamepadHideTouch = true;
 
+    if(options & GAME_OPTION_TOUCHJOY_MULTITOUCH)
+        touchcontrols::setTouchJoyMultiTouch(true);
+
     if(options & GAME_OPTION_HIDE_MENU_AND_GAME)
         hideGameAndMenu = true;
 
