@@ -802,5 +802,7 @@ void TouchInterface::newFrame()
 
 void TouchInterface::newGLContext()
 {
-
+#ifdef DOOM64EX // Fixes random touch textures being black
+    touchcontrols::setTextureNumberStart(10000);
+#endif
 }
