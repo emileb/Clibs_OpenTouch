@@ -73,6 +73,7 @@ void TouchInterface::createControls(std::string filesPath)
     tcGameMain->addControl(new touchcontrols::Button("b_button", touchcontrols::RectF(20, 3, 23, 6), "n64_b_button", PORT_ACT_N64_BUTTON_B, false, false, "B button"));
     tcGameMain->addControl(new touchcontrols::Button("radial", touchcontrols::RectF(3, 3, 5, 5), "inventory", PORT_ACT_INVEN, false, false, "Show radial menu"));
     tcGameMain->addControl(new touchcontrols::Button("fire_mode", touchcontrols::RectF(24, 3, 26, 5), "toggle", PORT_ACT_ALT_ATTACK, false, false, "Fire mode"));
+    tcGameMain->addControl(new touchcontrols::Button("alt_aim", touchcontrols::RectF(3, 5, 5, 7), "zoom", PORT_ACT_ZOOM_IN, false, false, "Aim mode"));
 #else
     tcGameMain->addControl(new touchcontrols::Button("use", touchcontrols::RectF(23, 6, 26, 9), "use", PORT_ACT_USE, false, false, "Use/Open"));
     tcGameMain->addControl(new touchcontrols::Button("quick_save", touchcontrols::RectF(24, 0, 26, 2), "save", PORT_ACT_QUICKSAVE, false, false, "Quick save"));
