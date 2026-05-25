@@ -82,6 +82,8 @@ extern void MouseButton(int state, int button);
 
 extern void MouseMove(float dx, float dy);
 
+extern void MouseMoveAbsolute(float dx, float dy);
+
 #ifdef __cplusplus
 }
 #endif

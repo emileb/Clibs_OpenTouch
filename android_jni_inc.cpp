@@ -578,6 +578,12 @@ void MouseMove(float dx, float dy)
         my = fmod(my, 1);
 }
 
+
+extern void MouseMoveAbsolute(float dx, float dy)
+{
+    SDL_InjectMouse(0, ACTION_MOVE, (int) dx, (int) dy, 0);
+}
+
 int getGameType()
 {
     return gameType;
