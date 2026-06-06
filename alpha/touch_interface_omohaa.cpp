@@ -142,6 +142,7 @@ void TouchInterface::createControls(std::string filesPath)
     tcGameMain->addControl(new touchcontrols::Button("quick_save", touchcontrols::RectF(24, 0, 26, 2), "save", PORT_ACT_QUICKSAVE, false, false, "Quick save"));
     tcGameMain->addControl(new touchcontrols::Button("quick_load", touchcontrols::RectF(20, 0, 22, 2), "load", PORT_ACT_QUICKLOAD, false, false, "Quick load"));
     tcGameMain->addControl(new touchcontrols::Button("objectives", touchcontrols::RectF(17, 0, 19, 2), "notebook", PORT_ACT_DATAPAD, false, false, "Objectives"));
+    tcGameMain->addControl(new touchcontrols::Button("holster", touchcontrols::RectF(15, 0, 17, 2), "holster", PORT_ACT_HOLSTER_WEAPON, false, false, "Holster weapon"));
 
     tcGameMain->addControl(new touchcontrols::Button("keyboard", touchcontrols::RectF(8, 0, 10, 2), "keyboard", KEY_SHOW_KBRD, false, false, "Show Keyboard"));
     tcGameMain->addControl(new touchcontrols::Button("jump", touchcontrols::RectF(24, 3, 26, 5), "jump", PORT_ACT_JUMP, false, false, "Jump/Swim up"));
