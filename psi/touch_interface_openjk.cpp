@@ -13,20 +13,143 @@ extern int mobile_screen_height;
 #include "touch_interface.h"
 #include "SDL_keycode.h"
 #include <fstream>
+#include <GLES/gl.h>
 
 // Local UI code (not a game action) to toggle the force-select panel. Picked to
 // not collide with the base KEY_* codes (0x1000-0x10013) or any PORT_ACT_*.
 #define KEY_SHOW_FORCE 0x1100
 
+// Alpha multiplier for a force button whose power the player hasn't learned yet
+// (fraction of the panel's normal alpha). Available powers use 1.0 (unchanged).
+#define FORCE_DIM_ALPHA 0.3f
+
+// The 4x3 grid of force-power buttons, kept so we can dim the ones the player
+// can't use. Paired with the PORT_ACT_FORCE_* used to query availability.
+static struct
+{
+    touchcontrols::Button *button;
+    int                    portAct;
+} s_forceButtons[16];
+static int s_forceButtonCount = 0;
+
+// Add a force button to the panel and remember it for availability updates.
+static void addForceButton(touchcontrols::TouchControls *tc, touchcontrols::Button *b, int portAct)
+{
+    tc->addControl(b);
+    if(s_forceButtonCount < (int) (sizeof(s_forceButtons) / sizeof(s_forceButtons[0])))
+    {
+        s_forceButtons[s_forceButtonCount].button  = b;
+        s_forceButtons[s_forceButtonCount].portAct = portAct;
+        s_forceButtonCount++;
+    }
+}
+
+// Dim the force buttons whose power the player doesn't currently have. Called
+// whenever the force-select panel is shown (and while it stays open).
+static void updateForceSelectAvailability()
+{
+    for(int i = 0; i < s_forceButtonCount; i++)
+    {
+        bool known = PortableGetForcePowerKnown(s_forceButtons[i].portAct);
+        // Available -> full alpha (1.0, unchanged); unavailable -> dimmed.
+        s_forceButtons[i].button->setAlpha(known ? 1.0f : FORCE_DIM_ALPHA);
+    }
+}
+
+// OpenJK (rd-vanilla) runs the fixed-function GLES1 renderer and caches GL state
+// in glState (tr_local.h): bound textures, active tmu, texEnv, cull, blend bits.
+// GL_Bind/GL_State/GL_Cull skip the actual GL call whenever the cache already
+// matches. The touch controls (gl_startRender + the button render) change blend,
+// cull, alpha test, texture-2D enable, the client array states, texEnv, the bound
+// texture, current colour and the viewport with raw GL calls behind that cache's
+// back. The result is a stale cache that corrupts later draws that trust it - most
+// visibly cinematics (RE_StretchRaw). gl_endRender only restores the matrices, so
+// we snapshot the rest before rendering and put it back afterwards, keeping the
+// real GL state consistent with the renderer's cache.
+static struct
+{
+    GLboolean blend, cullFace, alphaTest, depthTest, scissorTest, texture2D;
+    GLboolean vertexArray, texCoordArray, colorArray;
+    GLint     blendSrc, blendDst;
+    GLint     cullFaceMode;
+    GLint     texEnvMode;
+    GLint     texBinding;
+    GLint     activeTexture, clientActiveTexture;
+    GLint     viewport[4];
+    GLfloat   color[4];
+} s_savedGL;
+
+static inline void setEnabled(GLenum cap, GLboolean on)
+{
+    if(on)
+        glEnable(cap);
+    else
+        glDisable(cap);
+}
+
+static inline void setClientState(GLenum cap, GLboolean on)
+{
+    if(on)
+        glEnableClientState(cap);
+    else
+        glDisableClientState(cap);
+}
+
 void TouchInterface::openGLStart()
 {
-    touchcontrols::gl_startRender();
+    s_savedGL.blend        = glIsEnabled(GL_BLEND);
+    s_savedGL.cullFace     = glIsEnabled(GL_CULL_FACE);
+    s_savedGL.alphaTest    = glIsEnabled(GL_ALPHA_TEST);
+    s_savedGL.depthTest    = glIsEnabled(GL_DEPTH_TEST);
+    s_savedGL.scissorTest  = glIsEnabled(GL_SCISSOR_TEST);
+    s_savedGL.texture2D    = glIsEnabled(GL_TEXTURE_2D);
+    s_savedGL.vertexArray   = glIsEnabled(GL_VERTEX_ARRAY);
+    s_savedGL.texCoordArray = glIsEnabled(GL_TEXTURE_COORD_ARRAY);
+    s_savedGL.colorArray    = glIsEnabled(GL_COLOR_ARRAY);
 
+    glGetIntegerv(GL_BLEND_SRC, &s_savedGL.blendSrc);
+    glGetIntegerv(GL_BLEND_DST, &s_savedGL.blendDst);
+    glGetIntegerv(GL_CULL_FACE_MODE, &s_savedGL.cullFaceMode);
+    glGetTexEnviv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &s_savedGL.texEnvMode);
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &s_savedGL.texBinding);
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &s_savedGL.activeTexture);
+    glGetIntegerv(GL_CLIENT_ACTIVE_TEXTURE, &s_savedGL.clientActiveTexture);
+    glGetIntegerv(GL_VIEWPORT, s_savedGL.viewport);
+    glGetFloatv(GL_CURRENT_COLOR, s_savedGL.color);
+
+    touchcontrols::gl_startRender();
+    glDisable(GL_DEPTH_TEST);
 };
 
 void TouchInterface::openGLEnd()
 {
+    // Restores the projection/modelview matrices (and the framebuffer).
     touchcontrols::gl_endRender();
+
+    // Put back the active/client-active units first so the texEnv and binding
+    // restores below land on the unit they were captured from.
+    glActiveTexture(s_savedGL.activeTexture);
+    glClientActiveTexture(s_savedGL.clientActiveTexture);
+
+    glBindTexture(GL_TEXTURE_2D, s_savedGL.texBinding);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, s_savedGL.texEnvMode);
+    glBlendFunc(s_savedGL.blendSrc, s_savedGL.blendDst);
+    glCullFace(s_savedGL.cullFaceMode);
+    glViewport(s_savedGL.viewport[0], s_savedGL.viewport[1],
+               s_savedGL.viewport[2], s_savedGL.viewport[3]);
+    glColor4f(s_savedGL.color[0], s_savedGL.color[1],
+              s_savedGL.color[2], s_savedGL.color[3]);
+
+    setEnabled(GL_BLEND, s_savedGL.blend);
+    setEnabled(GL_CULL_FACE, s_savedGL.cullFace);
+    setEnabled(GL_ALPHA_TEST, s_savedGL.alphaTest);
+    setEnabled(GL_DEPTH_TEST, s_savedGL.depthTest);
+    setEnabled(GL_SCISSOR_TEST, s_savedGL.scissorTest);
+    setEnabled(GL_TEXTURE_2D, s_savedGL.texture2D);
+
+    setClientState(GL_VERTEX_ARRAY, s_savedGL.vertexArray);
+    setClientState(GL_TEXTURE_COORD_ARRAY, s_savedGL.texCoordArray);
+    setClientState(GL_COLOR_ARRAY, s_savedGL.colorArray);
 };
 
 void TouchInterface::mouseMove(int action, float x, float y, float mouse_x, float mouse_y)
@@ -202,21 +325,22 @@ void TouchInterface::createControls(std::string filesPath)
     //------------------------------------------------------
     // Pop-up grid of every force power (ported from jk3_old/android-jni.cpp).
     // Hidden by default; toggled by the KEY_SHOW_FORCE button on the game screen.
+    s_forceButtonCount = 0; // reset in case controls get rebuilt
     // Light side
-    tcForceSelect->addControl(new touchcontrols::Button("force_absorb",  touchcontrols::RectF(4, 2, 7, 5),   "f_lt_absorb",  PORT_ACT_FORCE_ABSORB));
-    tcForceSelect->addControl(new touchcontrols::Button("force_heal",    touchcontrols::RectF(4, 5, 7, 8),   "f_lt_heal",    PORT_ACT_FORCE_HEAL));
-    tcForceSelect->addControl(new touchcontrols::Button("force_mind",    touchcontrols::RectF(4, 8, 7, 11),  "f_lt_mind",    PORT_ACT_FORCE_MIND));
-    tcForceSelect->addControl(new touchcontrols::Button("force_protect", touchcontrols::RectF(4, 11, 7, 14), "f_lt_protect", PORT_ACT_FORCE_PROTECT));
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_absorb",  touchcontrols::RectF(4, 2, 7, 5),   "f_lt_absorb",  PORT_ACT_FORCE_ABSORB),  PORT_ACT_FORCE_ABSORB);
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_heal",    touchcontrols::RectF(4, 5, 7, 8),   "f_lt_heal",    PORT_ACT_FORCE_HEAL),    PORT_ACT_FORCE_HEAL);
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_mind",    touchcontrols::RectF(4, 8, 7, 11),  "f_lt_mind",    PORT_ACT_FORCE_MIND),    PORT_ACT_FORCE_MIND);
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_protect", touchcontrols::RectF(4, 11, 7, 14), "f_lt_protect", PORT_ACT_FORCE_PROTECT), PORT_ACT_FORCE_PROTECT);
     // Neutral
-    tcForceSelect->addControl(new touchcontrols::Button("force_pull",    touchcontrols::RectF(7, 2, 10, 5),   "force_pull",  PORT_ACT_FORCE_PULL));
-    tcForceSelect->addControl(new touchcontrols::Button("force_speed",   touchcontrols::RectF(7, 5, 10, 8),   "force_speed", PORT_ACT_FORCE_SPEED));
-    tcForceSelect->addControl(new touchcontrols::Button("force_push",    touchcontrols::RectF(7, 8, 10, 11),  "force_push",  PORT_ACT_FORCE_PUSH));
-    tcForceSelect->addControl(new touchcontrols::Button("force_sight",   touchcontrols::RectF(7, 11, 10, 14), "force_sence", PORT_ACT_FORCE_SIGHT));
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_pull",    touchcontrols::RectF(7, 2, 10, 5),   "force_pull",  PORT_ACT_FORCE_PULL),  PORT_ACT_FORCE_PULL);
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_speed",   touchcontrols::RectF(7, 5, 10, 8),   "force_speed", PORT_ACT_FORCE_SPEED), PORT_ACT_FORCE_SPEED);
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_push",    touchcontrols::RectF(7, 8, 10, 11),  "force_push",  PORT_ACT_FORCE_PUSH),  PORT_ACT_FORCE_PUSH);
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_sight",   touchcontrols::RectF(7, 11, 10, 14), "force_sence", PORT_ACT_FORCE_SIGHT), PORT_ACT_FORCE_SIGHT);
     // Dark side
-    tcForceSelect->addControl(new touchcontrols::Button("force_drain",     touchcontrols::RectF(10, 2, 13, 5),   "f_dk_drain",     PORT_ACT_FORCE_DRAIN));
-    tcForceSelect->addControl(new touchcontrols::Button("force_grip",      touchcontrols::RectF(10, 5, 13, 8),   "f_dk_grip",      PORT_ACT_FORCE_GRIP));
-    tcForceSelect->addControl(new touchcontrols::Button("force_lightning", touchcontrols::RectF(10, 8, 13, 11),  "f_dk_lightning", PORT_ACT_FORCE_LIGHT));
-    tcForceSelect->addControl(new touchcontrols::Button("force_rage",      touchcontrols::RectF(10, 11, 13, 14), "f_dk_rage",      PORT_ACT_FORCE_RAGE));
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_drain",     touchcontrols::RectF(10, 2, 13, 5),   "f_dk_drain",     PORT_ACT_FORCE_DRAIN), PORT_ACT_FORCE_DRAIN);
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_grip",      touchcontrols::RectF(10, 5, 13, 8),   "f_dk_grip",      PORT_ACT_FORCE_GRIP),  PORT_ACT_FORCE_GRIP);
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_lightning", touchcontrols::RectF(10, 8, 13, 11),  "f_dk_lightning", PORT_ACT_FORCE_LIGHT), PORT_ACT_FORCE_LIGHT);
+    addForceButton(tcForceSelect, new touchcontrols::Button("force_rage",      touchcontrols::RectF(10, 11, 13, 14), "f_dk_rage",      PORT_ACT_FORCE_RAGE),  PORT_ACT_FORCE_RAGE);
 
     tcForceSelect->signal_button.connect(sigc::mem_fun(this, &TouchInterface::forceSelectButton));
     tcForceSelect->setAlpha(0.8);
@@ -386,7 +510,7 @@ void TouchInterface::createControls(std::string filesPath)
 
 void TouchInterface::blankButton(int state, int code)
 {
-    PortableAction(state, PORT_ACT_USE);
+    // Shown during cinematics (TS_BLANK): a tap sends Enter to advance/skip.
     PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
 }
 
@@ -421,6 +545,11 @@ void TouchInterface::newFrame()
     if(screenMode != TS_GAME && tcForceSelect && tcForceSelect->enabled)
         tcForceSelect->setEnabled(false);
 
+    // Keep the force buttons' dim state current while the panel is open (the
+    // player may learn a power, e.g. via a level-up, with the panel showing).
+    if(screenMode == TS_GAME && tcForceSelect && tcForceSelect->enabled)
+        updateForceSelectAvailability();
+
     updateTouchScreenModeOut(screenMode);
     updateTouchScreenModeIn(screenMode);
 
@@ -440,7 +569,11 @@ void TouchInterface::gameButton(int state, int code)
         if(state == 1 && tcForceSelect)
         {
             if(!tcForceSelect->enabled)
+            {
+                // Dim the powers the player doesn't have before showing the panel.
+                updateForceSelectAvailability();
                 tcForceSelect->animateIn(5);
+            }
             else
                 tcForceSelect->animateOut(5);
         }

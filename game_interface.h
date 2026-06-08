@@ -70,6 +70,12 @@ bool PortableSetAlwaysRun(bool run);
 
 touchscreemode_t PortableGetScreenMode();
 
+// Whether the player currently has the given force power available, keyed by the
+// PORT_ACT_FORCE_* action code. Engine-specific (implemented by OpenJK); lets the
+// touch UI dim force buttons for powers the player hasn't learned. Engines that
+// don't implement it simply never call it.
+bool PortableGetForcePowerKnown(int forceAction);
+
 int isPlayerRunning();
 
 #define ACTION_DOWN 0

@@ -362,6 +362,15 @@ void TouchInterface::blankButton(int state, int code)
     PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
 }
 
+// TFE has no force-select panel; the base handling is all it needs. This
+// definition exists only because the shared psi/touch_interface.h declares
+// gameButton as an override (used by the OpenJK build's force panel), which
+// shadows the base and so requires a definition in every engine that uses it.
+void TouchInterface::gameButton(int state, int code)
+{
+    TouchInterfaceBase::gameButton(state, code);
+}
+
 void TouchInterface::automapButton(int state, int code)
 {
 
