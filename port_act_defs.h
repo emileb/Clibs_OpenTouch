@@ -119,6 +119,7 @@
 
 #define PORT_ACT_GYRO_TOGGLE        96
 
+#define PORT_ACT_HOLSTER_WEAPON     97
 
 #define PORT_ACT_WEAP0              100
 #define PORT_ACT_WEAP1              101
