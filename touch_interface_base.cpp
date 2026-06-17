@@ -97,6 +97,12 @@ void TouchInterfaceBase::init(int width, int height, const char *pngPath, const 
     if(options & GAME_OPTION_USE_SYSTEM_KEYBOARD)
         useSystemKeyboard = true;
 
+#ifdef GAME_HAS_MOUSE_TAP_MODE
+    // Only engines that implement the in-menu tap-to-position mouse (TFE / OpenJK) define this
+    // compile flag; PortableSetMouseTapMode is not linked by other apps sharing Clibs_OpenTouch.
+    PortableSetMouseTapMode((options & GAME_OPTION_MOUSE_TAP_MODE) ? 1 : 0);
+#endif
+
     int glesVersion = 1;
 
     if(options & GAME_OPTION_GLES2)
