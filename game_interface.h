@@ -64,6 +64,11 @@ void PortableCommand(const char *cmd);
 
 void PortableAutomapControl(float zoom, float x, float y);
 
+// TFE-only: drain the accumulated PortableAutomapControl() pan/zoom and apply it to
+// the DarkForces automap. Must be called on the engine main thread (TFE calls it from
+// pda_handleInput()). Only implemented by the TFE build.
+void PortableApplyMapTouch(void);
+
 int PortableShowKeyboard(void);
 
 bool PortableSetAlwaysRun(bool run);

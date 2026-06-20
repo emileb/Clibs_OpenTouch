@@ -981,11 +981,14 @@ void TouchInterfaceBase::updateTouchScreenModeIn(touchscreemode_t mode)
             case TS_MAP:
             {
                 // This is a bit of hack. We want the map button to be in the same place as the game map button
-                // So move it
+                // So move it. Some engines (TFE) have no "map" button, so guard the lookup.
                 touchcontrols::Button *mapGame = (touchcontrols::Button *) tcGameMain->getControl("map");
                 touchcontrols::Button *map = (touchcontrols::Button *) tcAutomap->getControl("map");
-                map->controlPos = mapGame->controlPos;
-                map->updateSize();
+                if(mapGame && map)
+                {
+                    map->controlPos = mapGame->controlPos;
+                    map->updateSize();
+                }
 
                 tcAutomap->setEnabled(true);
                 tcAutomap->fade(touchcontrols::FADE_IN, DEFAULT_FADE_FRAMES);

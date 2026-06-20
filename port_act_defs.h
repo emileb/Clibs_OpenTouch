@@ -205,6 +205,13 @@
 #define PORT_ACT_FLASH_LIGHT      200
 #define PORT_ACT_SPRINT           201
 
+//Dark Forces (TheForceEngine) inventory items. Holster reuses PORT_ACT_HOLSTER_WEAPON (97).
+#define PORT_ACT_DF_NIGHT_VISION  210
+#define PORT_ACT_DF_CLEATS        211
+#define PORT_ACT_DF_GAS_MASK      212
+#define PORT_ACT_DF_HEAD_LAMP     213
+#define PORT_ACT_DF_HEADWAVE      214
+
 
 #define PORT_ACT_MENU_UP                  0x200 //512
 #define PORT_ACT_MENU_DOWN                0x201 //513
