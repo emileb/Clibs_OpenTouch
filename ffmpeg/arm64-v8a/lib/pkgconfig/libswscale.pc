@@ -1,0 +1,14 @@
+prefix=/Users/emilebelanger/Android/AndroidStudioProjects/OpenTouch/opentouch/src/main/jni/Quake/ffmpeg/arm64-v8a
+exec_prefix=${prefix}
+libdir=/Users/emilebelanger/Android/AndroidStudioProjects/OpenTouch/opentouch/src/main/jni/Quake/ffmpeg/arm64-v8a/lib
+includedir=/Users/emilebelanger/Android/AndroidStudioProjects/OpenTouch/opentouch/src/main/jni/Quake/ffmpeg/arm64-v8a/include
+
+Name: libswscale
+Description: FFmpeg image rescaling library
+Version: 9.5.102
+Requires: 
+Requires.private: libavutil >= 60.26.102
+Conflicts:
+Libs: -L${libdir}  -lswscale 
+Libs.private: -lm -latomic
+Cflags: -I${includedir}
