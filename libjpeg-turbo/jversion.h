@@ -1,0 +1,34 @@
+/*
+ * jversion.h - hand-generated for the Android NDK build (COPYRIGHT_YEAR=2023).
+ */
+
+#if JPEG_LIB_VERSION >= 80
+
+#define JVERSION        "8d  15-Jan-2012"
+
+#elif JPEG_LIB_VERSION >= 70
+
+#define JVERSION        "7  27-Jun-2009"
+
+#else
+
+#define JVERSION        "6b  27-Mar-1998"
+
+#endif
+
+#define JCOPYRIGHT \
+  "Copyright (C) 2009-2023 D. R. Commander\n" \
+  "Copyright (C) 2015, 2020 Google, Inc.\n" \
+  "Copyright (C) 2019-2020 Arm Limited\n" \
+  "Copyright (C) 2015-2016, 2018 Matthieu Darbois\n" \
+  "Copyright (C) 2011-2016 Siarhei Siamashka\n" \
+  "Copyright (C) 2015 Intel Corporation\n" \
+  "Copyright (C) 2013-2014 Linaro Limited\n" \
+  "Copyright (C) 2013-2014 MIPS Technologies, Inc.\n" \
+  "Copyright (C) 2009, 2012 Pierre Ossman for Cendio AB\n" \
+  "Copyright (C) 2009-2011 Nokia Corporation and/or its subsidiary(-ies)\n" \
+  "Copyright (C) 1999-2006 MIYASAKA Masaru\n" \
+  "Copyright (C) 1991-2020 Thomas G. Lane, Guido Vollbeding"
+
+#define JCOPYRIGHT_SHORT \
+  "Copyright (C) 2023 The libjpeg-turbo Project and many others"
