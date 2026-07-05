@@ -36,6 +36,8 @@ int mobile_screen_height;
 int game_screen_width; // Game screen size, could be smaller than above due to framebuffer
 int game_screen_height;
 
+int game_maintain_aspect; // Framebuffer keeps game aspect (letterboxed) instead of stretching to fill
+
 bool allowGyro = true; // Used to toggle gyro on/off
 
 static TouchInterface touchInterface;
@@ -291,6 +293,8 @@ JAVA_FUNC(setFramebufferSize)(JNIEnv *env, jobject thiz, jint width, jint height
     config.vidWidthReal = mobile_screen_width;
     config.vidHeightReal = mobile_screen_height;
     config.maintainAspect = aspect;
+
+    game_maintain_aspect = aspect;
 
     if(config.vidWidth != 0 && config.vidHeight != 0)
     {
