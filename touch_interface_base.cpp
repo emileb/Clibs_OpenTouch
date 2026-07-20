@@ -1072,6 +1072,39 @@ void TouchInterfaceBase::createCustomControls(touchcontrols::TouchControls *cust
 }
 
 
+// Shifted symbols (US layout) have no scancode of their own - SDL_GetScancodeFromKey
+// only resolves a key's *unshifted* production, so e.g. '_' fails outright even
+// though Shift+'-' produces it. Map back to the unshifted key so callers can hold
+// Shift instead of silently sending no scancode at all.
+static char shiftedSymbolToBaseKey(char c)
+{
+    switch(c)
+    {
+        case '!': return '1';
+        case '@': return '2';
+        case '#': return '3';
+        case '$': return '4';
+        case '%': return '5';
+        case '^': return '6';
+        case '&': return '7';
+        case '*': return '8';
+        case '(': return '9';
+        case ')': return '0';
+        case '_': return '-';
+        case '+': return '=';
+        case '{': return '[';
+        case '}': return ']';
+        case ':': return ';';
+        case '"': return '\'';
+        case '<': return ',';
+        case '>': return '.';
+        case '?': return '/';
+        case '~': return '`';
+        case '|': return '\\';
+        default:  return 0;
+    }
+}
+
 void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
 {
     LOGI("Keyboard press: %d , %c", key, (char) key);
@@ -1104,32 +1137,67 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
     #define SDL_DEFAULT_KEYBOARD_ID    1
 
     SDL_Scancode sc = SDL_GetScancodeFromKey(key, NULL);
+    bool needShift = false;
+    if(sc == SDL_SCANCODE_UNKNOWN)
+    {
+        char base = shiftedSymbolToBaseKey((char) key);
+        if(base)
+        {
+            sc = SDL_GetScancodeFromKey(base, NULL);
+            needShift = (sc != SDL_SCANCODE_UNKNOWN);
+        }
+    }
     if(sc != SDL_SCANCODE_UNKNOWN)
     {
+        if(needShift) SDL_SendKeyboardKey(0, SDL_DEFAULT_KEYBOARD_ID, SDLK_LSHIFT, SDL_SCANCODE_LSHIFT, 1);
         SDL_SendKeyboardKey(0, SDL_DEFAULT_KEYBOARD_ID, key, sc, 1);
+    }
+
+    // Send text between press and release, matching real keyboard event order
+    // (KEYDOWN -> TEXTINPUT -> KEYUP). Some consumers (e.g. UT99's UWindow
+    // console) treat a press/release with no text in between as a non-text key
+    // and silently drop text that arrives after the release.
+    if(text[0])
+        SDL_SendKeyboardText(text);
+
+    if(sc != SDL_SCANCODE_UNKNOWN)
+    {
         waitFrames(1); // Some games (EDuke) need a frame to register
         SDL_SendKeyboardKey(0, SDL_DEFAULT_KEYBOARD_ID, key, sc, 0);
+        if(needShift) SDL_SendKeyboardKey(0, SDL_DEFAULT_KEYBOARD_ID, SDLK_LSHIFT, SDL_SCANCODE_LSHIFT, 0);
     }
 #else
     SDL_Scancode sc = SDL_GetScancodeFromKey(key);
-
-    // Send scancode
+    bool needShift = false;
+    if(sc == SDL_SCANCODE_UNKNOWN)
+    {
+        char base = shiftedSymbolToBaseKey((char) key);
+        if(base)
+        {
+            sc = SDL_GetScancodeFromKey(base);
+            needShift = (sc != SDL_SCANCODE_UNKNOWN);
+        }
+    }
     if(sc != SDL_SCANCODE_UNKNOWN)
     {
+        if(needShift) SDL_SendKeyboardKey(SDL_PRESSED, SDL_SCANCODE_LSHIFT);
         SDL_SendKeyboardKey(SDL_PRESSED, sc);
+    }
+
+    // Send text between press and release, matching real keyboard event order
+    // (KEYDOWN -> TEXTINPUT -> KEYUP). Some consumers (e.g. UT99's UWindow
+    // console) treat a press/release with no text in between as a non-text key
+    // and silently drop text that arrives after the release.
+    if(text[0])
+        SDL_SendKeyboardText(text);
+
+    if(sc != SDL_SCANCODE_UNKNOWN)
+    {
         waitFrames(1); // Some games (EDuke) need a frame to register
         SDL_SendKeyboardKey(SDL_RELEASED, sc);
+        if(needShift) SDL_SendKeyboardKey(SDL_RELEASED, SDL_SCANCODE_LSHIFT);
     }
 #endif
-    // Send text if avaliable
-    if(text[0])
-    {
-#ifdef USE_SDL3
-        SDL_SendKeyboardText(text);
-#else
-        SDL_SendKeyboardText(text);
-#endif
-    }
 }
 
 void TouchInterfaceBase::hideControls(void)
