@@ -1,0 +1,14 @@
+prefix=/Users/emilebelanger/Android/AndroidStudioProjects/OpenTouch/opentouch/src/main/jni/Quake/ffmpeg/armeabi-v7a
+exec_prefix=${prefix}
+libdir=/Users/emilebelanger/Android/AndroidStudioProjects/OpenTouch/opentouch/src/main/jni/Quake/ffmpeg/armeabi-v7a/lib
+includedir=/Users/emilebelanger/Android/AndroidStudioProjects/OpenTouch/opentouch/src/main/jni/Quake/ffmpeg/armeabi-v7a/include
+
+Name: libavformat
+Description: FFmpeg container format library
+Version: 62.12.102
+Requires: 
+Requires.private: libavcodec >= 62.28.102, libavutil >= 60.26.102
+Conflicts:
+Libs: -L${libdir}  -lavformat 
+Libs.private: -lm -latomic
+Cflags: -I${includedir}

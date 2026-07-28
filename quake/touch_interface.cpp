@@ -499,8 +499,8 @@ void TouchInterface::createControls(std::string filesPath)
 void TouchInterface::blankButton(int state, int code)
 {
     PortableAction(state, PORT_ACT_USE);
-#if DARKPLACES_NONO // Needed because demos need esc
-    PortableKeyEvent(state, SDL_SCANCODE_ESCAPE, 0);
+#if Q2REPRO // Needed because demos need esc
+    PortableKeyEvent(state, SDL_SCANCODE_SPACE, 0);
 #else
     PortableKeyEvent(state, SDL_SCANCODE_RETURN, 0);
 #endif
