@@ -47,6 +47,7 @@ extern "C"
 #ifdef USE_SDL3
 void SDL_SendKeyboardText(const char *text);
 bool SDL_SendKeyboardKey(Uint64 timestamp, SDL_KeyboardID keyboardID, int rawcode, SDL_Scancode scancode, bool down);
+int Android_JNI_SendMessage(int command, int param);
 #else
 int Android_JNI_SendMessage(int command, int param);
 int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
