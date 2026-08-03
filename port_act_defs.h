@@ -221,6 +221,17 @@
 #define PORT_ACT_DODGE_FWD        223
 #define PORT_ACT_DODGE_BACK       224
 
+//Aliens vs Predator, species abilities
+#define PORT_ACT_AVP_VISION       230 // Marine image intensifier / Alien sense
+#define PORT_ACT_AVP_CLOAK        231
+#define PORT_ACT_AVP_CYCLE_VISION 232
+#define PORT_ACT_AVP_FLARE        233
+#define PORT_ACT_AVP_JETPACK      234
+#define PORT_ACT_AVP_GRAPPLE      235
+#define PORT_ACT_AVP_RECALL_DISC  236
+#define PORT_ACT_AVP_ZOOM_IN      237
+#define PORT_ACT_AVP_ZOOM_OUT     238
+
 
 #define PORT_ACT_MENU_UP                  0x200 //512
 #define PORT_ACT_MENU_DOWN                0x201 //513
