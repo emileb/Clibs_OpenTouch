@@ -40,6 +40,7 @@
 #define COMMAND_VIBRATE            0x8005
 #define COMMAND_LOAD_SAVE_CONTROLS 0x8006
 #define COMMAND_SHOW_QUICK_COMMANDS 0x8008
+#define COMMAND_SHOW_ENGINE_OPTIONS 0x8009
 
 
 extern "C"
@@ -362,6 +363,11 @@ void TouchInterfaceBase::gameButton(int state, int code)
     {
         if(state)
             Android_JNI_SendMessage(COMMAND_SHOW_QUICK_COMMANDS, 0);
+    }
+    else if(code == KEY_SHOW_ENGINE_OPTIONS)
+    {
+        if(state)
+            Android_JNI_SendMessage(COMMAND_SHOW_ENGINE_OPTIONS, 0);
     }
     else if(code == PORT_ACT_GYRO_TOGGLE)
     {
