@@ -210,9 +210,10 @@ public:
 
     int volumeKey(int state, bool volumeUp);
 
-    bool saveControlSettings(std::string path);
+    // Virtual: engines with more than one game screen (AVP) save/load extra files.
+    virtual bool saveControlSettings(std::string path);
 
-    bool loadControlSettings(std::string path);
+    virtual bool loadControlSettings(std::string path);
 
     void executeCommand(const char *cmd);
 
