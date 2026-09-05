@@ -17,6 +17,7 @@
 #include <map>
 #include <algorithm>
 #include <cstring>
+#include <ctype.h>
 
 // glslang numbers in/out per stage by declaration order, which differs between main.vp and main.fp,
 // so varying locations are assigned here by name across both stages instead.
@@ -135,6 +136,48 @@ static const TBuiltInResource DefaultTBuiltInResource = {
 	}
 };
 
+// GLES has no fp64, and SPIRV-Cross cannot lower it, so demote before glslang builds Float64 types.
+// Mod shaders declare doubles by accident (desktop GL accepts them) and never need the extra precision.
+static void DemoteDoubles(std::string &s)
+{
+	static const std::map<std::string, std::string> types = {
+		{ "double", "float" },
+		{ "dvec2", "vec2" }, { "dvec3", "vec3" }, { "dvec4", "vec4" },
+		{ "dmat2", "mat2" }, { "dmat3", "mat3" }, { "dmat4", "mat4" },
+		{ "dmat2x2", "mat2x2" }, { "dmat2x3", "mat2x3" }, { "dmat2x4", "mat2x4" },
+		{ "dmat3x2", "mat3x2" }, { "dmat3x3", "mat3x3" }, { "dmat3x4", "mat3x4" },
+		{ "dmat4x2", "mat4x2" }, { "dmat4x3", "mat4x3" }, { "dmat4x4", "mat4x4" },
+	};
+
+	std::string out;
+	out.reserve(s.size());
+	for (size_t pos = 0; pos < s.size(); )
+	{
+		char c = s[pos];
+		if (!(isalpha((unsigned char)c) || c == '_'))
+		{
+			out += c;
+			pos++;
+			continue;
+		}
+		size_t end = pos;
+		while (end < s.size() && (isalnum((unsigned char)s[end]) || s[end] == '_')) end++;
+		std::string token = s.substr(pos, end - pos);
+		char prev = pos > 0 ? s[pos - 1] : 0;
+		if ((token == "lf" || token == "LF") && (isdigit((unsigned char)prev) || prev == '.'))
+		{
+			// double literal suffix; the bare number is already a float
+		}
+		else
+		{
+			auto it = types.find(token);
+			out += it != types.end() ? it->second : token;
+		}
+		pos = end;
+	}
+	s = std::move(out);
+}
+
 // The renderer composes mobile sources with a GLES header; retarget it so glslang parses desktop GLSL.
 // precision statements are GLES only and SPIRV-Cross regenerates them, so drop them.
 static std::string RetargetToDesktop(const FString &src)
@@ -157,6 +200,7 @@ static std::string RetargetToDesktop(const FString &src)
 			out.append(s, pos, eol - pos + 1);
 		pos = eol + 1;
 	}
+	DemoteDoubles(out);
 	return out;
 }
 
