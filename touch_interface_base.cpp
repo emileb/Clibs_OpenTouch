@@ -631,7 +631,7 @@ void TouchInterfaceBase::customButton(int state, int code)
     PortableAction(state, code);
 
     // If we are binding keys hide the custom buttons again
-    if(state == 1)
+    if(state == 0) // 1 -> 0,  1/10/26 change
         showCustomMenu = false;
 }
 
@@ -1136,15 +1136,18 @@ void TouchInterfaceBase::keyboardKeyPressed(uint32_t key)
     }
 
     // Change upper case to lower case to get scan code
-    if(key >= 65 && key <= 90)
+    bool upperCase = (key >= 65 && key <= 90);
+    if(upperCase)
     {
         key = key + 32;
     }
 #ifdef USE_SDL3
     #define SDL_DEFAULT_KEYBOARD_ID    1
 
-    SDL_Scancode sc = SDL_GetScancodeFromKey(key, NULL);
-    bool needShift = false;
+    // SDL3's keymap has the shifted layer ('_' is Shift + minus); press Shift for engines that build text from keys (Far Cry).
+    SDL_Keymod keyMod = SDL_KMOD_NONE;
+    SDL_Scancode sc = SDL_GetScancodeFromKey(key, &keyMod);
+    bool needShift = upperCase || (keyMod & SDL_KMOD_SHIFT);
     if(sc == SDL_SCANCODE_UNKNOWN)
     {
         char base = shiftedSymbolToBaseKey((char) key);
