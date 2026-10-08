@@ -13,11 +13,15 @@ void LogWritter_Init(const char *filename)
 
 void LogWritter_Write(const char *msg)
 {
+    if (!file)
+        return;
     fprintf(file, "%s\n", msg);
     fflush(file);
 }
 
 void LogWritter_Close()
 {
-    fclose(file);
+    if (file)
+        fclose(file);
+    file = NULL;
 }
