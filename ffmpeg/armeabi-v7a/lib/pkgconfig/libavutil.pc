@@ -1,7 +1,7 @@
-prefix=/Users/emilebelanger/Android/AndroidStudioProjects/Sigma_Touch/SigmaTouch/sigmatouch/src/main/jni/Clibs_OpenTouch/ffmpeg/armeabi-v7a
+prefix=/Users/emilebelanger/Android/AndroidStudioProjects/Alpha_Touch/AlphaTouch/alphatouch/src/main/jni/Clibs_OpenTouch/ffmpeg/armeabi-v7a
 exec_prefix=${prefix}
-libdir=/Users/emilebelanger/Android/AndroidStudioProjects/Sigma_Touch/SigmaTouch/sigmatouch/src/main/jni/Clibs_OpenTouch/ffmpeg/armeabi-v7a/lib
-includedir=/Users/emilebelanger/Android/AndroidStudioProjects/Sigma_Touch/SigmaTouch/sigmatouch/src/main/jni/Clibs_OpenTouch/ffmpeg/armeabi-v7a/include
+libdir=/Users/emilebelanger/Android/AndroidStudioProjects/Alpha_Touch/AlphaTouch/alphatouch/src/main/jni/Clibs_OpenTouch/ffmpeg/armeabi-v7a/lib
+includedir=/Users/emilebelanger/Android/AndroidStudioProjects/Alpha_Touch/AlphaTouch/alphatouch/src/main/jni/Clibs_OpenTouch/ffmpeg/armeabi-v7a/include
 
 Name: libavutil
 Description: FFmpeg utility library
@@ -9,6 +9,6 @@ Version: 60.26.102
 Requires: 
 Requires.private: 
 Conflicts:
-Libs: -L${libdir}  -lavutil 
-Libs.private: -lm -latomic -landroid
+Libs: -L${libdir}  -lavutil -lm -latomic -landroid -pthread
+Libs.private: 
 Cflags: -I${includedir}

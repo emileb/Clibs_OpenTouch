@@ -1,8 +1,9 @@
-# Prebuilt FFmpeg static libs (per ABI) for q2repro cinematic playback (cin.c)
-# and ogg music (ogg.c). Built PIC (--enable-pic) so the .a link into the shared
-# libq2repro.so. Smaller than shipping the 5 .so. Inter-lib deps are declared so
-# ndk-build orders the link correctly; avutil exports libm/libz.
-# Minimal build: theora/vorbis/idcin/pcm decoders, ogg/idcin/wav demuxers.
+# Prebuilt FFmpeg static libs (per ABI) for q2repro cinematics + ogg music, AVP Bink
+# videos and RealRTCW WebM videos. Built PIC (--enable-pic) so the .a link into the
+# engine's shared lib. Inter-lib deps are declared so ndk-build orders the link
+# correctly; avutil exports libm/libz. Built by FFmpeg's build_android_q2.sh.
+# Minimal build: theora/vorbis/idcin/pcm/bink/vp8/vp9/opus decoders,
+# ogg/idcin/wav/bink/matroska(webm) demuxers. Threads and NEON enabled.
 
 LOCAL_PATH := $(call my-dir)
 
