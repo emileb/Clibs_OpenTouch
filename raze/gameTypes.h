@@ -9,3 +9,5 @@
 #define RAZE_GAME_AWOL    108
 #define RAZE_GAME_AMC    109
 #define RAZE_GAME_NBLOOD    110
+#define RAZE_GAME_REDNUKEM  111
+#define RAZE_GAME_DUKE64    112
