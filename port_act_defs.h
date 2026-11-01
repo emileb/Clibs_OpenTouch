@@ -232,6 +232,12 @@
 #define PORT_ACT_AVP_ZOOM_IN      237
 #define PORT_ACT_AVP_ZOOM_OUT     238
 
+//Jedi Knight: Dark Forces II (OpenJKDF2) force powers with no JK2/JK3 equivalent
+#define PORT_ACT_JK_FORCE_JUMP        240
+#define PORT_ACT_JK_FORCE_BLINDING    241
+#define PORT_ACT_JK_FORCE_DESTRUCTION 242
+#define PORT_ACT_JK_FORCE_DEADLYSIGHT 243
+
 
 #define PORT_ACT_MENU_UP                  0x200 //512
 #define PORT_ACT_MENU_DOWN                0x201 //513
