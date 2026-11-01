@@ -496,11 +496,9 @@ JAVA_FUNC(executeCommand)(JNIEnv *env, jobject obj, jstring command)
 int EXPORT_ME
 JAVA_FUNC(renderControls)(JNIEnv *env, jobject obj)
 {
-    // Wait for game thread to have rendered at least one frame
-    while(!game_finished_load)
-    {
-        usleep(1000);
-    }
+    // Skip until the game renders a frame; blocking here stalls the window's first draw and its dialogs stay hidden
+    if(!game_finished_load)
+        return 0;
 
     touchInterface.frameControls(false, true); // FRAMEBUFFER = false, TOUCH = true
     return 0;
